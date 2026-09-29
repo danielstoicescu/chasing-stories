@@ -4,7 +4,7 @@ type: primary
 components:
   - kind: Application
     name: web
-    gitRepo: 'REPLACE_WITH_REPO_URL'
+    gitRepo: 'https://github.com/danielstoicescu/chasing-stories.git'
     gitBranch: main
     gitApplicationPath: /
     dockerCompose:
