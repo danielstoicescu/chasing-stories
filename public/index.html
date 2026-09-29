@@ -418,6 +418,21 @@ body.hdr-hidden .filters{top:env(safe-area-inset-top,0px)}
 .plink figcaption{display:flex;justify-content:space-between;gap:16px;margin-top:10px}
 .plink .vp{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);padding-bottom:3px;background:linear-gradient(currentColor,currentColor) left bottom/0 1px no-repeat;transition:background-size .45s var(--ease)}
 .plink:hover .frame.in img{transform:scale(1.04)}
+/* hero loop: used as the WebGL texture; only shown directly when WebGL is missing */
+.hero-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none;transition:opacity .8s ease}
+.hero-vid.on{opacity:1}
+.hero.gl .hero-vid{opacity:0 !important}
+.fm .poster video{width:100%;height:100%;display:block;background:#000;object-fit:contain}
+/* square pointer */
+html.sq-cursor,html.sq-cursor *{cursor:none}
+html.sq-cursor input,html.sq-cursor textarea{cursor:text}
+.sq{position:fixed;left:0;top:0;z-index:99;width:0;height:0;pointer-events:none;opacity:0;transition:opacity .2s ease;mix-blend-mode:difference}
+.sq.on{opacity:1}
+.sq i{position:absolute;left:0;top:0;width:10px;height:10px;translate:-50% -50%;background:#fff;border:1.5px solid #fff;box-sizing:border-box;
+  transition:width .35s var(--ease),height .35s var(--ease),rotate .45s var(--ease),background-color .25s ease}
+.sq[data-s="click"] i{width:24px;height:24px;rotate:45deg;background:transparent}
+.sq[data-s="field"] i{width:var(--fs,26px);height:var(--fs,26px);background:transparent}
+.sq[data-s="text"] i{width:2px;height:20px}
 /* merged closing folds */
 .world-cta{display:grid;justify-items:center;gap:18px;margin-top:clamp(28px,4vw,48px);padding-top:clamp(28px,4vw,48px);border-top:1px solid rgba(255,255,255,.35);width:min(100%,560px)}
 .world-cta .lead{font-family:var(--display);font-style:italic;font-size:var(--t-lead)}
@@ -443,8 +458,10 @@ body.hdr-hidden .filters{top:env(safe-area-inset-top,0px)}
 /* palette squares: four to seven, three sizes; they step in, and pulse when the palette chip is hovered */
 .frame i.sw{position:absolute;aspect-ratio:1;z-index:2;transform:scale(0);transform-origin:center;transition:transform .5s cubic-bezier(.3,1.5,.5,1) var(--d);pointer-events:none}
 .frame.sw-on i.sw{transform:scale(1)}
-.frame.pal-on i.sw{animation:swPulse 1.6s ease-in-out infinite}
-@keyframes swPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0),inset 0 0 0 1px rgba(255,255,255,.35)}50%{box-shadow:0 0 0 3px rgba(255,255,255,.9),inset 0 0 0 1px rgba(255,255,255,.9)}}
+.frame i.sw::after{content:"";position:absolute;inset:-3px;pointer-events:none;opacity:0;
+  box-shadow:0 0 0 1px rgba(255,255,255,.38),0 0 14px 3px rgba(255,255,255,.22)}   /* thin translucent edge, glow fading outward */
+.frame.pal-on i.sw::after{animation:swPulse 1.9s ease-in-out infinite}
+@keyframes swPulse{0%,100%{opacity:0;transform:scale(.94)}45%{opacity:1;transform:scale(1.04)}}
 .frame .pal{position:absolute;right:10px;bottom:10px;z-index:3;display:flex;align-items:center;gap:3px;padding:6px;background:rgba(10,15,14,.28);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:auto;cursor:default;opacity:0;transform:translateY(6px);transition:opacity .5s ease .45s,transform .5s var(--ease) .45s,padding .45s var(--ease),gap .45s var(--ease),background .3s}
 .frame.sw-on .pal{opacity:1;transform:none}
 .frame .pal i{display:block;width:8px;height:8px;transition:width .45s var(--ease),height .45s var(--ease)}
@@ -644,7 +661,7 @@ a:hover > .roll > span + span{transform:none}
 
 <div class="lb fm" id="fm" hidden role="dialog" aria-modal="true" aria-label="Film">
   <div class="bar"><span class="meta" style="color:#C9D0CE" id="fmTitle"></span><button class="xbtn" id="fmClose">CLOSE ✕</button></div>
-  <div class="stage"><div class="poster"><img id="fmImg" alt=""><span class="play"></span><div class="note">Plays here in the site's own player, with sound. Streaming file to be encoded from the master.</div></div></div>
+  <div class="stage"><div class="poster"><video id="fmVid" controls playsinline crossorigin="anonymous" preload="metadata" hidden></video><img id="fmImg" alt=""><span class="play" id="fmPlay"></span><div class="note" id="fmNote">Plays here in the site's own player, with sound. Streaming file to be encoded from the master.</div></div></div>
   <div class="cap"></div>
 </div>
 
@@ -870,6 +887,45 @@ const HOME_WORK = ['palau','heritance','sixsenses','hoiana','bangkok','hideaway'
 const HOME_PHOTOS = [
   ['p-1','Hospitality'],['p-2','Interiors'],['p-3','Drone'],['p-4','Lifestyle'],['p-5','Hospitality'],['p-7','Interiors'],['p-8','Food & Beverage']];
 
+/* Films: poster asset key -> Google Drive id of the web-sized [SMALL] mp4 (Drive refuses cross-site playback, so these are the SOURCE files to re-encode and host).
+   The page plays them through videoURL(). Generated from the Drive listing; see tools/ for the mapping rules. */
+const VIDEOS = {
+ "f-01": "123uep-xby_bQH6I-xo3feeBktSrn5nzk",
+ "f-02": "13t2VYMjZCJDHa9XOwqFXrXwDG-nw60U0",
+ "f-03": "11UiZiol3CWLv4GEJWSUvYeZE4bMUSZnC",
+ "film-palau-1": "1nyJAPKRNu-L8QreWxRwodax1RLBaviou",
+ "film-palau-2": "1poUOnx-b7QpVAnx0X5sFmjvQdjF0wOvm",
+ "film-palau-3": "1Ye1fQ73d6NFlhYT6JE9Ci-Ir_sFMEqJF",
+ "film-bangkok-1": "1Jh57gJzQAJb5buwqOZXA1fGfxYt8vpIc",
+ "film-bangkok-2": "1iDREAQNi9z-osc_UiBbZRez_TNLiMSkD",
+ "film-heritance-1": "1rQlsmVWglM-ekSUGQrVqW5FcopCa0T-x",
+ "film-heritance-2": "1n98OFofjKSYXT7lbVyft7fS0n5lvZZOv",
+ "film-heritance-3": "1QaRQUZ6bjPyU2DiMSja3mSv9i-Ki8Idb",
+ "film-hideaway-1": "16bdZyPQQQ4GRyH5eImviTnjxhsx-iFIW",
+ "film-intercontinental-1": "17jfO47x_G-IEmIHHcFocTgSeczASagjL",
+ "film-intercontinental-2": "1zMbCMWyiOwVqEKYnKVyCZNQWxkJmydsg",
+ "film-intercontinental-3": "1Baz_2Qe-n16FJ3LuXogpN-FFogjsceDS",
+ "film-westin-1": "1oGC9g0iQX-id_RpiAowx0iUPk9ia-RYA",
+ "film-westin-2": "11YxGuGSc3F3Ac_OCg9F3x_SsDNzLWEBG",
+ "film-westin-3": "1peGqPxFqJRNHaxqtFYYQ__SbeZNWdgYp",
+ "film-italy-1": "145jDsEmmPwS9iq0-2ErTQZXszV3cYqW5",
+ "film-italy-4": "1fFlwBFeD8pH7PBlkMdUxDgLGTxIMmtoZ",
+ "film-mazda-1": "1Ftg8lphXzVQnJQyjQq4m0dvTfwrbqfeM",
+ "film-garmin-2": "1ZNE7Tglvg8CDX8ZLMeEGMMbqjEoV6cX_",
+ "film-dior-1": "1D7o2wB2f_dvOcjPR_lNxtGFmLtnkEd6S",
+ "pl-hoiana": "1qUUDIYmsEUKxZq1Ob6wNJ-zxUuB-JolE",
+ "pl-hoiana-2": "16Kq0_4T2C3Z-wBiOZwG-syvvFx-WKVAs",
+ "pl-millennium": "12r0oh5uiRXg0KEmrSlJMDXU894T8P260",
+ "pl-millennium-2": "1VWQ8wNgE3BNNclINNp2MImQ7w_YJf40Y",
+ "pl-sixsenses": "1IXvxJ6VJErHds4wJYeUae_ZqLBfOiiTq",
+ "pl-sixsenses-2": "1QvCBoT7H512bXoTitIXzccv8MXFU8xHI",
+ "hero": "13P3Bn-ti-XY5RMdTh9mI4I1y0wEbnQCe",
+ "hero-m": "13P3Bn-ti-XY5RMdTh9mI4I1y0wEbnQCe"
+};
+// Where the web versions live. Empty until hosting is decided: the player then shows the poster.
+const VIDEO_BASE = '';
+const videoURL = k => (VIDEO_BASE && VIDEOS[k]) ? `${VIDEO_BASE}/${k}.mp4` : '';
+
 </script>
 <script>
 (()=>{
@@ -1041,7 +1097,7 @@ function pixelField(host,img,o){
   const scene=new THREE.Scene(),cam=new THREE.Camera(),geo=new THREE.PlaneGeometry(2,2);scene.add(new THREE.Mesh(geo,mat));
   let base=40,introOn=false,alive=true,raf=0,it=0;
   const size=()=>{const r=host.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);renderer.setPixelRatio(dpr);renderer.setSize(r.width,r.height,false);
-    U.uRes.value.set(r.width,r.height);U.uDpr.value=dpr;base=r.width/(innerWidth<760?o.colsM||12:o.cols);if(!introOn)U.uCell.value=base};
+    U.uRes.value.set(r.width,r.height);U.uDpr.value=dpr;base=r.width/(innerWidth<760?o.colsM||12:o.cols);host.dataset.cell=base.toFixed(1);if(!introOn)U.uCell.value=base};
   size();addEventListener('resize',size);host.classList.add('gl');
   if(introOn){U.uForce.value=1;const mul=[12,6,3,1.5];let i=0;U.uCell.value=base*mul[0];
     it=setInterval(()=>{i++;if(i<mul.length)U.uCell.value=base*mul[i];else{clearInterval(it);U.uForce.value=0;U.uCell.value=base;introOn=false}},200)}
@@ -1056,8 +1112,11 @@ function pixelField(host,img,o){
     U.uStep.value=RM?0:Math.floor((now-t0)/850);trail.forEach(v=>{v.z=Math.max(0,v.z-dt*.55)});
     const r=host.getBoundingClientRect();U.uScroll.value=Math.round(-r.top/Math.max(1,base))*.21;renderer.render(scene,cam)};
   raf=requestAnimationFrame(loop);
-  return ()=>{alive=false;cancelAnimationFrame(raf);clearInterval(it);io.disconnect();removeEventListener('resize',size);host.removeEventListener('pointermove',pm);host.removeEventListener('pointerdown',pd);
-    geo.dispose();mat.dispose();tex.dispose();renderer.dispose();renderer.forceContextLoss&&renderer.forceContextLoss();cv.remove()};
+  const destroy=()=>{alive=false;cancelAnimationFrame(raf);clearInterval(it);io.disconnect();removeEventListener('resize',size);host.removeEventListener('pointermove',pm);host.removeEventListener('pointerdown',pd);
+    geo.dispose();mat.dispose();U.uTex.value.dispose();renderer.dispose();renderer.forceContextLoss&&renderer.forceContextLoss();cv.remove()};
+  destroy.useVideo=v=>{const vt=new THREE.VideoTexture(v);vt.minFilter=THREE.LinearFilter;vt.generateMipmaps=false;
+    const old=U.uTex.value;U.uTex.value=vt;U.uImg.value.set(v.videoWidth,v.videoHeight);old.dispose()};
+  return destroy;
 }
 
 /* ============================================================
@@ -1381,7 +1440,8 @@ function hydrate(first){
     world:{cols:28,colsM:12,density:0,box:[0,0,0,0],dark:.5,edge:0},
     nf:{cols:24,colsM:10,density:0,box:[0,0,0,0],dark:.45}};
   $$('[data-field]',app).forEach(host=>{const o=FIELDS[host.dataset.field];const img=host.querySelector('picture img, img');
-    const start=()=>loaded(img).then(im=>{if(!im||!host.isConnected)return;const d=pixelField(host,im,o);if(d)cleanups.push(d)});
+    const start=()=>loaded(img).then(im=>{if(!im||!host.isConnected)return;const d=pixelField(host,im,o);if(d)cleanups.push(d);
+      if(host.dataset.field==='hero')heroLoop(host,d)});
     const ob=new IntersectionObserver(es=>{if(es[0].isIntersecting){ob.disconnect();start()}},{rootMargin:'300px'});ob.observe(host);cleanups.push(()=>ob.disconnect())});
 
   // services list: marker takes a colour from its photograph; image trails the cursor, softly
@@ -1406,6 +1466,18 @@ function hydrate(first){
 
   const form=$('#enq',app);if(form)wireForm(form);
   const co=$('#cookieOpen',app);if(co)co.onclick=()=>{ck.hidden=false;$('#ckAccept').focus()};
+}
+
+/* hero loop: the [SMALL] master from Drive, muted and looping; drives the WebGL field when there is one */
+function heroLoop(host,field){
+  if(RM)return;const portrait=innerWidth<760&&innerHeight>innerWidth;const url=videoURL(portrait?'hero-m':'hero');if(!url)return;
+  const v=document.createElement('video');Object.assign(v,{muted:true,loop:true,playsInline:true,autoplay:true,preload:'auto'});
+  v.setAttribute('muted','');v.setAttribute('playsinline','');v.crossOrigin='anonymous';v.className='hero-vid';v.src=url;
+  host.querySelector('picture').appendChild(v);
+  v.addEventListener('playing',()=>{if(!host.isConnected)return;if(field&&field.useVideo){try{field.useVideo(v)}catch(e){v.classList.add('on')}}else v.classList.add('on')},{once:true});
+  v.addEventListener('error',()=>v.remove(),{once:true});
+  v.play().catch(()=>{});
+  cleanups.push(()=>{v.pause();v.removeAttribute('src');v.load();v.remove()});
 }
 
 /* words wrapped once, so each can rise out of a blur on its own delay */
@@ -1478,9 +1550,11 @@ $('#lbStage').addEventListener('pointerup',e=>{if(sx==null)return;const d=e.clie
 
 /* ---------- film player shell ---------- */
 const fm=$('#fm');
-function openFilm(i,from){const f=filmList[i];if(!f)return;$('#fmImg').src=I(f.k);$('#fmTitle').textContent=[f.title,f.meta||f.client].filter(Boolean).join(' · ');
+function openFilm(i,from){const f=filmList[i];if(!f)return;$('#fmImg').src=I(f.k);
+  const v=$('#fmVid'),url=videoURL(f.k),has=!!url;v.hidden=!has;$('#fmImg').hidden=has;$('#fmPlay').hidden=has;$('#fmNote').hidden=has;
+  if(has){v.poster=I(f.k);v.src=url;v.onerror=()=>{v.hidden=true;$('#fmImg').hidden=false;$('#fmPlay').hidden=false;$('#fmNote').hidden=false};v.play().catch(()=>{})}$('#fmTitle').textContent=[f.title,f.meta||f.client].filter(Boolean).join(' · ');
   lastFocus=from;fm.hidden=false;lockScroll(true);requestAnimationFrame(()=>fm.classList.add('open'));$('#fmClose').focus()}
-function closeFM(){fm.classList.remove('open');setTimeout(()=>{fm.hidden=true},RM?0:320);lockScroll(false);lastFocus&&lastFocus.focus()}
+function closeFM(){const v=$('#fmVid');v.pause();v.removeAttribute('src');v.load();fm.classList.remove('open');setTimeout(()=>{fm.hidden=true},RM?0:320);lockScroll(false);lastFocus&&lastFocus.focus()}
 $('#fmClose').onclick=closeFM;
 
 addEventListener('keydown',e=>{
@@ -1509,6 +1583,27 @@ function getC(){try{const v=JSON.parse(localStorage.getItem(KEY));return v&&v.t>
 function setC(a){try{localStorage.setItem(KEY,JSON.stringify({a,t:Date.now()}))}catch(e){}ck.hidden=true}
 if(!getC())setTimeout(()=>{ck.hidden=false},RM?0:2600);
 $('#ckAccept').onclick=()=>setC(true);$('#ckDecline').onclick=()=>setC(false);$('#cookieSettings').onclick=()=>{ck.hidden=false;$('#ckAccept').focus()};
+
+/* ---------- square pointer ----------
+   A small square; over anything clickable it turns 45 degrees and grows; over a pixel field it takes
+   half the side of the cells the cursor paints. Position is written straight through (no easing) so it never lags. */
+if(matchMedia('(pointer:fine)').matches&&!RM){
+  document.documentElement.classList.add('sq-cursor');
+  const sq=document.createElement('div');sq.className='sq';sq.innerHTML='<i></i>';document.body.appendChild(sq);
+  const CLICK='a,button,[role="button"],label,select,summary,.chip,.pal';
+  let x=-99,y=-99,pend=false,state='';
+  const paint=()=>{pend=false;sq.style.transform=`translate3d(${x}px,${y}px,0)`};
+  addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;x=e.clientX;y=e.clientY;
+    const t=e.target;let st='',size='';
+    if(t.closest&&t.closest('input,textarea'))st='text';
+    else if(t.closest&&t.closest(CLICK))st='click';
+    else{const f=t.closest&&t.closest('[data-field].gl');if(f&&f.dataset.cell){st='field';size=(f.dataset.cell/2).toFixed(1)+'px'}}
+    if(st!==state){sq.dataset.s=st;state=st}
+    sq.style.setProperty('--fs',size||'');sq.classList.add('on');
+    if(!pend){pend=true;requestAnimationFrame(paint)}},{passive:true});
+  document.addEventListener('pointerleave',()=>sq.classList.remove('on'));
+  addEventListener('blur',()=>sq.classList.remove('on'));
+}
 
 go(true);
 })();

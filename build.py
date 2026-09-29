@@ -11,7 +11,7 @@ dev = '--dev' in sys.argv
 web = '--web' in sys.argv   # real server: images stay separate files next to index.html
 src = lambda f: open(os.path.join(ROOT, 'src', f), encoding='utf-8').read()
 
-shell, css, data, app = src('shell.html'), src('styles.css'), src('data.js'), src('app.js')
+shell, css, data, app = src('shell.html'), src('styles.css'), src('data.js') + '\n' + src('videos.js'), src('app.js')
 manifest = json.load(open(os.path.join(ROOT, 'assets', 'manifest.json')))
 
 # only ship the images the code actually references

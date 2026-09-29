@@ -413,6 +413,21 @@ body.hdr-hidden .filters{top:env(safe-area-inset-top,0px)}
 .plink figcaption{display:flex;justify-content:space-between;gap:16px;margin-top:10px}
 .plink .vp{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);padding-bottom:3px;background:linear-gradient(currentColor,currentColor) left bottom/0 1px no-repeat;transition:background-size .45s var(--ease)}
 .plink:hover .frame.in img{transform:scale(1.04)}
+/* hero loop: used as the WebGL texture; only shown directly when WebGL is missing */
+.hero-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none;transition:opacity .8s ease}
+.hero-vid.on{opacity:1}
+.hero.gl .hero-vid{opacity:0 !important}
+.fm .poster video{width:100%;height:100%;display:block;background:#000;object-fit:contain}
+/* square pointer */
+html.sq-cursor,html.sq-cursor *{cursor:none}
+html.sq-cursor input,html.sq-cursor textarea{cursor:text}
+.sq{position:fixed;left:0;top:0;z-index:99;width:0;height:0;pointer-events:none;opacity:0;transition:opacity .2s ease;mix-blend-mode:difference}
+.sq.on{opacity:1}
+.sq i{position:absolute;left:0;top:0;width:10px;height:10px;translate:-50% -50%;background:#fff;border:1.5px solid #fff;box-sizing:border-box;
+  transition:width .35s var(--ease),height .35s var(--ease),rotate .45s var(--ease),background-color .25s ease}
+.sq[data-s="click"] i{width:24px;height:24px;rotate:45deg;background:transparent}
+.sq[data-s="field"] i{width:var(--fs,26px);height:var(--fs,26px);background:transparent}
+.sq[data-s="text"] i{width:2px;height:20px}
 /* merged closing folds */
 .world-cta{display:grid;justify-items:center;gap:18px;margin-top:clamp(28px,4vw,48px);padding-top:clamp(28px,4vw,48px);border-top:1px solid rgba(255,255,255,.35);width:min(100%,560px)}
 .world-cta .lead{font-family:var(--display);font-style:italic;font-size:var(--t-lead)}
@@ -438,8 +453,10 @@ body.hdr-hidden .filters{top:env(safe-area-inset-top,0px)}
 /* palette squares: four to seven, three sizes; they step in, and pulse when the palette chip is hovered */
 .frame i.sw{position:absolute;aspect-ratio:1;z-index:2;transform:scale(0);transform-origin:center;transition:transform .5s cubic-bezier(.3,1.5,.5,1) var(--d);pointer-events:none}
 .frame.sw-on i.sw{transform:scale(1)}
-.frame.pal-on i.sw{animation:swPulse 1.6s ease-in-out infinite}
-@keyframes swPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0),inset 0 0 0 1px rgba(255,255,255,.35)}50%{box-shadow:0 0 0 3px rgba(255,255,255,.9),inset 0 0 0 1px rgba(255,255,255,.9)}}
+.frame i.sw::after{content:"";position:absolute;inset:-3px;pointer-events:none;opacity:0;
+  box-shadow:0 0 0 1px rgba(255,255,255,.38),0 0 14px 3px rgba(255,255,255,.22)}   /* thin translucent edge, glow fading outward */
+.frame.pal-on i.sw::after{animation:swPulse 1.9s ease-in-out infinite}
+@keyframes swPulse{0%,100%{opacity:0;transform:scale(.94)}45%{opacity:1;transform:scale(1.04)}}
 .frame .pal{position:absolute;right:10px;bottom:10px;z-index:3;display:flex;align-items:center;gap:3px;padding:6px;background:rgba(10,15,14,.28);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:auto;cursor:default;opacity:0;transform:translateY(6px);transition:opacity .5s ease .45s,transform .5s var(--ease) .45s,padding .45s var(--ease),gap .45s var(--ease),background .3s}
 .frame.sw-on .pal{opacity:1;transform:none}
 .frame .pal i{display:block;width:8px;height:8px;transition:width .45s var(--ease),height .45s var(--ease)}

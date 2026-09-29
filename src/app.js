@@ -167,7 +167,7 @@ function pixelField(host,img,o){
   const scene=new THREE.Scene(),cam=new THREE.Camera(),geo=new THREE.PlaneGeometry(2,2);scene.add(new THREE.Mesh(geo,mat));
   let base=40,introOn=false,alive=true,raf=0,it=0;
   const size=()=>{const r=host.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);renderer.setPixelRatio(dpr);renderer.setSize(r.width,r.height,false);
-    U.uRes.value.set(r.width,r.height);U.uDpr.value=dpr;base=r.width/(innerWidth<760?o.colsM||12:o.cols);if(!introOn)U.uCell.value=base};
+    U.uRes.value.set(r.width,r.height);U.uDpr.value=dpr;base=r.width/(innerWidth<760?o.colsM||12:o.cols);host.dataset.cell=base.toFixed(1);if(!introOn)U.uCell.value=base};
   size();addEventListener('resize',size);host.classList.add('gl');
   if(introOn){U.uForce.value=1;const mul=[12,6,3,1.5];let i=0;U.uCell.value=base*mul[0];
     it=setInterval(()=>{i++;if(i<mul.length)U.uCell.value=base*mul[i];else{clearInterval(it);U.uForce.value=0;U.uCell.value=base;introOn=false}},200)}
@@ -182,8 +182,11 @@ function pixelField(host,img,o){
     U.uStep.value=RM?0:Math.floor((now-t0)/850);trail.forEach(v=>{v.z=Math.max(0,v.z-dt*.55)});
     const r=host.getBoundingClientRect();U.uScroll.value=Math.round(-r.top/Math.max(1,base))*.21;renderer.render(scene,cam)};
   raf=requestAnimationFrame(loop);
-  return ()=>{alive=false;cancelAnimationFrame(raf);clearInterval(it);io.disconnect();removeEventListener('resize',size);host.removeEventListener('pointermove',pm);host.removeEventListener('pointerdown',pd);
-    geo.dispose();mat.dispose();tex.dispose();renderer.dispose();renderer.forceContextLoss&&renderer.forceContextLoss();cv.remove()};
+  const destroy=()=>{alive=false;cancelAnimationFrame(raf);clearInterval(it);io.disconnect();removeEventListener('resize',size);host.removeEventListener('pointermove',pm);host.removeEventListener('pointerdown',pd);
+    geo.dispose();mat.dispose();U.uTex.value.dispose();renderer.dispose();renderer.forceContextLoss&&renderer.forceContextLoss();cv.remove()};
+  destroy.useVideo=v=>{const vt=new THREE.VideoTexture(v);vt.minFilter=THREE.LinearFilter;vt.generateMipmaps=false;
+    const old=U.uTex.value;U.uTex.value=vt;U.uImg.value.set(v.videoWidth,v.videoHeight);old.dispose()};
+  return destroy;
 }
 
 /* ============================================================
@@ -507,7 +510,8 @@ function hydrate(first){
     world:{cols:28,colsM:12,density:0,box:[0,0,0,0],dark:.5,edge:0},
     nf:{cols:24,colsM:10,density:0,box:[0,0,0,0],dark:.45}};
   $$('[data-field]',app).forEach(host=>{const o=FIELDS[host.dataset.field];const img=host.querySelector('picture img, img');
-    const start=()=>loaded(img).then(im=>{if(!im||!host.isConnected)return;const d=pixelField(host,im,o);if(d)cleanups.push(d)});
+    const start=()=>loaded(img).then(im=>{if(!im||!host.isConnected)return;const d=pixelField(host,im,o);if(d)cleanups.push(d);
+      if(host.dataset.field==='hero')heroLoop(host,d)});
     const ob=new IntersectionObserver(es=>{if(es[0].isIntersecting){ob.disconnect();start()}},{rootMargin:'300px'});ob.observe(host);cleanups.push(()=>ob.disconnect())});
 
   // services list: marker takes a colour from its photograph; image trails the cursor, softly
@@ -532,6 +536,18 @@ function hydrate(first){
 
   const form=$('#enq',app);if(form)wireForm(form);
   const co=$('#cookieOpen',app);if(co)co.onclick=()=>{ck.hidden=false;$('#ckAccept').focus()};
+}
+
+/* hero loop: the [SMALL] master from Drive, muted and looping; drives the WebGL field when there is one */
+function heroLoop(host,field){
+  if(RM)return;const portrait=innerWidth<760&&innerHeight>innerWidth;const url=videoURL(portrait?'hero-m':'hero');if(!url)return;
+  const v=document.createElement('video');Object.assign(v,{muted:true,loop:true,playsInline:true,autoplay:true,preload:'auto'});
+  v.setAttribute('muted','');v.setAttribute('playsinline','');v.crossOrigin='anonymous';v.className='hero-vid';v.src=url;
+  host.querySelector('picture').appendChild(v);
+  v.addEventListener('playing',()=>{if(!host.isConnected)return;if(field&&field.useVideo){try{field.useVideo(v)}catch(e){v.classList.add('on')}}else v.classList.add('on')},{once:true});
+  v.addEventListener('error',()=>v.remove(),{once:true});
+  v.play().catch(()=>{});
+  cleanups.push(()=>{v.pause();v.removeAttribute('src');v.load();v.remove()});
 }
 
 /* words wrapped once, so each can rise out of a blur on its own delay */
@@ -604,9 +620,11 @@ $('#lbStage').addEventListener('pointerup',e=>{if(sx==null)return;const d=e.clie
 
 /* ---------- film player shell ---------- */
 const fm=$('#fm');
-function openFilm(i,from){const f=filmList[i];if(!f)return;$('#fmImg').src=I(f.k);$('#fmTitle').textContent=[f.title,f.meta||f.client].filter(Boolean).join(' · ');
+function openFilm(i,from){const f=filmList[i];if(!f)return;$('#fmImg').src=I(f.k);
+  const v=$('#fmVid'),url=videoURL(f.k),has=!!url;v.hidden=!has;$('#fmImg').hidden=has;$('#fmPlay').hidden=has;$('#fmNote').hidden=has;
+  if(has){v.poster=I(f.k);v.src=url;v.onerror=()=>{v.hidden=true;$('#fmImg').hidden=false;$('#fmPlay').hidden=false;$('#fmNote').hidden=false};v.play().catch(()=>{})}$('#fmTitle').textContent=[f.title,f.meta||f.client].filter(Boolean).join(' · ');
   lastFocus=from;fm.hidden=false;lockScroll(true);requestAnimationFrame(()=>fm.classList.add('open'));$('#fmClose').focus()}
-function closeFM(){fm.classList.remove('open');setTimeout(()=>{fm.hidden=true},RM?0:320);lockScroll(false);lastFocus&&lastFocus.focus()}
+function closeFM(){const v=$('#fmVid');v.pause();v.removeAttribute('src');v.load();fm.classList.remove('open');setTimeout(()=>{fm.hidden=true},RM?0:320);lockScroll(false);lastFocus&&lastFocus.focus()}
 $('#fmClose').onclick=closeFM;
 
 addEventListener('keydown',e=>{
@@ -635,6 +653,27 @@ function getC(){try{const v=JSON.parse(localStorage.getItem(KEY));return v&&v.t>
 function setC(a){try{localStorage.setItem(KEY,JSON.stringify({a,t:Date.now()}))}catch(e){}ck.hidden=true}
 if(!getC())setTimeout(()=>{ck.hidden=false},RM?0:2600);
 $('#ckAccept').onclick=()=>setC(true);$('#ckDecline').onclick=()=>setC(false);$('#cookieSettings').onclick=()=>{ck.hidden=false;$('#ckAccept').focus()};
+
+/* ---------- square pointer ----------
+   A small square; over anything clickable it turns 45 degrees and grows; over a pixel field it takes
+   half the side of the cells the cursor paints. Position is written straight through (no easing) so it never lags. */
+if(matchMedia('(pointer:fine)').matches&&!RM){
+  document.documentElement.classList.add('sq-cursor');
+  const sq=document.createElement('div');sq.className='sq';sq.innerHTML='<i></i>';document.body.appendChild(sq);
+  const CLICK='a,button,[role="button"],label,select,summary,.chip,.pal';
+  let x=-99,y=-99,pend=false,state='';
+  const paint=()=>{pend=false;sq.style.transform=`translate3d(${x}px,${y}px,0)`};
+  addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;x=e.clientX;y=e.clientY;
+    const t=e.target;let st='',size='';
+    if(t.closest&&t.closest('input,textarea'))st='text';
+    else if(t.closest&&t.closest(CLICK))st='click';
+    else{const f=t.closest&&t.closest('[data-field].gl');if(f&&f.dataset.cell){st='field';size=(f.dataset.cell/2).toFixed(1)+'px'}}
+    if(st!==state){sq.dataset.s=st;state=st}
+    sq.style.setProperty('--fs',size||'');sq.classList.add('on');
+    if(!pend){pend=true;requestAnimationFrame(paint)}},{passive:true});
+  document.addEventListener('pointerleave',()=>sq.classList.remove('on'));
+  addEventListener('blur',()=>sq.classList.remove('on'));
+}
 
 go(true);
 })();
