@@ -1,0 +1,582 @@
+(()=>{
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (s,r=document)=>r.querySelector(s), $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const esc = s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const I = k=>ASSETS[k]||'';
+const DIM = k=>(MANIFEST[k]||[4,5]);
+const LOGO = f=>ASSETS['logo/'+f]||'';
+const byslug = s=>PROJECTS.find(p=>p.slug===s);
+const nf = n=>String(n).padStart(2,'0');
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ============================================================
+   PIXEL SYSTEM
+   One shape (the square), colour always sampled from the image.
+   ============================================================ */
+function loaded(img){return img.complete&&img.naturalWidth?Promise.resolve(img):new Promise(r=>{img.addEventListener('load',()=>r(img),{once:true});img.addEventListener('error',()=>r(null),{once:true})})}
+function coverRect(iw,ih,cw,ch,pos=[.5,.5]){const s=Math.max(cw/iw,ch/ih),w=iw*s,h=ih*s;return[(cw-w)*pos[0],(ch-h)*pos[1],w,h]}
+const hex=(r,g,b)=>'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+function palette(img,n=6){
+  const c=document.createElement('canvas');c.width=12;c.height=12;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,12,12);
+  let d;try{d=x.getImageData(0,0,12,12).data}catch(e){return[]}
+  const cells=[];for(let i=0;i<d.length;i+=4)cells.push([d[i],d[i+1],d[i+2]]);
+  cells.sort((a,b)=>(a[0]*.3+a[1]*.59+a[2]*.11)-(b[0]*.3+b[1]*.59+b[2]*.11));
+  return Array.from({length:n},(_,k)=>hex(...cells[Math.round((k+.5)*cells.length/n-.5)]));
+}
+function hash(x,y){const t=Math.sin(x*127.1+y*311.7)*43758.5453;return t-Math.floor(t)}
+function vnoise(x,y){const i=Math.floor(x),j=Math.floor(y),f=x-i,g=y-j,u=f*f*(3-2*f),v=g*g*(3-2*g);
+  return (hash(i,j)*(1-u)+hash(i+1,j)*u)*(1-v)+(hash(i,j+1)*(1-u)+hash(i+1,j+1)*u)*v}
+
+/* Palette squares: at most six, one per distinct colour, each placed where its colour lives in the photograph.
+   Three sizes only: a quarter cell, one cell, four cells (half, one, two cell widths). */
+function distRGB(a,b){const dr=a[0]-b[0],dg=a[1]-b[1],db=a[2]-b[2];return Math.sqrt(dr*dr*.3+dg*dg*.59+db*db*.11)}
+function spots(frame,img){
+  if(frame.dataset.done)return;frame.dataset.done=1;
+  const r=frame.getBoundingClientRect();if(r.width<2)return;
+  const W=r.width,H=r.height,land=W>H*1.1,cols=land?14:9,cell=W/cols,rows=Math.max(1,Math.floor(H/cell));
+  const g=2,c=document.createElement('canvas');c.width=cols*g;c.height=rows*g;
+  const x=c.getContext('2d',{willReadFrequently:true});const [dx,dy,dw,dh]=coverRect(img.naturalWidth,img.naturalHeight,cols*g,rows*g);x.drawImage(img,dx,dy,dw,dh);
+  let d;try{d=x.getImageData(0,0,cols*g,rows*g).data}catch(e){return}
+  const cand=[];
+  for(let yy=0;yy<rows*g;yy++)for(let xx=0;xx<cols*g;xx++){const k=(yy*cols*g+xx)*4,rgb=[d[k],d[k+1],d[k+2]];
+    const mx=Math.max(...rgb),mn=Math.min(...rgb),l=rgb[0]*.3+rgb[1]*.59+rgb[2]*.11;cand.push({x:xx/g,y:yy/g,rgb,score:(mx?(mx-mn)/mx:0)*.7+Math.abs(l-128)/255*.3})}
+  cand.sort((a,b)=>b.score-a.score);
+  const chosen=[cand[0]];
+  while(chosen.length<6){let best=null,bd=-1;
+    for(const p of cand){const cd=Math.min(...chosen.map(q=>distRGB(p.rgb,q.rgb)));const sd=Math.min(...chosen.map(q=>Math.hypot(p.x-q.x,p.y-q.y)));
+      if(sd<1.6)continue;const v=cd+sd*2;if(cd>26&&v>bd){bd=v;best=p}}
+    if(!best)break;chosen.push(best)}
+  const sizes=[1,.5,2,1,.5,1];
+  chosen.forEach((p,i)=>{const s=sizes[i];let cx=Math.round(p.x/.5)*.5,cy=Math.round(p.y/.5)*.5;
+    cx=Math.min(Math.max(0,cx),cols-s);cy=Math.min(Math.max(0,cy),rows-s);
+    const e=document.createElement('i');e.className='sw';e.dataset.hex=hex(...p.rgb).toUpperCase();
+    e.style.cssText=`left:${cx/cols*100}%;top:${cy*cell/H*100}%;width:${s/cols*100}%;background:${hex(...p.rgb)};--d:${i*70}ms;--mx:${(i%2?1:-1)*s*.5}; --my:${(i%3-1)*s*.5}`;
+    frame.appendChild(e)});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>frame.classList.add('sw-on')));
+}
+
+/* WebGL pixel field for full-bleed media (hero, CTA, project hero, 404).
+   Takes an image today; a VideoTexture drops into the same shader later. */
+const FRAG=`
+precision highp float;
+uniform sampler2D uTex; uniform vec2 uRes; uniform vec2 uImg; uniform vec2 uFocus; uniform float uDpr;
+uniform float uCell; uniform float uStep; uniform float uDensity; uniform vec4 uBox; uniform float uForce;
+uniform float uDark; uniform float uEdge; uniform float uScroll; uniform vec3 uTrail[10];
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+vec3 tex(vec2 px){float s=max(uRes.x/uImg.x,uRes.y/uImg.y);vec2 sz=uImg*s;vec2 u=(px-(uRes-sz)*uFocus)/sz;return texture2D(uTex,vec2(u.x,1.-u.y)).rgb;}
+void main(){
+  vec2 px=vec2(gl_FragCoord.x,uRes.y*uDpr-gl_FragCoord.y)/uDpr;
+  vec2 id=floor(px/uCell);vec2 c0=id*uCell;vec2 cc=c0+uCell*.5;
+  vec3 photo=tex(px);
+  vec3 avg=vec3(0.);for(int i=0;i<3;i++)for(int j=0;j<3;j++)avg+=tex(c0+uCell*(vec2(float(i),float(j))+.5)/3.);avg/=9.;
+  vec2 cu=cc/uRes;
+  float inBox=step(uBox.x,cu.x)*step(cu.x,uBox.z)*step(uBox.y,cu.y)*step(cu.y,uBox.w);
+  float dens=mix(uDensity,uDensity*.3,inBox);
+  dens*=mix(.35,1.,step(64./uRes.y,cu.y));
+  float f=n(id*.21+vec2(uStep*.11,uScroll-uStep*.05))*.72+h(id)*.28;
+  float on=0.*step(1.-dens*1.25,f);
+  for(int k=0;k<10;k++){vec3 t=uTrail[k];if(t.z>0.){float d=length(cc-t.xy)/uCell;on=max(on,step(d,2.7*t.z)*step(.28+.5*(1.-t.z),h(id*1.37+float(k))));}}
+  on=max(on,uForce);
+  vec2 m=mod(px,uCell);
+  float edge=1.-step(1.,m.x)*step(1.,m.y)*step(m.x,uCell-1.)*step(m.y,uCell-1.);
+  float ghost=0.*edge;
+  vec2 pu=px/uRes;                                   // per pixel, so the shading is a smooth gradient, never a grid
+  float d=distance(pu,vec2(.5,.52));
+  photo*=1.-uDark*(1.-smoothstep(.05,.62,d));
+  photo*=1.-uEdge*(.32*(1.-smoothstep(0.,.2,pu.y))+.28*smoothstep(.8,1.,pu.y));
+  float r=h(id+13.1);
+  if(r<.45){vec2 q=vec2(h(id+2.7),h(id+5.9))*uRes;vec2 qc=floor(q/uCell)*uCell;vec3 a2=vec3(0.);
+    for(int i=0;i<2;i++)for(int j=0;j<2;j++)a2+=tex(qc+uCell*(vec2(float(i),float(j))+.5)/2.);avg=a2/4.;}
+  float l=dot(avg,vec3(.299,.587,.114));
+  avg=clamp(mix(vec3(l),avg,1.45),0.,1.);
+  avg*=mix(.82,1.12,h(id+21.4));
+  avg*=mix(1.,.8,inBox);
+  ghost*=step(80./uRes.y,cu.y);
+  vec3 col=mix(photo,avg,on);
+  col=mix(col,vec3(1.),ghost*.8);
+  gl_FragColor=vec4(col,1.);
+}`;
+function pixelField(host,img,o){
+  if(!window.THREE)return null;
+  const probe=document.createElement('canvas');probe.width=probe.height=1;const px=probe.getContext('2d');px.drawImage(img,0,0,1,1);
+  try{px.getImageData(0,0,1,1)}catch(e){return null}
+  let renderer;try{renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'})}catch(e){return null}
+  if(!renderer.getContext())return null;
+  const cv=renderer.domElement;cv.className='glc';cv.setAttribute('aria-hidden','true');
+  host.insertBefore(cv,host.querySelector('.scrim')||host.querySelector('.copy'));
+  const src=document.createElement('canvas');const sc=Math.min(1,2048/Math.max(img.naturalWidth,img.naturalHeight));
+  src.width=Math.round(img.naturalWidth*sc);src.height=Math.round(img.naturalHeight*sc);const sx=src.getContext('2d');sx.drawImage(img,0,0,src.width,src.height);
+  try{sx.getImageData(0,0,1,1)}catch(e){return null}
+  const tex=new THREE.CanvasTexture(src);tex.minFilter=THREE.LinearFilter;tex.generateMipmaps=false;
+  const trail=Array.from({length:10},()=>new THREE.Vector3());
+  const U={uTex:{value:tex},uRes:{value:new THREE.Vector2()},uImg:{value:new THREE.Vector2(src.width,src.height)},uFocus:{value:new THREE.Vector2(...(o.focus||[.5,.5]))},
+    uDpr:{value:1},uCell:{value:40},uStep:{value:0},uDensity:{value:o.density},uBox:{value:new THREE.Vector4(...o.box)},uForce:{value:0},
+    uDark:{value:o.dark??.3},uEdge:{value:o.edge??1},uScroll:{value:0},uTrail:{value:trail}};
+  const mat=new THREE.ShaderMaterial({uniforms:U,vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:FRAG,depthTest:false});
+  const scene=new THREE.Scene(),cam=new THREE.Camera(),geo=new THREE.PlaneGeometry(2,2);scene.add(new THREE.Mesh(geo,mat));
+  let base=40,introOn=false,alive=true,raf=0,it=0;
+  const size=()=>{const r=host.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);renderer.setPixelRatio(dpr);renderer.setSize(r.width,r.height,false);
+    U.uRes.value.set(r.width,r.height);U.uDpr.value=dpr;base=r.width/(innerWidth<760?o.colsM||12:o.cols);if(!introOn)U.uCell.value=base};
+  size();addEventListener('resize',size);host.classList.add('gl');
+  if(introOn){U.uForce.value=1;const mul=[12,6,3,1.5];let i=0;U.uCell.value=base*mul[0];
+    it=setInterval(()=>{i++;if(i<mul.length)U.uCell.value=base*mul[i];else{clearInterval(it);U.uForce.value=0;U.uCell.value=base;introOn=false}},200)}
+  let tp=0,last=null;
+  const pm=e=>{if(e.pointerType!=='mouse')return;const r=host.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+    if(!last||Math.hypot(x-last[0],y-last[1])>base*.6){trail[tp].set(x,y,1);tp=(tp+1)%trail.length;last=[x,y]}};
+  const pd=e=>{if(e.pointerType==='mouse')return;const r=host.getBoundingClientRect();for(let k=0;k<3;k++){trail[tp].set(e.clientX-r.left+(k-1)*base,e.clientY-r.top,1);tp=(tp+1)%trail.length}};
+  host.addEventListener('pointermove',pm);host.addEventListener('pointerdown',pd);
+  let vis=true;const io=new IntersectionObserver(es=>{vis=es[0].isIntersecting});io.observe(host);
+  const t0=performance.now();let prev=t0;
+  const loop=now=>{if(!alive)return;raf=requestAnimationFrame(loop);if(!vis)return;const dt=Math.min(.1,(now-prev)/1000);prev=now;
+    U.uStep.value=RM?0:Math.floor((now-t0)/850);trail.forEach(v=>{v.z=Math.max(0,v.z-dt*.75)});
+    const r=host.getBoundingClientRect();U.uScroll.value=Math.round(-r.top/Math.max(1,base))*.21;renderer.render(scene,cam)};
+  raf=requestAnimationFrame(loop);
+  return ()=>{alive=false;cancelAnimationFrame(raf);clearInterval(it);io.disconnect();removeEventListener('resize',size);host.removeEventListener('pointermove',pm);host.removeEventListener('pointerdown',pd);
+    geo.dispose();mat.dispose();tex.dispose();renderer.dispose();renderer.forceContextLoss&&renderer.forceContextLoss();cv.remove()};
+}
+
+/* ============================================================
+   TEMPLATES
+   ============================================================ */
+const btn=(href,label,cls='')=>`<a class="btn ${cls}" href="#${href}">${label} <i></i></a>`;
+const label=t=>`<span class="label">${t}</span>`;
+function frame(k,alt,{ratio,px}={}){
+  const [w,h]=DIM(k);const ar=ratio||`${w}/${h}`;
+  return `<div class="frame"${px?` data-px="${px}"`:''} style="aspect-ratio:${ar}"><img src="${I(k)}" alt="${esc(alt)}" loading="lazy" width="${w}" height="${h}"></div>`;
+}
+function projCard(p,cls,land,withSvc){
+  const loc=[p.location,p.year].filter(Boolean).join(' · ')||'Location to confirm';
+  return `<a class="card ${land?'land ':''}${cls}" href="#work-${p.slug}" data-cursor="View">
+    ${frame(land?p.coverL:p.coverV,p.name,{ratio:land?'3/2':'4/5'})}
+    <div class="row"><div><h3>${esc(p.name)}</h3><div class="meta">${esc(loc)}</div>${withSvc?`<div class="meta svc">${p.services.join(', ')}</div>`:''}</div><span class="arrow" aria-hidden="true">↗</span></div></a>`;
+}
+const intro=(lab,line)=>`<div class="intro"><div class="l">${label(lab)}<p>${line}</p></div></div>`;
+function cta(project){
+  const h=project?'Planning a similar production?':'Have a project in mind?';
+  return `<section class="cta" id="enquire" data-field="prefooter">
+    <img class="bg" src="${I('prefooter')}" alt="" loading="lazy">
+    <div class="scrim"></div>
+    <div class="copy"><h2>${h}</h2>${project?'':`<p class="lead">Let's create something meaningful.</p>`}
+      ${btn(project?'contact-'+project:'contact','Get in touch','light')}<p class="meta" style="color:inherit;opacity:.85">Available worldwide.</p></div></section>`;
+}
+function logoGrid(){
+  return `<div class="logos">${LOGOS.map(([f,n,slug,w,h])=>{const s=`<img src="${LOGO(f)}" alt="" style="--w:${w}%;--h:${h}%" loading="lazy">`;
+    return slug?`<a class="logo" href="#work-${slug}" title="${esc(n)}" aria-label="${esc(n)}, view project">${s}</a>`:`<div class="logo" role="img" title="${esc(n)}" aria-label="${esc(n)}">${s}</div>`}).join('')}</div>`;
+}
+function filmBtn(f,i,big){
+  return `<button class="film${big?' big':''}" data-film="${i}" data-cursor="Play"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></div>
+    <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${esc(f.meta||[f.client!==f.title?f.client:'',f.loc].filter(Boolean).join(' · ')||f.cat)}</div></div>${f.project?`<a class="vp" href="#work-${f.project}" data-stop>View project</a>`:''}</div></button>`;
+}
+
+function hrail(lab,cards,title){
+  return `<section class="hscroll"><div class="hs-sticky"><div class="wrap hs-head">${label(lab)}${title?`<h2>${title}</h2>`:''}<span class="hs-count meta"><b>01</b> / ${nf(cards.length)}</span></div>
+    <div class="hs-view"><div class="hs-track">${cards.join('')}</div></div>
+    <div class="wrap"><div class="hs-bar"><i></i></div></div></div></section>`;
+}
+const PAGES={};
+
+PAGES.home=()=>{
+  const W=HOME_WORK.map(byslug);const cls=['c1','c2','c3','c4','c5','c6'];
+  return {hero:true,filmList:HOME_FILMS,lightbox:HOME_PHOTOS.map(([k,c])=>({k,cap:c})),html:`
+  <section class="hero" id="hero" data-field="hero">
+    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I('hero-m')}"><img src="${I('hero')}" alt="A guest reading on an overwater deck in the Maldives, villas on the horizon" fetchpriority="high"></picture>
+    <div class="scrim"></div>
+    <div class="copy"><p class="display" aria-hidden="true">Chasing Stories</p>
+      <h1>Visual storytelling for luxury hospitality, travel &amp; lifestyle brands.</h1>
+      <p class="sub">Photography, film &amp; creative production.</p>${btn('work','View our work','light')}</div>
+    <span class="cue" aria-hidden="true"><i></i></span>
+  </section>
+  <section class="sec"><div class="wrap">${intro('Selected work','Recent productions for hotels, resorts and destinations.')}
+    <div class="grid work">${W.map((p,i)=>projCard(p,cls[i],i%2===1)).join('')}</div>
+    <div class="more">${btn('work','View all work')}</div></div></section>
+  <section class="sec photo"><div class="wrap">${intro('Photography','Hotels, resorts, food, people and places, composed with an editorial eye.')}
+    <div class="grid gal">${HOME_PHOTOS.map(([k,c],i)=>`<figure class="g${i+1}"><button data-lb="${i}" data-cursor="Open" aria-label="Open photograph ${i+1}">${frame(k,c,{ratio:'2/3'})}</button><figcaption class="meta">${c}</figcaption></figure>`).join('')}</div>
+    <div class="more">${btn('photography','View photography')}</div></div></section>
+  <section class="sec"><div class="wrap">${intro('Trusted by','Hotels, resorts and brands we have worked with.')}${logoGrid()}</div></section>
+  <section class="sec photo"><div class="wrap">${intro('Film','Short films and brand films that carry the pace, light and sound of a place.')}
+    <div class="grid films">${HOME_FILMS.map((f,i)=>`<div class="f${i+1}">${filmBtn(f,i,i===0)}</div>`).join('')}</div>
+    <div class="more">${btn('film','View film')}</div></div></section>
+  <section class="sec studio"><div class="wrap grid">
+    <div class="lab">${label('The studio')}</div>
+    <div class="txt"><p class="lead">We are a visual storytelling studio specializing in luxury hospitality, travel and lifestyle content.</p>
+      <p>Through cinematic photography, refined videography and emotionally driven storytelling, we help hotels, resorts and premium brands translate experiences into compelling visual narratives.</p>
+      <p>Our work blends creative direction with production expertise to capture the atmosphere, emotion and identity of a place, creating imagery that feels lived-in, elevated and deeply experiential.</p>
+      <p class="meta">Available worldwide.</p><div>${btn('about','About Chasing Stories')}</div></div>
+    <div class="img">${frame('studio','Guest in a stone-walled suite at dusk',{ratio:'2/3'})}</div></div></section>
+  <section class="sec" style="padding-top:0"><div class="wrap"><div class="intro"><div class="l">${label('What we do')}</div></div>
+    <ul class="svc">${SERVICES.map(s=>`<li><a href="#services-${s.id}" data-img="${I(s.img)}"><span class="dot" data-k="${s.img}"></span><h3>${s.name}</h3><p>${s.short}</p><span class="arr" aria-hidden="true">→</span></a></li>`).join('')}</ul>
+    <div class="more">${btn('services','Explore services')}</div></div></section>
+  ${cta()}`};
+};
+
+PAGES.work=()=>{
+  const cls=['w-a','w-b','w-c','w-d','w-e'];const land=[true,false,false,true,true];
+  return {html:`
+  <section class="pintro"><div class="wrap"><h1>Work</h1><p>Selected productions for hotels, resorts, destinations and brands.</p><span class="count">${nf(PROJECTS.length)} projects</span></div></section>
+  <section style="padding-bottom:clamp(88px,12vw,180px)"><div class="wrap"><div class="grid wgrid">
+    ${PROJECTS.map((p,i)=>projCard(p,cls[i%5],land[i%5],true)).join('')}
+  </div></div></section>${cta()}`};
+};
+
+PAGES.project=slug=>{
+  const p=byslug(slug);if(!p)return PAGES.notfound();
+  const i=PROJECTS.indexOf(p),next=PROJECTS[(i+1)%PROJECTS.length];
+  const tbc=v=>v?`<span class="v">${esc(v)}</span>`:`<span class="v tbc">To confirm</span>`;
+  let vids=[];
+  const vid=k=>{vids.push({k,title:p.name,meta:p.client});return `<button class="vid" data-film="${vids.length-1}" data-cursor="Play">${frame(k,'',{ratio:'16/9'})}<span class="play" aria-hidden="true"></span></button>`};
+  const b=p.blocks.map(bl=>{
+    switch(bl.t){
+      case 'large':return `<div class="blk blk-large ${bl.side||''}">${frame(bl.k,p.name)}</div>`;
+      case 'pair':return `<div class="blk blk-pair">${bl.k.map(k=>frame(k,p.name)).join('')}</div>`;
+      case 'full':return `<div class="blk blk-full">${frame(bl.k,p.name,{ratio:'16/9'})}</div>`;
+      case 'drone':return `<div class="blk blk-drone">${frame(bl.k,p.name+', aerial',{ratio:'16/9'})}</div>`;
+      case 'mixed':return `<div class="blk blk-mixed">${frame(bl.k[0],p.name)}${bl.video?vid(bl.k[1]):frame(bl.k[1],p.name)}</div>`;
+      case 'video':return `<div class="blk blk-video">${vid(bl.k)}</div>`;
+    }}).join('');
+  return {hero:true,filmList:vids,html:`
+  <section class="phero" data-field="phero">
+    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(p.heroM)}"><img src="${I(p.hero)}" alt="${esc(p.name)}"></picture>
+    <div class="scrim"></div>
+    <div class="copy"><h1>${esc(p.name)}</h1><span class="loc">${esc(p.location||'Location to confirm')}</span></div>
+  </section>
+  <div class="wrap">
+    <div class="metab"><div>${label('Client')}${tbc(p.client)}</div><div>${label('Location')}${tbc(p.location)}</div><div>${label('Year')}${tbc(p.year)}</div><div>${label('Services')}${tbc(p.services.join(', '))}</div></div>
+    <div class="blocks">${b}</div>
+    ${p.logo?`<div class="clogo"><span class="meta">Client</span><img class="m" src="${LOGO(p.logo)}" alt="${esc(p.client)}"></div>`:''}
+  </div>
+  <section class="band pcta"><h2>Planning a similar production?</h2>${btn('contact-'+p.slug,'Get in touch')}<span class="meta">Available worldwide.</span></section>
+  <a class="nextp" href="#work-${next.slug}"><img src="${I(next.coverL)}" alt="" loading="lazy"><div class="sc"></div>
+    <div class="copy"><span class="label" style="color:inherit">Next project</span><h2>${esc(next.name)}</h2><span class="meta" style="color:inherit">${esc(next.location||'')}</span></div></a>`,next:next.coverL};
+};
+
+function layoutPhotos(list){
+  // editorial rhythm: verticals large and offset, landscapes across; never a uniform grid
+  const pat=[['1/7',0],['8/12','12vw'],['3/8','-2vw'],['9/13','6vw'],['1/5','8vw'],['6/12',0]];
+  const patL=['1/13','2/12'];
+  let v=0,l=0;
+  return list.map((ph,i)=>{const [w,h]=DIM(ph.k);const landscape=w>h*1.15;let col,mt=0;
+    if(landscape){col=patL[l++%2]}else{[col,mt]=pat[v++%pat.length]}
+    const pr=ph.project?byslug(ph.project):null;
+    const cap=[ph.loc,pr?pr.name:''].filter(Boolean).join(' / ')||CATS.find(c=>c[0]===ph.cats[0])[1];
+    return `<figure style="grid-column:${col};margin-top:${mt}"><button data-lb="${i}" data-cursor="Open" aria-label="Open photograph">${frame(ph.k,cap)}</button><figcaption class="meta">${esc(cap)}</figcaption></figure>`}).join('');
+}
+PAGES.photography=cat=>{
+  const valid=CATS.find(c=>c[0]===cat);const list=valid?PHOTOS.filter(p=>p.cats.includes(cat)):PHOTOS;
+  const count=c=>PHOTOS.filter(p=>p.cats.includes(c)).length;
+  return {lightbox:list.map(ph=>{const pr=ph.project?byslug(ph.project):null;return {k:ph.k,cap:[ph.loc,pr?pr.name:''].filter(Boolean).join(' / ')||CATS.find(c=>c[0]===ph.cats[0])[1],project:ph.project}}),html:`
+  <section class="pintro"><div class="wrap"><h1>Photography</h1><p>Photography is where our work began and where it remains strongest. Every image is composed for the brand it belongs to, in natural light wherever possible.</p></div></section>
+  <nav class="filters" aria-label="Photography categories"><div class="wrap">
+    <a class="chip${valid?'':' on'}" href="#photography">All <span class="n">${PHOTOS.length}</span></a>
+    ${CATS.map(([id,n])=>`<a class="chip${cat===id?' on':''}" href="#photography-${id}">${n} <span class="n">${count(id)}</span></a>`).join('')}
+  </div></nav>
+  <section><div class="wrap"><div class="grid pgrid">${layoutPhotos(list)}</div></div></section>${cta()}`};
+};
+
+PAGES.film=()=>{
+  const groups={};FILMS.forEach(f=>(groups[f.cat]=groups[f.cat]||[]).push(f));
+  const big=[],rest=[];Object.entries(groups).forEach(([c,l])=>l.length>=2?big.push([c,l]):rest.push(...l));
+  let idx=0;const all=[];
+  const cards=l=>l.map(f=>{all.push(f);return filmBtn(f,idx++)}).join('');
+  const html=big.map(([c,l])=>`<section class="fgroup">${label(c)}<div class="fcards">${cards(l)}</div></section>`).join('')+
+    (rest.length?`<section class="fgroup">${label('More films')}<div class="fcards">${cards(rest)}</div></section>`:'');
+  return {filmList:all,html:`
+  <section class="pintro"><div class="wrap"><h1>Film</h1><p>Our films follow the same principle as our photography: composed, unhurried and true to the place. Property films, brand films and short-form stories, shot for the big screen and cut for every channel.</p></div></section>
+  <div class="wrap" style="padding-bottom:clamp(88px,12vw,180px)">${html}</div>${cta()}`};
+};
+
+PAGES.services=anchor=>({anchor,html:`
+  <section class="pintro"><div class="wrap"><h1>Services</h1><p>From a single photography brief to a full production across photo, film and drone, we plan, direct and deliver the visual content a property needs.</p></div></section>
+  <div class="wrap">${SERVICES.map((s,i)=>`<section class="split${i%2?' flip':''}" id="svc-${s.id}">
+    <div class="media">${frame(s.img,s.name,{ratio:'4/5'})}</div>
+    <div class="t"><h2>${s.name}</h2><p>${s.body}</p>${s.deliv?`<div class="deliv"><span class="meta">Typical deliverables</span><span>${s.deliv}</span></div>`:''}</div></section>`).join('')}</div>
+  <section class="band"><p>Every production is scoped individually. Tell us about your project and we will prepare a proposal.</p>${btn('contact','Start a project')}</section>`});
+
+PAGES.about=()=>({html:`
+  <section class="about-open"><div class="wrap grid">
+    <div class="t"><h1>About Chasing Stories</h1><p>Chasing Stories is a creative production studio for luxury hospitality, travel and lifestyle brands. We produce photography and film for hotels, resorts and destinations across Asia, the Indian Ocean and beyond.</p></div>
+    <div class="i">${frame('ab-open','Overwater villas and lagoon from above, Maldives',{ratio:'3/4',px:.3})}</div></div></section>
+  <section class="txtblock"><div class="wrap grid"><div class="l">${label('Our approach')}</div><div class="r"><h2>Our approach</h2>
+    <p>We treat every property as a place with its own character. Before we shoot, we study how guests move through it, when the light is at its best and what sets it apart. On location, we direct rather than document: every frame is planned, with room left for the moments that cannot be.</p></div></div></section>
+  <section class="txtblock" style="padding-top:0;padding-bottom:0"><div class="wrap"><div class="grid"><div class="l">${label('Creative production')}</div><div class="r"><h2>Creative production</h2>
+    <p>Photography, film, drone and lifestyle production are handled by one team, under one creative direction. One brief, one visual language and a single library of assets that works across your website, campaigns, PR and social channels.</p></div></div></div></section>
+  <section class="disc"><div class="wrap"><div class="grid disc-g">
+    <a class="dcard d1" href="#work-sixsenses">${frame('ab-photo','Photography, Six Senses Kocataş Mansions',{ratio:'4/5'})}<div class="dcap"><span class="label">Photography</span><span class="meta">Six Senses Kocataş Mansions</span></div></a>
+    <button class="dcard d2 vid" data-film="0">${frame('film-palau-2','Film still, Four Seasons Explorer',{ratio:'16/10'})}<span class="play" aria-hidden="true"></span><div class="dcap"><span class="label">Film</span><span class="meta">Four Seasons Explorer</span></div></button>
+    <a class="dcard d3" href="#work-hoiana">${frame('ab-drone','Drone, Hoiana Resort & Golf',{ratio:'1/1'})}<div class="dcap"><span class="label">Drone</span><span class="meta">Hoiana Resort &amp; Golf</span></div></a>
+  </div></div></section>
+  ${hrail('How we work',[['Discover','We learn the property, the brand and the audience, and agree on what the content needs to achieve.','heritance-6'],
+      ['Concept','Visual direction, moodboards, shot lists and schedules, approved before we arrive.','sixsenses-4'],
+      ['Produce','Photography, film and drone on location, with talent and styling where the story needs it.','palau-3'],
+      ['Curate','We edit with restraint. Only the strongest frames make the final selection.','hoiana-5'],
+      ['Deliver','Retouched images and graded films, prepared in the formats each channel requires.','bangkok-6']]
+      .map(([t,d,k],i)=>`<article class="hs-card step">${frame(k,t,{ratio:'4/5'})}<div class="hs-cap"><span class="num">${nf(i+1)}</span><h3>${t}</h3><p>${d}</p></div></article>`),'How we work')}
+  <section class="world" data-field="world"><img src="${I('ab-dest')}" alt="" loading="lazy"><div class="sc"></div>
+    <div class="copy"><h2>Available worldwide</h2><p>We travel for every production. Recent work has taken us to the Maldives, Thailand, Vietnam, Palau, Singapore, Hong Kong, Malaysia, Turkey and Tanzania.</p>
+      <div class="world-cta"><span class="lead">Have a project in mind? Let's create something meaningful.</span>${btn('contact','Get in touch','light')}</div></div></section>`,filmList:[{k:'film-palau-2',title:'Four Seasons Explorer',meta:'Palau'}]});
+
+PAGES.contact=project=>{
+  const p=project?byslug(project):null;
+  const types=['Photography','Film','Photography + Film','Creative Direction','Full Production'];
+  const F=(id,lab,{type='text',req=true,ph='',w=false}={})=>`<div class="field${w?' w':''}"><label for="${id}">${lab}${req?'':' <span class="opt">(optional)</span>'}</label>
+    <input id="${id}" name="${id}" type="${type}" ${req?'required':''} placeholder="${esc(ph)}" autocomplete="${type==='email'?'email':id==='f-name'?'name':id==='f-company'?'organization':'off'}"><span class="err" aria-live="polite"></span></div>`;
+  return {html:`
+  <section class="contact"><div class="wrap grid">
+    <div class="l"><h1>Let's create something</h1>
+      <p class="intro-t">Tell us a little about your project, location and requirements. We reply to every enquiry within two working days.</p>
+      <form class="form" id="enq" novalidate>
+        ${F('f-name','Name')}${F('f-company','Company / Brand')}
+        ${F('f-email','Email',{type:'email'})}${F('f-web','Website / Instagram',{req:false,ph:'e.g. www.yourhotel.com or @yourhotel'})}
+        ${F('f-loc','Project location',{ph:'City, country'})}${F('f-dates','Preferred dates',{req:false,ph:'e.g. March 2027, flexible'})}
+        <div class="field w"><label for="f-type">Project type</label><select id="f-type" name="f-type" required><option value="">Select</option>${types.map(t=>`<option>${t}</option>`).join('')}</select><span class="err" aria-live="polite"></span></div>
+        <div class="field w"><label for="f-details">Project details</label><textarea id="f-details" name="f-details" required placeholder="Tell us about the property, the goal and what you have in mind."></textarea><span class="err" aria-live="polite"></span></div>
+        <input type="hidden" name="source" value="${esc(p?'project:'+p.slug:'contact')}">
+        <label class="consent"><input type="checkbox" id="f-consent" required><span>I agree to Chasing Stories processing my details to respond to this enquiry. <a href="#privacy">Privacy Policy</a></span></label>
+        <div class="field w" style="margin-top:-18px"><span class="err" id="consentErr" aria-live="polite"></span></div>
+        <div class="actions"><button class="btn" type="submit">Send enquiry <i></i></button>${p?`<span class="meta">About: ${esc(p.name)}</span>`:''}</div>
+      </form>
+      <div class="direct"><span class="label">Direct contact</span>
+        <span>Email: <span style="user-select:all">hello@chasingstories.org</span></span>
+        <a href="https://www.instagram.com/andra.oprea" target="_blank" rel="noopener">Instagram ↗</a>
+        <a href="https://www.linkedin.com/in/andra-oprea-2a620b310/" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <span class="meta">Available worldwide.</span></div>
+    </div>
+    <div class="r">${frame('contact','Evening light on a terrace',{ratio:'4/5',px:.3})}</div>
+  </div></section><div style="height:clamp(80px,10vw,160px)"></div>`};
+};
+
+PAGES.privacy=()=>({html:`<section class="legal-p"><div class="wrap"><h1>Privacy &amp; Cookies</h1><div class="body">
+  <p>The legal text is being prepared. It will cover the points below.</p>
+  ${['Who operates this website','What the enquiry form collects and why','How long data is kept','Your rights as a visitor','The analytics tool and its cookies','How to change your cookie choice','Contact for data requests']
+   .map(t=>`<h2>${t}</h2><p>To be supplied.</p>`).join('')}
+  <div style="margin-top:24px"><button class="btn" id="cookieOpen" type="button">Cookie settings <i></i></button></div></div></div></section>${cta()}`});
+
+PAGES.notfound=()=>({hero:true,html:`<section class="nf" data-field="nf"><picture><img src="${I('film-palau-1')}" alt=""></picture><div class="scrim"></div>
+  <div class="copy"><span class="label" style="color:inherit">404</span><h1>This story has moved on.</h1><p style="margin:0">The page you are looking for does not exist or has been moved.</p>
+  <div class="b">${btn('work','View our work','light')}${btn('','Back to home','light')}</div></div></section>`});
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+function parse(h){
+  h=(h||'').replace(/^#/,'');
+  if(!h||h==='top')return ['home'];
+  if(h==='work')return ['work'];
+  if(h.startsWith('work-'))return ['project',h.slice(5)];
+  if(h==='photography')return ['photography'];
+  if(h.startsWith('photography-'))return ['photography',h.slice(12)];
+  if(h==='film')return ['film'];
+  if(h==='services')return ['services'];
+  if(h.startsWith('services-'))return ['services',h.slice(9)];
+  if(h==='about')return ['about'];
+  if(h==='contact')return ['contact'];
+  if(h.startsWith('contact-'))return ['contact',h.slice(8)];
+  if(h==='privacy')return ['privacy'];
+  return ['notfound'];
+}
+const app=$('#app');let cleanups=[],current=null,filmList=[],lbList=[];
+const navKey={home:null,work:'work',project:'work',photography:'photography',film:'film',services:'services',about:'about',contact:'contact'};
+const TITLES={home:'Chasing Stories',work:'Work',photography:'Photography',film:'Film',services:'Services',about:'About',contact:'Contact',privacy:'Privacy & Cookies',notfound:'Page not found'};
+
+async function go(first){
+  const [name,arg]=parse(location.hash);
+  const key=name+(arg||'');
+  if(key===current)return;
+  const soft=current&&current.startsWith('photography')&&name==='photography';
+  const sameAnchor=current&&current.startsWith('services')&&name==='services';
+  current=key;
+  const view=(PAGES[name]||PAGES.notfound)(arg);
+  const animate=!first&&!RM&&!sameAnchor;
+  const keepY=soft?Math.min(scrollY,($('.filters')?.offsetTop||0)):0;
+  if(animate){
+    if(soft){const g=$('.pgrid');if(g){g.classList.add('leave');await wait(260)}}
+    else{app.classList.add('leave');await wait(420)}
+  }
+  cleanups.forEach(f=>{try{f()}catch(e){}});cleanups=[];
+  app.innerHTML=`<div class="page">${view.html}</div>`;
+  document.title=(name==='project'&&byslug(arg)?byslug(arg).name+' | ':TITLES[name]&&name!=='home'?TITLES[name]+' | ':'')+'Chasing Stories';
+  filmList=view.filmList||[];lbList=view.lightbox||[];
+  $$('.nav a.link').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+navKey[name]));
+  if(view.anchor){const t=$('#svc-'+view.anchor);if(t)requestAnimationFrame(()=>scrollToY(t.getBoundingClientRect().top+scrollY-60,first))}
+  else if(!sameAnchor)scrollToY(soft?keepY:0,true);
+  if(animate){
+    if(soft){const g=$('.pgrid');g&&g.classList.add('enter');requestAnimationFrame(()=>requestAnimationFrame(()=>g&&g.classList.remove('enter')))}
+    else{app.classList.remove('leave');app.classList.add('enter');requestAnimationFrame(()=>requestAnimationFrame(()=>{app.classList.remove('enter');setTimeout(()=>app.classList.add('settled'),700)}));app.classList.remove('settled')}
+  }
+  hydrate(first);onScroll();
+}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+addEventListener('hashchange',()=>go(false));
+
+/* smooth, weighted scrolling */
+let lenis=null;
+if(window.Lenis&&!RM){lenis=new Lenis({duration:1.15,easing:t=>1-Math.pow(1-t,3.2),smoothWheel:true});
+  const raf=t=>{lenis.raf(t);requestAnimationFrame(raf)};requestAnimationFrame(raf)}
+function scrollToY(y,instant){if(lenis)lenis.scrollTo(y,{immediate:!!instant,force:true});else scrollTo({top:y,behavior:instant?'instant':'smooth'})}
+function lockScroll(on){document.documentElement.style.overflow=on?'hidden':'';if(lenis)on?lenis.stop():lenis.start()}
+
+/* ============================================================
+   HYDRATE: wire the page that was just mounted
+   ============================================================ */
+function hydrate(first){
+  // images arrive out of focus and settle; then their palette squares step in
+  const frames=$$('.frame',app);
+  const settle=f=>{f.classList.add('in');const img=f.querySelector('img');if(f.closest('.nextp,.world'))return;
+    loaded(img).then(im=>{if(im&&f.isConnected)setTimeout(()=>spots(f,im),650)})};
+  if('IntersectionObserver' in window&&!RM){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);settle(e.target)}}),{rootMargin:'0px 0px -8% 0px'});
+    frames.forEach(f=>io.observe(f));cleanups.push(()=>io.disconnect())}else frames.forEach(settle);
+
+  // headings and lead lines rise out of a blur, word by word
+  const texts=$$('.display,.hero h1,.pintro h1,.pintro p,.intro p,.phero h1,.cta h2,.world h2,.about-open h1,.contact h1,.txtblock h2,.split h2,.nf h1,.band p,.band h2,.hs-head h2',app);
+  texts.forEach(splitWords);
+  const tio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){tio.unobserve(e.target);e.target.classList.add('in')}}),{rootMargin:'0px 0px -6% 0px'});
+  texts.forEach(t=>{if(t.closest('.hero,.phero,.pintro,.nf,.about-open,.contact'))requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('in')));else tio.observe(t)});
+  cleanups.push(()=>tio.disconnect());
+  setTimeout(()=>texts.forEach(t=>t.classList.add('in')),4000); // never leave copy hidden
+
+  // hero: first frame comes in out of focus; scrolling away blurs the copy again
+  const hero=$('.hero,.phero',app);
+  if(hero){if(!RM){hero.classList.add('boot');setTimeout(()=>hero.classList.remove('boot'),first?250:80)}
+    const copy=hero.querySelector('.copy');let tk=false;
+    const hs=()=>{tk=false;const y=Math.max(0,-hero.getBoundingClientRect().top),k=Math.min(1,y/(hero.offsetHeight*.6));
+      copy.style.filter=k>0?`blur(${(k*10).toFixed(1)}px)`:'';copy.style.opacity=(1-k*.9).toFixed(3);copy.style.transform=`translateY(${(-k*40).toFixed(1)}px)`};
+    const on=()=>{if(!tk){tk=true;requestAnimationFrame(hs)}};addEventListener('scroll',on,{passive:true});cleanups.push(()=>removeEventListener('scroll',on))}
+
+  // WebGL fields: pixels only where the cursor is
+  const FIELDS={hero:{cols:26,colsM:12,density:0,box:[0,0,0,0],focus:[.5,.45],dark:.34},
+    phero:{cols:24,colsM:10,density:0,box:[0,0,0,0],dark:.1},
+    prefooter:{cols:28,colsM:12,density:0,box:[0,0,0,0],dark:.22,edge:0},
+    world:{cols:28,colsM:12,density:0,box:[0,0,0,0],dark:.5,edge:0},
+    nf:{cols:24,colsM:10,density:0,box:[0,0,0,0],dark:.45}};
+  $$('[data-field]',app).forEach(host=>{const o=FIELDS[host.dataset.field];const img=host.querySelector('picture img, img');
+    const start=()=>loaded(img).then(im=>{if(!im||!host.isConnected)return;const d=pixelField(host,im,o);if(d)cleanups.push(d)});
+    const ob=new IntersectionObserver(es=>{if(es[0].isIntersecting){ob.disconnect();start()}},{rootMargin:'300px'});ob.observe(host);cleanups.push(()=>ob.disconnect())});
+
+  // services list: marker takes a colour from its photograph; image trails the cursor, softly
+  const flt=$('#float'),fimg=$('#floatImg');let fx=0,fy=0,tx=0,ty=0,fr=0;
+  const follow=()=>{fx+=(tx-fx)*.14;fy+=(ty-fy)*.14;flt.style.transform=`translate(${fx.toFixed(1)}px,${fy.toFixed(1)}px) rotate(${((tx-fx)*.02).toFixed(2)}deg)`;fr=requestAnimationFrame(follow)};
+  $$('.svc a',app).forEach(a=>{const pre=new Image();pre.src=a.dataset.img;
+    loaded(pre).then(im=>{if(!im)return;const p=palette(im,6);a.querySelector('.dot').style.background=p[2]||''});
+    a.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;fimg.src=a.dataset.img;tx=fx=e.clientX+28;ty=fy=e.clientY-160;flt.classList.add('on');cancelAnimationFrame(fr);fr=requestAnimationFrame(follow)});
+    a.addEventListener('pointerleave',()=>{flt.classList.remove('on');setTimeout(()=>cancelAnimationFrame(fr),400)});
+    a.addEventListener('pointermove',e=>{tx=e.clientX+28;ty=e.clientY-160});
+    a.addEventListener('click',()=>flt.classList.remove('on'))});
+  cleanups.push(()=>{cancelAnimationFrame(fr);flt.classList.remove('on')});
+
+  // horizontal rails driven by vertical scroll
+  $$('.hscroll',app).forEach(sec=>{const d=hRail(sec);if(d)cleanups.push(d)});
+
+  // lightbox + film triggers
+  $$('[data-lb]',app).forEach(b=>b.addEventListener('click',()=>openLB(+b.dataset.lb,b)));
+  $$('[data-film]',app).forEach(b=>b.addEventListener('click',e=>{if(e.target.closest('[data-stop]'))return;openFilm(+b.dataset.film,b)}));
+
+  rollLinks($$('.nav a.link,.fcols a,.legal a,.direct a',document));
+
+  const form=$('#enq',app);if(form)wireForm(form);
+  const co=$('#cookieOpen',app);if(co)co.onclick=()=>{ck.hidden=false;$('#ckAccept').focus()};
+}
+
+/* words wrapped once, so each can rise out of a blur on its own delay */
+function splitWords(el){
+  if(el.dataset.split)return;el.dataset.split=1;let n=0;
+  const walk=node=>{[...node.childNodes].forEach(c=>{
+    if(c.nodeType===3){const parts=c.textContent.split(/(\s+)/);const frag=document.createDocumentFragment();
+      parts.forEach(p=>{if(!p)return;if(/^\s+$/.test(p)){frag.appendChild(document.createTextNode(p));return}
+        const w=document.createElement('span');w.className='w';const i=document.createElement('span');i.textContent=p;i.style.transitionDelay=(n++*45)+'ms';w.appendChild(i);frag.appendChild(w)});
+      c.replaceWith(frag)}
+    else if(c.nodeType===1&&c.tagName!=='BR')walk(c)})};
+  walk(el);el.classList.add('wsplit');
+}
+
+/* a horizontal rail pinned in place while the page scrolls vertically */
+function hRail(sec){
+  const track=sec.querySelector('.hs-track'),bar=sec.querySelector('.hs-bar i'),count=sec.querySelector('.hs-count b');
+  const items=track.children.length;let dist=0;
+  const size=()=>{dist=Math.max(0,track.scrollWidth-sec.querySelector('.hs-sticky').clientWidth);sec.style.height=(innerHeight+dist*1.1)+'px'};
+  let tk=false;
+  const upd=()=>{tk=false;const r=sec.getBoundingClientRect(),span=sec.offsetHeight-innerHeight;const p=span>0?Math.min(1,Math.max(0,-r.top/span)):0;
+    track.style.transform=`translate3d(${(-p*dist).toFixed(1)}px,0,0)`;if(bar)bar.style.transform=`scaleX(${Math.max(.02,p)})`;
+    if(count)count.textContent=nf(Math.min(items,1+Math.round(p*(items-1))))};
+  const on=()=>{if(!tk){tk=true;requestAnimationFrame(upd)}};
+  size();upd();addEventListener('scroll',on,{passive:true});addEventListener('resize',size);
+  const ro=new ResizeObserver(()=>{size();upd()});ro.observe(track);
+  return ()=>{removeEventListener('scroll',on);removeEventListener('resize',size);ro.disconnect()};
+}
+
+/* buttons lean toward the pointer */
+function magnetic(els){els.forEach(el=>{if(el.dataset.mag)return;el.dataset.mag=1;
+  el.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;const r=el.getBoundingClientRect();const x=(e.clientX-r.left-r.width/2)/r.width,y=(e.clientY-r.top-r.height/2)/r.height;
+    el.style.transform=`translate(${(x*10).toFixed(1)}px,${(y*8).toFixed(1)}px)`});
+  el.addEventListener('pointerleave',()=>{el.style.transform=''})})}
+
+/* link labels roll to a second copy on hover */
+function rollLinks(els){els.forEach(a=>{if(a.dataset.roll||a.children.length)return;a.dataset.roll=1;const t=a.textContent;
+  a.innerHTML=`<span class="roll"><span>${esc(t)}</span><span aria-hidden="true">${esc(t)}</span></span>`})}
+
+/* ---------- form ---------- */
+function wireForm(form){
+  const check=el=>{const f=el.closest('.field');if(!f)return true;const e=f.querySelector('.err');let msg='';
+    if(el.required&&!el.value.trim())msg='Please fill in this field.';
+    else if(el.type==='email'&&el.value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value))msg='Please enter a valid email address.';
+    f.classList.toggle('bad',!!msg);e.textContent=msg;return !msg};
+  $$('input,select,textarea',form).forEach(el=>el.addEventListener('blur',()=>{if(el.type!=='checkbox'&&el.type!=='hidden')check(el)}));
+  form.addEventListener('submit',e=>{e.preventDefault();let ok=true,first=null;
+    $$('input:not([type=hidden]):not([type=checkbox]),select,textarea',form).forEach(el=>{if(!check(el)){ok=false;first=first||el}});
+    const c=$('#f-consent',form);$('#consentErr').textContent=c.checked?'':'Please confirm you agree so we can reply.';if(!c.checked){ok=false;first=first||c}
+    if(!ok){first.focus();return}
+    form.innerHTML=`<div class="form-msg" role="status"><div><strong>Thank you.</strong> Your enquiry is with us and we will reply within two working days.<br><span class="meta">Prototype: nothing was sent. The live site posts this to the studio inbox.</span></div></div>`});
+}
+
+/* ---------- lightbox ---------- */
+const lb=$('#lb'),lbImg=$('#lbImg');let cur=0,lastFocus=null;
+function show(i,instant){cur=(i+lbList.length)%lbList.length;const it=lbList[cur];
+  const swap=()=>{lbImg.src=I(it.k);lbImg.alt=it.cap||'';$('#lbCap').textContent=it.cap||'';$('#lbCount').textContent=nf(cur+1)+' / '+nf(lbList.length);
+    const pl=$('#lbProject');pl.hidden=!it.project;if(it.project)pl.href='#work-'+it.project;lbImg.classList.remove('swap')};
+  if(instant||RM)swap();else{lbImg.classList.add('swap');setTimeout(swap,220)}}
+function openLB(i,from){if(!lbList.length)return;lastFocus=document.activeElement;show(i,true);lb.hidden=false;lockScroll(true);
+  const src=from&&from.querySelector('img');
+  if(src&&!RM){requestAnimationFrame(()=>{const a=src.getBoundingClientRect(),b=lbImg.getBoundingClientRect();if(!b.width)return;
+    const sc=a.width/b.width;lbImg.style.transition='none';lbImg.style.transform=`translate(${a.left+a.width/2-(b.left+b.width/2)}px,${a.top+a.height/2-(b.top+b.height/2)}px) scale(${sc})`;
+    requestAnimationFrame(()=>{lbImg.style.transition='';lbImg.style.transform=''})})}
+  requestAnimationFrame(()=>lb.classList.add('open'));$('#lbClose').focus()}
+function closeLB(){lb.classList.remove('open');setTimeout(()=>{lb.hidden=true},RM?0:320);lockScroll(false);lastFocus&&lastFocus.focus()}
+$('#lbPrev').onclick=()=>show(cur-1);$('#lbNext').onclick=()=>show(cur+1);$('#lbClose').onclick=closeLB;$('#lbProject').addEventListener('click',closeLB);
+let sx=null;$('#lbStage').addEventListener('pointerdown',e=>{sx=e.clientX});
+$('#lbStage').addEventListener('pointerup',e=>{if(sx==null)return;const d=e.clientX-sx;sx=null;if(Math.abs(d)>50)show(cur+(d<0?1:-1))});
+
+/* ---------- film player shell ---------- */
+const fm=$('#fm');
+function openFilm(i,from){const f=filmList[i];if(!f)return;$('#fmImg').src=I(f.k);$('#fmTitle').textContent=[f.title,f.meta||f.client].filter(Boolean).join(' · ');
+  lastFocus=from;fm.hidden=false;lockScroll(true);requestAnimationFrame(()=>fm.classList.add('open'));$('#fmClose').focus()}
+function closeFM(){fm.classList.remove('open');setTimeout(()=>{fm.hidden=true},RM?0:320);lockScroll(false);lastFocus&&lastFocus.focus()}
+$('#fmClose').onclick=closeFM;
+
+addEventListener('keydown',e=>{
+  if(!lb.hidden){if(e.key==='Escape')closeLB();if(e.key==='ArrowRight')show(cur+1);if(e.key==='ArrowLeft')show(cur-1)}
+  else if(!fm.hidden&&e.key==='Escape')closeFM();
+  else if(!mnav.hidden&&e.key==='Escape')closeMenu();
+});
+
+/* ---------- header: transparent over a hero, hides on scroll down ---------- */
+const hdr=$('#hdr');let lastY=scrollY;
+function onScroll(){const y=scrollY;const hero=$('.hero,.phero,.nf',app);const h=hero?hero.offsetHeight-hdr.offsetHeight:0;
+  hdr.classList.toggle('over',!!hero&&y<h);
+  const hide=y>Math.max(h,120)&&y>lastY+4;if(hide)hdr.classList.add('hide');else if(y<lastY-4||y<h)hdr.classList.remove('hide');
+  document.body.classList.toggle('hdr-hidden',hdr.classList.contains('hide'));lastY=y}
+addEventListener('scroll',onScroll,{passive:true});
+
+/* ---------- mobile menu ---------- */
+const mnav=$('#mnav'),mb=$('#menuBtn');
+function openMenu(){mnav.hidden=false;mb.setAttribute('aria-expanded','true');lockScroll(true);requestAnimationFrame(()=>mnav.classList.add('open'));$('#menuClose').focus()}
+function closeMenu(){mnav.classList.remove('open');mb.setAttribute('aria-expanded','false');lockScroll(false);setTimeout(()=>{mnav.hidden=true},RM?0:360)}
+mb.onclick=openMenu;$('#menuClose').onclick=()=>{closeMenu();mb.focus()};$$('#mnav a').forEach(a=>a.addEventListener('click',closeMenu));
+
+/* ---------- cookie consent (remembered 6 months) ---------- */
+const ck=$('#cookie'),KEY='cs-consent';
+function getC(){try{const v=JSON.parse(localStorage.getItem(KEY));return v&&v.t>Date.now()-15552e6?v:null}catch(e){return null}}
+function setC(a){try{localStorage.setItem(KEY,JSON.stringify({a,t:Date.now()}))}catch(e){}ck.hidden=true}
+if(!getC())setTimeout(()=>{ck.hidden=false},RM?0:2600);
+$('#ckAccept').onclick=()=>setC(true);$('#ckDecline').onclick=()=>setC(false);$('#cookieSettings').onclick=()=>{ck.hidden=false;$('#ckAccept').focus()};
+
+go(true);
+})();

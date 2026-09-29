@@ -1,0 +1,19 @@
+kind: Environment
+name: chasing-stories-test
+type: primary
+components:
+  - kind: Application
+    name: web
+    gitRepo: 'REPLACE_WITH_REPO_URL'
+    gitBranch: main
+    gitApplicationPath: /
+    dockerCompose:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      ports:
+        - '8080:8080'
+    hosts:
+      - hostname: 'chasing-stories-{{ env.base_domain }}'
+        path: /
+        servicePort: 8080

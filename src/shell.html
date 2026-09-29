@@ -1,0 +1,97 @@
+<title>Chasing Stories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/*STYLES*/
+</style>
+<header class="hdr over" id="hdr">
+  <div class="wrap">
+    <a class="brand" href="#" aria-label="Chasing Stories, home">
+      <span class="mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="wordmark">Chasing Stories</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="link" href="#work">Work</a>
+      <a class="link" href="#photography">Photography</a>
+      <a class="link" href="#film">Film</a>
+      <a class="link" href="#services">Services</a>
+      <a class="link" href="#about">About</a>
+      <a class="enq" href="#contact"><span>Enquire</span></a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mnav">MENU</button>
+    </nav>
+  </div>
+</header>
+
+<div class="mnav" id="mnav" hidden role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="top">
+    <span class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="wordmark">Chasing Stories</span></span>
+    <button class="xbtn" id="menuClose">CLOSE</button>
+  </div>
+  <ul>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#photography">Photography</a></li>
+    <li><a href="#film">Film</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Enquire</a></li>
+  </ul>
+  <div class="foot meta"><span>hello@chasingstories.org</span><span>Instagram</span></div>
+</div>
+
+
+<main id="app"></main>
+<div class="float" id="float" aria-hidden="true"><img alt="" id="floatImg"></div>
+<footer>
+  <div class="wrap">
+    <div class="grid fcols">
+      <div class="f-a">
+        <span class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="wordmark">Chasing Stories</span></span>
+        <p>Creative production for luxury hospitality, travel and lifestyle brands.</p>
+      </div>
+      <div class="f-b"><span class="meta">Navigate</span>
+        <ul><li><a href="#work">Work</a></li><li><a href="#photography">Photography</a></li><li><a href="#film">Film</a></li><li><a href="#services">Services</a></li><li><a href="#about">About</a></li><li><a href="#contact">Contact</a></li></ul>
+      </div>
+      <div class="f-c"><span class="meta">Email</span><span style="user-select:all">hello@chasingstories.org</span></div>
+      <div class="f-d"><span class="meta">Social</span><ul><li><a href="https://www.instagram.com/andra.oprea" target="_blank" rel="noopener">Instagram</a></li><li><a href="https://www.linkedin.com/in/andra-oprea-2a620b310/" target="_blank" rel="noopener">LinkedIn</a></li></ul></div>
+    </div>
+    <div class="legal meta">
+      <span>© <span id="yr">2026</span> Chasing Stories. All rights reserved.</span>
+      <span class="l"><a href="#privacy">Privacy &amp; Cookies</a><button id="cookieSettings">Cookie settings</button></span>
+    </div>
+  </div>
+</footer>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Photograph">
+  <div class="bar"><span class="meta" style="color:#C9D0CE" id="lbCount">01 / 07</span><button class="xbtn" id="lbClose">CLOSE ✕</button></div>
+  <div class="stage" id="lbStage">
+    <img id="lbImg" alt="">
+    <button class="nav-arr prev" id="lbPrev" aria-label="Previous photograph">←</button>
+    <button class="nav-arr next" id="lbNext" aria-label="Next photograph">→</button>
+  </div>
+  <div class="cap"><span class="meta" style="color:#C9D0CE" id="lbCap"></span><a class="btn light" href="#work" id="lbProject" hidden>View project <i></i></a></div>
+</div>
+
+<div class="lb fm" id="fm" hidden role="dialog" aria-modal="true" aria-label="Film">
+  <div class="bar"><span class="meta" style="color:#C9D0CE" id="fmTitle"></span><button class="xbtn" id="fmClose">CLOSE ✕</button></div>
+  <div class="stage"><div class="poster"><img id="fmImg" alt=""><span class="play"></span><div class="note">Plays here in the site's own player, with sound. Streaming file to be encoded from the master.</div></div></div>
+  <div class="cap"></div>
+</div>
+
+<div class="cookie" id="cookie" hidden role="region" aria-label="Cookie consent">
+  <p>We use cookies to understand how visitors use our website. You can accept or decline analytics cookies. <a href="#privacy">Privacy &amp; Cookies</a></p>
+  <div class="b"><button class="btn" id="ckAccept">Accept</button><button class="btn" id="ckDecline">Decline</button></div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+/*ASSETS*/
+</script>
+<script>
+/*DATA*/
+</script>
+<script>
+/*APP*/
+</script>
