@@ -8,3 +8,6 @@ Nu deschide fișierele din `src/` — sunt sursele; singure arată doar header �
 - `assets/` — imaginile web (WebP) + logo-uri clienți
 - `python3 build.py` — reconstruiește `dist/index.html` și fișierul de mai sus
 - `python3 prep_assets.py` — trage imaginile alese din Drive
+
+## Server (Bunnyshell, cromatic-wp-prod-new)
+Aplicație statică, document root = `public/`. După orice modificare: `python3 build.py --web`, commit, push — apoi redeploy din Bunnyshell.

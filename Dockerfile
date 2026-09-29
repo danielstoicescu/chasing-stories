@@ -9,6 +9,6 @@ RUN python3 build.py --web
 # 2) serve it
 FROM nginx:1.27-alpine
 COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist/web/ /usr/share/nginx/html/
+COPY --from=build /app/public/ /usr/share/nginx/html/
 EXPOSE 8080
 HEALTHCHECK CMD wget -qO- http://127.0.0.1:8080/healthz || exit 1

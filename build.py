@@ -2,6 +2,7 @@
 
   python3 build.py          -> dist/index.html  (one self-contained file, images inlined; what gets published)
   python3 build.py --dev    -> dist/dev.html    (same page, images loaded from ../assets for quick iteration)
+  python3 build.py --web    -> public/          (what the server serves: index.html + assets/ as files)
 """
 import base64, json, os, re, sys
 
@@ -42,7 +43,7 @@ out = (shell.replace('/*STYLES*/', css)
 os.makedirs(os.path.join(ROOT, 'dist'), exist_ok=True)
 if web:
     import shutil
-    out_dir = os.path.join(ROOT, 'dist', 'web')
+    out_dir = os.path.join(ROOT, 'public')   # document root on the server; committed to git
     shutil.rmtree(out_dir, ignore_errors=True)
     os.makedirs(os.path.join(out_dir, 'assets', 'logo'))
     for k in used: shutil.copy(os.path.join(ROOT, 'assets', k + '.webp'), os.path.join(out_dir, 'assets'))
@@ -54,7 +55,7 @@ if web:
             '</head><body>')
     open(os.path.join(out_dir, 'index.html'), 'w', encoding='utf-8').write(head + out + '</body></html>')
     open(os.path.join(out_dir, 'robots.txt'), 'w').write('User-agent: *\nDisallow: /\n')
-    print('web build: dist/web  (%d images)' % len(used))
+    print('web build: public/  (%d images)' % len(used))
     sys.exit(0)
 name = 'dev.html' if dev else 'index.html'
 path = os.path.join(ROOT, 'dist', name)
