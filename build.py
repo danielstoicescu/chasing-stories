@@ -55,6 +55,11 @@ if web:
             '</head><body>')
     open(os.path.join(out_dir, 'index.html'), 'w', encoding='utf-8').write(head + out + '</body></html>')
     open(os.path.join(out_dir, 'robots.txt'), 'w').write('User-agent: *\nDisallow: /\n')
+    # the Bunnyshell server runs Apache: serve index.html, keep the test site out of search, cache images
+    open(os.path.join(out_dir, '.htaccess'), 'w').write(
+        'DirectoryIndex index.html\n'
+        '<IfModule mod_headers.c>\n  Header set X-Robots-Tag "noindex, nofollow"\n</IfModule>\n'
+        '<IfModule mod_expires.c>\n  ExpiresActive On\n  ExpiresByType image/webp "access plus 30 days"\n  ExpiresByType image/svg+xml "access plus 30 days"\n  ExpiresByType image/png "access plus 30 days"\n</IfModule>\n')
     print('web build: public/  (%d images)' % len(used))
     sys.exit(0)
 name = 'dev.html' if dev else 'index.html'
