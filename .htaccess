@@ -1,12 +1,12 @@
-# The Bunnyshell app serves the repo root; the site lives in public/.
-# Every request is mapped to public/ internally, so sources in the repo are never reachable.
+# Static site served from the repo root. No rewrites: sources are left out by Bunnyshell's "Excluded files".
 Options -Indexes
-DirectoryIndex index.html
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteCond %{REQUEST_URI} !^/public/
-  RewriteRule ^(.*)$ public/$1 [L]
-</IfModule>
+DirectoryIndex index.html index.php
 <IfModule mod_headers.c>
   Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
 </IfModule>
