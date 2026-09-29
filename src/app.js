@@ -90,7 +90,7 @@ function spots(frame,img){
   if(!placed.length)return;
   // the palette chip, bottom right: grows on hover, names the palette, makes the squares on the photo pulse
   const pal=document.createElement('span');pal.className='pal';
-  pal.innerHTML=placed.map(c=>`<i style="background:${hex(...c)}"></i>`).join('')+`<b>${paletteWord(placed)}</b>`;
+  pal.innerHTML=placed.map(c=>`<i style="background:${hex(...c)}"></i>`).join('');
   pal.addEventListener('pointerenter',()=>frame.classList.add('pal-on'));
   pal.addEventListener('pointerleave',()=>frame.classList.remove('pal-on'));
   frame.appendChild(pal);
@@ -191,9 +191,9 @@ function pixelField(host,img,o){
    ============================================================ */
 const btn=(href,label,cls='')=>`<a class="btn ${cls}" href="#${href}">${label} <i></i></a>`;
 const label=t=>`<span class="label">${t}</span>`;
-function frame(k,alt,{ratio,px}={}){
+function frame(k,alt,{ratio,px,pal}={}){
   const [w,h]=DIM(k);const ar=ratio||`${w}/${h}`;
-  return `<div class="frame" data-k="${k}"${px?` data-px="${px}"`:''} style="aspect-ratio:${ar}"><img src="${I(k)}" alt="${esc(alt)}" loading="lazy" width="${w}" height="${h}"></div>`;
+  return `<div class="frame" data-k="${k}"${pal||PAL_PAGE?' data-pal="1"':''}${px?` data-px="${px}"`:''} style="aspect-ratio:${ar}"><img src="${I(k)}" alt="${esc(alt)}" loading="lazy" width="${w}" height="${h}"></div>`;
 }
 function projCard(p,cls,land,withSvc){
   const loc=[p.location,p.year].filter(Boolean).join(' · ')||'Location to confirm';
@@ -215,8 +215,11 @@ function logoGrid(){
     return slug?`<a class="logo" href="#work-${slug}" title="${esc(n)}" aria-label="${esc(n)}, view project">${s}</a>`:`<div class="logo" role="img" title="${esc(n)}" aria-label="${esc(n)}">${s}</div>`}).join('')}</div>`;
 }
 function filmBtn(f,i,big){
-  return `<button class="film${big?' big':''}" data-film="${i}" data-cursor="Play"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></div>
-    <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${esc(f.meta||[f.client!==f.title?f.client:'',f.loc].filter(Boolean).join(' · ')||f.cat)}</div></div>${f.project?`<a class="vp" href="#work-${f.project}" data-stop>View project</a>`:''}</div></button>`;
+  const meta=esc(f.meta||[f.client!==f.title?f.client:'',f.loc].filter(Boolean).join(' · ')||f.cat);
+  if(f.project)return `<a class="film linked${big?' big':''}" href="#work-${f.project}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="go" aria-hidden="true">↗</span></div>
+    <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${meta}</div></div><span class="vp">View project</span></div></a>`;
+  return `<button class="film${big?' big':''}" data-film="${i}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></div>
+    <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${meta}</div></div><span class="vp">Play film</span></div></button>`;
 }
 
 function hrail(lab,cards,title){
@@ -224,6 +227,7 @@ function hrail(lab,cards,title){
     <div class="hs-view"><div class="hs-track">${cards.join('')}</div></div>
     <div class="wrap"><div class="hs-bar"><i></i></div></div></div></section>`;
 }
+let PAL_PAGE=false; // set while a page that shows palettes everywhere (home, services) is rendered
 const PAGES={};
 
 PAGES.home=()=>{
@@ -275,13 +279,14 @@ PAGES.project=slug=>{
   const tbc=v=>v?`<span class="v">${esc(v)}</span>`:`<span class="v tbc">To confirm</span>`;
   let vids=[];
   const vid=k=>{vids.push({k,title:p.name,meta:p.client});return `<button class="vid" data-film="${vids.length-1}" data-cursor="Play">${frame(k,'',{ratio:'16/9'})}<span class="play" aria-hidden="true"></span></button>`};
-  const b=p.blocks.map(bl=>{
+  const palAt=new Set([0,Math.floor(p.blocks.length/2)]);
+  const b=p.blocks.map((bl,bi)=>{const pal=palAt.has(bi);
     switch(bl.t){
-      case 'large':return `<div class="blk blk-large ${bl.side||''}">${frame(bl.k,p.name)}</div>`;
-      case 'pair':return `<div class="blk blk-pair">${bl.k.map(k=>frame(k,p.name)).join('')}</div>`;
-      case 'full':return `<div class="blk blk-full">${frame(bl.k,p.name,{ratio:'16/9'})}</div>`;
-      case 'drone':return `<div class="blk blk-drone">${frame(bl.k,p.name+', aerial',{ratio:'16/9'})}</div>`;
-      case 'mixed':return `<div class="blk blk-mixed">${frame(bl.k[0],p.name)}${bl.video?vid(bl.k[1]):frame(bl.k[1],p.name)}</div>`;
+      case 'large':return `<div class="blk blk-large ${bl.side||''}">${frame(bl.k,p.name,{pal})}</div>`;
+      case 'pair':return `<div class="blk blk-pair">${bl.k.map((k,j)=>frame(k,p.name,{pal:pal&&j===0})).join('')}</div>`;
+      case 'full':return `<div class="blk blk-full">${frame(bl.k,p.name,{ratio:'16/9',pal})}</div>`;
+      case 'drone':return `<div class="blk blk-drone">${frame(bl.k,p.name+', aerial',{ratio:'16/9',pal})}</div>`;
+      case 'mixed':return `<div class="blk blk-mixed">${frame(bl.k[0],p.name,{pal})}${bl.video?vid(bl.k[1]):frame(bl.k[1],p.name)}</div>`;
       case 'video':return `<div class="blk blk-video">${vid(bl.k)}</div>`;
     }}).join('');
   return {hero:true,filmList:vids,html:`
@@ -309,7 +314,8 @@ function layoutPhotos(list){
     if(landscape){col=patL[l++%2]}else{[col,mt]=pat[v++%pat.length]}
     const pr=ph.project?byslug(ph.project):null;
     const cap=[ph.loc,pr?pr.name:''].filter(Boolean).join(' / ')||CATS.find(c=>c[0]===ph.cats[0])[1];
-    return `<figure style="grid-column:${col};margin-top:${mt}"><button data-lb="${i}" data-cursor="Open" aria-label="Open photograph">${frame(ph.k,cap)}</button><figcaption class="meta">${esc(cap)}</figcaption></figure>`}).join('');
+    if(pr)return `<figure style="grid-column:${col};margin-top:${mt}"><a class="plink" href="#work-${pr.slug}" aria-label="${esc(pr.name)}, view project">${frame(ph.k,cap)}<figcaption class="meta"><span>${esc(cap)}</span><span class="vp">View project</span></figcaption></a></figure>`;
+    return `<figure style="grid-column:${col};margin-top:${mt}"><button data-lb="${i}" aria-label="Open photograph">${frame(ph.k,cap)}</button><figcaption class="meta">${esc(cap)}</figcaption></figure>`}).join('');
 }
 PAGES.photography=cat=>{
   const valid=CATS.find(c=>c[0]===cat);const list=valid?PHOTOS.filter(p=>p.cats.includes(cat)):PHOTOS;
@@ -435,7 +441,9 @@ async function go(first){
   const soft=current&&current.startsWith('photography')&&name==='photography';
   const sameAnchor=current&&current.startsWith('services')&&name==='services';
   current=key;
+  PAL_PAGE=(name==='home'||name==='services');
   const view=(PAGES[name]||PAGES.notfound)(arg);
+  PAL_PAGE=false;
   const animate=!first&&!RM&&!sameAnchor;
   const keepY=soft?Math.min(scrollY,($('.filters')?.offsetTop||0)):0;
   if(animate){
@@ -471,7 +479,7 @@ function lockScroll(on){document.documentElement.style.overflow=on?'hidden':'';i
 function hydrate(first){
   // images arrive out of focus and settle; then their palette squares step in
   const frames=$$('.frame',app);
-  const settle=f=>{f.classList.add('in');const img=f.querySelector('img');if(f.closest('.nextp,.world'))return;
+  const settle=f=>{f.classList.add('in');const img=f.querySelector('img');if(f.closest('.nextp,.world')||!f.dataset.pal)return;
     loaded(img).then(im=>{if(im&&f.isConnected)setTimeout(()=>spots(f,im),650)})};
   if('IntersectionObserver' in window&&!RM){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);settle(e.target)}}),{rootMargin:'0px 0px -8% 0px'});
     frames.forEach(f=>io.observe(f));cleanups.push(()=>io.disconnect())}else frames.forEach(settle);
