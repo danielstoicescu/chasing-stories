@@ -426,11 +426,19 @@ body.hdr-hidden .filters{top:env(safe-area-inset-top,0px)}
 .frame.in img{filter:none;transform:none;opacity:1}
 .card:hover .frame.in img,.gal button:hover .frame.in img,.pgrid button:hover .frame.in img,.film:hover .frame.in img,.vid:hover .frame.in img,.hs-card:hover .frame.in img{transform:scale(1.04)}
 
-/* palette squares: max six, three sizes, they step in and drift on hover */
+/* palette squares: four to seven, three sizes; they step in, and pulse when the palette chip is hovered */
 .frame i.sw{position:absolute;aspect-ratio:1;z-index:2;transform:scale(0);transform-origin:center;transition:transform .5s cubic-bezier(.3,1.5,.5,1) var(--d);pointer-events:none}
 .frame.sw-on i.sw{transform:scale(1)}
-
-
+.frame.pal-on i.sw{animation:swPulse 1.6s ease-in-out infinite}
+@keyframes swPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0),inset 0 0 0 1px rgba(255,255,255,.35)}50%{box-shadow:0 0 0 3px rgba(255,255,255,.9),inset 0 0 0 1px rgba(255,255,255,.9)}}
+.frame .pal{position:absolute;right:10px;bottom:10px;z-index:3;display:flex;align-items:center;gap:3px;padding:6px;background:rgba(10,15,14,.28);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:auto;cursor:default;opacity:0;transform:translateY(6px);transition:opacity .5s ease .45s,transform .5s var(--ease) .45s,padding .45s var(--ease),gap .45s var(--ease),background .3s}
+.frame.sw-on .pal{opacity:1;transform:none}
+.frame .pal i{display:block;width:8px;height:8px;transition:width .45s var(--ease),height .45s var(--ease)}
+.frame .pal b{font:500 .64rem/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:#fff;max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .5s var(--ease),opacity .35s ease,margin .45s var(--ease)}
+.frame .pal:hover{padding:9px 12px 9px 9px;gap:5px;background:rgba(10,15,14,.5)}
+.frame .pal:hover i{width:16px;height:16px}
+.frame .pal:hover b{max-width:14em;opacity:1;margin-left:8px}
+@media (hover:none){.frame .pal{right:8px;bottom:8px}}
 
 /* words rise out of a blur */
 .wsplit .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}

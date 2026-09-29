@@ -33,7 +33,14 @@ for f in logos:
     assets['logo/' + f] = ('assets/logo/' + f) if web else ('../assets/logo/' + f) if dev else uri(p, mime)
 
 man = {k: manifest[k] for k in used}
-asset_js = 'const ASSETS=%s;\nconst MANIFEST=%s;' % (json.dumps(assets), json.dumps(man))
+# face / head boxes the palette squares must avoid (auto-detected, then manual fixes win per image)
+avoid = {}
+for fn in ('avoid.json', 'avoid_manual.json'):
+    p = os.path.join(ROOT, 'assets', fn)
+    if os.path.exists(p):
+        for k, v in json.load(open(p)).items():
+            if k in used: avoid[k] = v
+asset_js = 'const ASSETS=%s;\nconst MANIFEST=%s;\nconst AVOID=%s;' % (json.dumps(assets), json.dumps(man), json.dumps(avoid))
 
 out = (shell.replace('/*STYLES*/', css)
             .replace('/*ASSETS*/', asset_js)

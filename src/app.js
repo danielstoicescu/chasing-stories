@@ -27,31 +27,73 @@ function hash(x,y){const t=Math.sin(x*127.1+y*311.7)*43758.5453;return t-Math.fl
 function vnoise(x,y){const i=Math.floor(x),j=Math.floor(y),f=x-i,g=y-j,u=f*f*(3-2*f),v=g*g*(3-2*g);
   return (hash(i,j)*(1-u)+hash(i+1,j)*u)*(1-v)+(hash(i,j+1)*(1-u)+hash(i+1,j+1)*u)*v}
 
-/* Palette squares: at most six, one per distinct colour, each placed where its colour lives in the photograph.
-   Three sizes only: a quarter cell, one cell, four cells (half, one, two cell widths). */
+/* Palette squares: four to seven per photograph, one per distinct colour, each placed where its colour lives,
+   never on a face or head (boxes from tools/detect_people.py + manual fixes), and clear of the palette chip.
+   Sizes: a quarter cell, one cell, four cells. The chip in the corner names the palette with a strategy word. */
 function distRGB(a,b){const dr=a[0]-b[0],dg=a[1]-b[1],db=a[2]-b[2];return Math.sqrt(dr*dr*.3+dg*dg*.59+db*db*.11)}
+function seedOf(str){let h=2166136261;for(const c of str){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return (h>>>0)/4294967295}
+function paletteWord(cols){
+  // brand-strategy vocabulary, chosen from lightness, saturation, warmth, contrast and dominant hue
+  const hsl=cols.map(([r,g,b])=>{r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;
+    let h=0;if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}
+    return {h,s:d?d/(1-Math.abs(2*l-1)):0,l,warm:r-b}});
+  const avg=k=>hsl.reduce((a,c)=>a+c[k],0)/hsl.length;
+  const L=avg('l'),S=avg('s'),W=avg('warm'),C=Math.max(...hsl.map(c=>c.l))-Math.min(...hsl.map(c=>c.l));
+  const sat=hsl.filter(c=>c.s>.25),green=sat.filter(c=>c.h>70&&c.h<165).length,blue=sat.filter(c=>c.h>=165&&c.h<250).length;
+  if(S<.12)return 'Timeless';
+  if(C>.68)return 'Bold';
+  if(green>=2&&green>=blue)return 'Rooted';
+  if(L>.6)return W>.02?'Radiant':'Serene';
+  if(L<.3)return W>.02?'Intimate':'Nocturnal';
+  if(blue>=2)return 'Tranquil';
+  return W>.04?'Welcoming':'Composed';
+}
 function spots(frame,img){
   if(frame.dataset.done)return;frame.dataset.done=1;
   const r=frame.getBoundingClientRect();if(r.width<2)return;
+  const key=frame.dataset.k||'',av=(AVOID&&AVOID[key])||{h:[],s:[]};
   const W=r.width,H=r.height,land=W>H*1.1,cols=land?14:9,cell=W/cols,rows=Math.max(1,Math.floor(H/cell));
   const g=2,c=document.createElement('canvas');c.width=cols*g;c.height=rows*g;
   const x=c.getContext('2d',{willReadFrequently:true});const [dx,dy,dw,dh]=coverRect(img.naturalWidth,img.naturalHeight,cols*g,rows*g);x.drawImage(img,dx,dy,dw,dh);
   let d;try{d=x.getImageData(0,0,cols*g,rows*g).data}catch(e){return}
+  // frame cells -> image coordinates, to test against the avoid boxes
+  const sc=Math.max(W/img.naturalWidth,H/img.naturalHeight),ox=(W-img.naturalWidth*sc)/2,oy=(H-img.naturalHeight*sc)/2;
+  const toImg=(fx,fy)=>[(fx-ox)/(img.naturalWidth*sc),(fy-oy)/(img.naturalHeight*sc)];
+  const hits=(boxes,cx,cy,s,pad)=>{const [u0,v0]=toImg(cx*cell,cy*cell),[u1,v1]=toImg((cx+s)*cell,(cy+s)*cell);
+    return boxes.some(b=>u1>b[0]-pad&&u0<b[2]+pad&&v1>b[1]-pad&&v0<b[3]+pad)};
+  const chip=[cols-(land?5.2:4.2),rows-(land?1.9:1.7)];                 // keep the corner chip clear
   const cand=[];
   for(let yy=0;yy<rows*g;yy++)for(let xx=0;xx<cols*g;xx++){const k=(yy*cols*g+xx)*4,rgb=[d[k],d[k+1],d[k+2]];
-    const mx=Math.max(...rgb),mn=Math.min(...rgb),l=rgb[0]*.3+rgb[1]*.59+rgb[2]*.11;cand.push({x:xx/g,y:yy/g,rgb,score:(mx?(mx-mn)/mx:0)*.7+Math.abs(l-128)/255*.3})}
+    const mx=Math.max(...rgb),mn=Math.min(...rgb),l=rgb[0]*.3+rgb[1]*.59+rgb[2]*.11;
+    const px=xx/g,py=yy/g;if(px>=chip[0]&&py>=chip[1])continue;
+    if(hits(av.h,px,py,1,.02))continue;
+    cand.push({x:px,y:py,rgb,score:(mx?(mx-mn)/mx:0)*.7+Math.abs(l-128)/255*.3-(hits(av.s,px,py,1,0)?.35:0)})}
   cand.sort((a,b)=>b.score-a.score);
-  const chosen=[cand[0]];
-  while(chosen.length<6){let best=null,bd=-1;
-    for(const p of cand){const cd=Math.min(...chosen.map(q=>distRGB(p.rgb,q.rgb)));const sd=Math.min(...chosen.map(q=>Math.hypot(p.x-q.x,p.y-q.y)));
-      if(sd<1.6)continue;const v=cd+sd*2;if(cd>26&&v>bd){bd=v;best=p}}
-    if(!best)break;chosen.push(best)}
-  const sizes=[1,.5,2,1,.5,1];
-  chosen.forEach((p,i)=>{const s=sizes[i];let cx=Math.round(p.x/.5)*.5,cy=Math.round(p.y/.5)*.5;
+  const want=4+Math.floor(seedOf(key||img.src.slice(-40))*4);            // 4..7, stable per photograph
+  const chosen=cand.length?[cand[0]]:[];
+  for(const th of [26,16,8]){
+    while(chosen.length<want){let best=null,bd=-1;
+      for(const p of cand){const cd=Math.min(...chosen.map(q=>distRGB(p.rgb,q.rgb)));const sd=Math.min(...chosen.map(q=>Math.hypot(p.x-q.x,p.y-q.y)));
+        if(sd<1.5)continue;const v=cd+sd*2;if(cd>th&&v>bd){bd=v;best=p}}
+      if(!best)break;chosen.push(best)}
+    if(chosen.length>=want)break;
+  }
+  const sizes=[1,.5,2,1,.5,1,.5];
+  const placed=[];
+  chosen.forEach((p,i)=>{let s=sizes[i%sizes.length];let cx=Math.round(p.x/.5)*.5,cy=Math.round(p.y/.5)*.5;
     cx=Math.min(Math.max(0,cx),cols-s);cy=Math.min(Math.max(0,cy),rows-s);
-    const e=document.createElement('i');e.className='sw';e.dataset.hex=hex(...p.rgb).toUpperCase();
-    e.style.cssText=`left:${cx/cols*100}%;top:${cy*cell/H*100}%;width:${s/cols*100}%;background:${hex(...p.rgb)};--d:${i*70}ms;--mx:${(i%2?1:-1)*s*.5}; --my:${(i%3-1)*s*.5}`;
-    frame.appendChild(e)});
+    if(s===2&&(hits(av.h,cx,cy,2,.02)||(cx+2>chip[0]&&cy+2>chip[1])))s=1;          // a big square must not grow onto a head
+    if(hits(av.h,cx,cy,s,.01))return;
+    const e=document.createElement('i');e.className='sw';
+    e.style.cssText=`left:${cx/cols*100}%;top:${cy*cell/H*100}%;width:${s/cols*100}%;background:${hex(...p.rgb)};--d:${i*70}ms`;
+    frame.appendChild(e);placed.push(p.rgb)});
+  if(!placed.length)return;
+  // the palette chip, bottom right: grows on hover, names the palette, makes the squares on the photo pulse
+  const pal=document.createElement('span');pal.className='pal';
+  pal.innerHTML=placed.map(c=>`<i style="background:${hex(...c)}"></i>`).join('')+`<b>${paletteWord(placed)}</b>`;
+  pal.addEventListener('pointerenter',()=>frame.classList.add('pal-on'));
+  pal.addEventListener('pointerleave',()=>frame.classList.remove('pal-on'));
+  frame.appendChild(pal);
   requestAnimationFrame(()=>requestAnimationFrame(()=>frame.classList.add('sw-on')));
 }
 
@@ -76,7 +118,15 @@ void main(){
   dens*=mix(.35,1.,step(64./uRes.y,cu.y));
   float f=n(id*.21+vec2(uStep*.11,uScroll-uStep*.05))*.72+h(id)*.28;
   float on=0.*step(1.-dens*1.25,f);
-  for(int k=0;k<10;k++){vec3 t=uTrail[k];if(t.z>0.){float d=length(cc-t.xy)/uCell;on=max(on,step(d,2.7*t.z)*step(.28+.5*(1.-t.z),h(id*1.37+float(k))));}}
+  // each trail point lives 1 -> 0; cells dissolve in and out one by one, sparse and soft
+  float w=0.;
+  for(int k=0;k<10;k++){vec3 t=uTrail[k];if(t.z>0.){float d=length(cc-t.xy)/uCell;
+    float life=(1.-smoothstep(.82,1.,t.z))*smoothstep(0.,.55,t.z);   // quick fade in, long fade out
+    float reach=1.-smoothstep(.6,2.1,d);                                // edges must be ascending in GLSL
+    float lim=life*reach*.5*(1.-.75*inBox);
+    float cellv=(h(id*1.37+vec2(float(k)*3.1,7.7))<lim)?1.:0.;       // strict: no cell when lim is 0
+    w=max(w,cellv*life);}}
+  on=max(on,w);
   on=max(on,uForce);
   vec2 m=mod(px,uCell);
   float edge=1.-step(1.,m.x)*step(1.,m.y)*step(m.x,uCell-1.)*step(m.y,uCell-1.);
@@ -93,7 +143,7 @@ void main(){
   avg*=mix(.82,1.12,h(id+21.4));
   avg*=mix(1.,.8,inBox);
   ghost*=step(80./uRes.y,cu.y);
-  vec3 col=mix(photo,avg,on);
+  vec3 col=mix(photo,avg,on*.9);
   col=mix(col,vec3(1.),ghost*.8);
   gl_FragColor=vec4(col,1.);
 }`;
@@ -123,13 +173,13 @@ function pixelField(host,img,o){
     it=setInterval(()=>{i++;if(i<mul.length)U.uCell.value=base*mul[i];else{clearInterval(it);U.uForce.value=0;U.uCell.value=base;introOn=false}},200)}
   let tp=0,last=null;
   const pm=e=>{if(e.pointerType!=='mouse')return;const r=host.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
-    if(!last||Math.hypot(x-last[0],y-last[1])>base*.6){trail[tp].set(x,y,1);tp=(tp+1)%trail.length;last=[x,y]}};
+    if(!last||Math.hypot(x-last[0],y-last[1])>base*1.1){trail[tp].set(x,y,1);tp=(tp+1)%trail.length;last=[x,y]}};
   const pd=e=>{if(e.pointerType==='mouse')return;const r=host.getBoundingClientRect();for(let k=0;k<3;k++){trail[tp].set(e.clientX-r.left+(k-1)*base,e.clientY-r.top,1);tp=(tp+1)%trail.length}};
   host.addEventListener('pointermove',pm);host.addEventListener('pointerdown',pd);
   let vis=true;const io=new IntersectionObserver(es=>{vis=es[0].isIntersecting});io.observe(host);
   const t0=performance.now();let prev=t0;
   const loop=now=>{if(!alive)return;raf=requestAnimationFrame(loop);if(!vis)return;const dt=Math.min(.1,(now-prev)/1000);prev=now;
-    U.uStep.value=RM?0:Math.floor((now-t0)/850);trail.forEach(v=>{v.z=Math.max(0,v.z-dt*.75)});
+    U.uStep.value=RM?0:Math.floor((now-t0)/850);trail.forEach(v=>{v.z=Math.max(0,v.z-dt*.55)});
     const r=host.getBoundingClientRect();U.uScroll.value=Math.round(-r.top/Math.max(1,base))*.21;renderer.render(scene,cam)};
   raf=requestAnimationFrame(loop);
   return ()=>{alive=false;cancelAnimationFrame(raf);clearInterval(it);io.disconnect();removeEventListener('resize',size);host.removeEventListener('pointermove',pm);host.removeEventListener('pointerdown',pd);
@@ -143,7 +193,7 @@ const btn=(href,label,cls='')=>`<a class="btn ${cls}" href="#${href}">${label} <
 const label=t=>`<span class="label">${t}</span>`;
 function frame(k,alt,{ratio,px}={}){
   const [w,h]=DIM(k);const ar=ratio||`${w}/${h}`;
-  return `<div class="frame"${px?` data-px="${px}"`:''} style="aspect-ratio:${ar}"><img src="${I(k)}" alt="${esc(alt)}" loading="lazy" width="${w}" height="${h}"></div>`;
+  return `<div class="frame" data-k="${k}"${px?` data-px="${px}"`:''} style="aspect-ratio:${ar}"><img src="${I(k)}" alt="${esc(alt)}" loading="lazy" width="${w}" height="${h}"></div>`;
 }
 function projCard(p,cls,land,withSvc){
   const loc=[p.location,p.year].filter(Boolean).join(' · ')||'Location to confirm';
@@ -443,8 +493,8 @@ function hydrate(first){
     const on=()=>{if(!tk){tk=true;requestAnimationFrame(hs)}};addEventListener('scroll',on,{passive:true});cleanups.push(()=>removeEventListener('scroll',on))}
 
   // WebGL fields: pixels only where the cursor is
-  const FIELDS={hero:{cols:26,colsM:12,density:0,box:[0,0,0,0],focus:[.5,.45],dark:.34},
-    phero:{cols:24,colsM:10,density:0,box:[0,0,0,0],dark:.1},
+  const FIELDS={hero:{cols:26,colsM:12,density:0,box:[.24,.22,.76,.78],focus:[.5,.45],dark:.34},
+    phero:{cols:24,colsM:10,density:0,box:[0,.62,.7,1],dark:.1},
     prefooter:{cols:28,colsM:12,density:0,box:[0,0,0,0],dark:.22,edge:0},
     world:{cols:28,colsM:12,density:0,box:[0,0,0,0],dark:.5,edge:0},
     nf:{cols:24,colsM:10,density:0,box:[0,0,0,0],dark:.45}};
