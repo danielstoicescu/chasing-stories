@@ -60,6 +60,10 @@ if web:
         'DirectoryIndex index.html\n'
         '<IfModule mod_headers.c>\n  Header set X-Robots-Tag "noindex, nofollow"\n</IfModule>\n'
         '<IfModule mod_expires.c>\n  ExpiresActive On\n  ExpiresByType image/webp "access plus 30 days"\n  ExpiresByType image/svg+xml "access plus 30 days"\n  ExpiresByType image/png "access plus 30 days"\n</IfModule>\n')
+    # the Bunnyshell vhost serves the repo root and ignores .htaccess, so the page also lives at the root;
+    # it points at assets/ in the root, which already holds every referenced image under the same name
+    shutil.copy(os.path.join(out_dir, 'index.html'), os.path.join(ROOT, 'index.html'))
+    shutil.copy(os.path.join(out_dir, 'robots.txt'), os.path.join(ROOT, 'robots.txt'))
     print('web build: public/  (%d images)' % len(used))
     sys.exit(0)
 name = 'dev.html' if dev else 'index.html'
