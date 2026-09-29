@@ -64,6 +64,10 @@ if web:
     # it points at assets/ in the root, which already holds every referenced image under the same name
     shutil.copy(os.path.join(out_dir, 'index.html'), os.path.join(ROOT, 'index.html'))
     shutil.copy(os.path.join(out_dir, 'robots.txt'), os.path.join(ROOT, 'robots.txt'))
+    # the vhost only accepts index.php as a directory index (it was a WordPress app), so hand the page over from PHP
+    open(os.path.join(ROOT, 'index.php'), 'w').write(
+        "<?php\n// Serves the static Chasing Stories page at / (the server's directory index is index.php only).\n"
+        "header('Content-Type: text/html; charset=utf-8');\nheader('X-Robots-Tag: noindex, nofollow');\nreadfile(__DIR__ . '/index.html');\n")
     print('web build: public/  (%d images)' % len(used))
     sys.exit(0)
 name = 'dev.html' if dev else 'index.html'
