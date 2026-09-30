@@ -514,7 +514,7 @@ if(PATH_MODE){
 
 /* smooth, weighted scrolling */
 let lenis=null;
-if(window.Lenis&&!RM){lenis=new Lenis({duration:1.15,easing:t=>1-Math.pow(1-t,3.2),smoothWheel:true});
+if(window.Lenis&&!RM){lenis=new Lenis({lerp:.14,wheelMultiplier:1,smoothWheel:true,syncTouch:false});
   const raf=t=>{lenis.raf(t);requestAnimationFrame(raf)};requestAnimationFrame(raf)}
 function scrollToY(y,instant){if(lenis)lenis.scrollTo(y,{immediate:!!instant,force:true});else scrollTo({top:y,behavior:instant?'instant':'smooth'})}
 function lockScroll(on){document.documentElement.style.overflow=on?'hidden':'';if(lenis)on?lenis.stop():lenis.start()}
