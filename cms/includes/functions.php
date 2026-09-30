@@ -198,13 +198,42 @@ function logo_url(string $ref): string
     return ($ref[0] === '/' || preg_match('#^https?://#', $ref)) ? $ref : '/assets/logo/' . $ref;
 }
 
+/** mb_substr for servers without mbstring (only this function is used). */
+if (!function_exists('mb_substr')) {
+    function mb_substr(string $s, int $start, ?int $length = null, ?string $enc = null): string
+    {
+        $chars = preg_split('//u', $s, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        return implode('', array_slice($chars, $start, $length));
+    }
+}
+
+/** MIME type of an uploaded file: fileinfo when the server has it, otherwise the file's magic bytes. */
+function file_mime(string $path): string
+{
+    if (!is_file($path)) {
+        return '';
+    }
+    if (class_exists('finfo')) {
+        return (string) (new finfo(FILEINFO_MIME_TYPE))->file($path);
+    }
+    $h = (string) file_get_contents($path, false, null, 0, 512);
+    if (strncmp($h, "\xFF\xD8\xFF", 3) === 0) return 'image/jpeg';
+    if (strncmp($h, "\x89PNG", 4) === 0) return 'image/png';
+    if (strncmp($h, 'GIF8', 4) === 0) return 'image/gif';
+    if (strncmp($h, 'RIFF', 4) === 0 && substr($h, 8, 4) === 'WEBP') return 'image/webp';
+    if (strncmp($h, "\x1A\x45\xDF\xA3", 4) === 0) return 'video/webm';
+    if (substr($h, 4, 4) === 'ftyp') return substr($h, 8, 2) === 'qt' ? 'video/quicktime' : 'video/mp4';
+    if (preg_match('/^\s*(<\?xml[^>]*>\s*)?(<!--.*?-->\s*)*(<!DOCTYPE svg[^>]*>\s*)?<svg[\s>]/is', $h)) return 'image/svg+xml';
+    return 'application/octet-stream';
+}
+
 /** Stores an uploaded image: EXIF-rotated, max 2400px on the long edge, saved as WebP when the server can. */
 function store_image(array $file, string $kind = 'image'): array
 {
     if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
         throw new RuntimeException(upload_error_text((int) ($file['error'] ?? 4)));
     }
-    $mime = (new finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']);
+    $mime = file_mime($file['tmp_name']);
     $dir = '/uploads/' . date('Y/m');
     @mkdir(CS_ROOT . $dir, 0755, true);
     $base = slugify(pathinfo((string) $file['name'], PATHINFO_FILENAME));
@@ -275,7 +304,7 @@ function store_video(array $file): array
     if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
         throw new RuntimeException(upload_error_text((int) ($file['error'] ?? 4)));
     }
-    $mime = (new finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']);
+    $mime = file_mime($file['tmp_name']);
     if (!in_array($mime, ['video/mp4', 'video/webm', 'video/quicktime'], true)) {
         throw new RuntimeException('Video neacceptat (' . $mime . '). Folosește MP4 (H.264).');
     }

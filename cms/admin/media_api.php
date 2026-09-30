@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $kind = in_array($_POST['kind'] ?? '', ['image', 'logo', 'video'], true) ? $_POST['kind'] : 'image';
         $f = $_FILES['file'] ?? [];
-        $mime = isset($f['tmp_name']) && is_file($f['tmp_name']) ? (new finfo(FILEINFO_MIME_TYPE))->file($f['tmp_name']) : '';
+        $mime = file_mime((string) ($f['tmp_name'] ?? ''));
         $rec = str_starts_with($mime, 'video/') ? store_video($f) : store_image($f, $kind);
         content_cache_clear();
         json_out(200, ['item' => ['ref' => $rec['ref'], 'url' => $rec['url'], 'thumb' => $rec['url'], 'name' => basename($rec['ref']), 'kind' => $rec['kind']]]);

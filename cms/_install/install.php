@@ -93,9 +93,8 @@ if (!$installed && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'PHP 8.1 sau mai nou (acum ' . PHP_VERSION . ')' => version_compare(PHP_VERSION, '8.1', '>='),
         'Extensia pdo_mysql' => extension_loaded('pdo_mysql') || DB_DRIVER === 'sqlite',
         'Extensia gd, cu WebP (redimensionează pozele)' => function_exists('imagewebp'),
-        'Extensia fileinfo (verifică fișierele încărcate)' => class_exists('finfo'),
+        
         'Extensia openssl (parola SMTP criptată)' => function_exists('openssl_encrypt'),
-        'Extensia mbstring' => function_exists('mb_substr'),
         'Folderul uploads/ se poate scrie' => is_writable(CS_ROOT . '/uploads'),
         'Folderul cache/ se poate scrie' => is_writable(CS_ROOT . '/cache'),
         'Conexiunea la baza de date (datele din includes/config.php)' => (function () { try { db()->query('SELECT 1'); return true; } catch (Throwable $e) { return false; } })(),

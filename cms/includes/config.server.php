@@ -10,7 +10,7 @@
 $secrets = __DIR__ . '/secrets.php';
 if (!is_file($secrets)) {
     $wp = '';
-    foreach ([dirname(__DIR__) . '/_wordpress-vechi/wp-config.php', dirname(__DIR__) . '/wp-config.php', dirname(__DIR__, 2) . '/wp-config.php'] as $f) {
+    foreach ([dirname(__DIR__) . '/_wordpress-vechi/wp-config.php', dirname(__DIR__) . '/wp-config.php', dirname(__DIR__, 2) . '/wp-config.php', dirname(__DIR__, 2) . '/_wordpress-vechi/wp-config.php'] as $f) {
         if (is_file($f)) {
             $wp = (string) file_get_contents($f);
             break;

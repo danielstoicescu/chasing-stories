@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($_FILES['files']['name'] as $i => $name) {
             $f = ['name' => $name, 'type' => $_FILES['files']['type'][$i], 'tmp_name' => $_FILES['files']['tmp_name'][$i], 'error' => $_FILES['files']['error'][$i], 'size' => $_FILES['files']['size'][$i]];
             try {
-                $mime = is_file($f['tmp_name']) ? (new finfo(FILEINFO_MIME_TYPE))->file($f['tmp_name']) : '';
+                $mime = file_mime((string) ($f['tmp_name'] ?? ''));
                 str_starts_with($mime, 'video/') ? store_video($f) : store_image($f, $mime === 'image/svg+xml' ? 'logo' : 'image');
                 $n++;
             } catch (Throwable $e) {
