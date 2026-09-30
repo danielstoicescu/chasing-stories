@@ -3,7 +3,7 @@ import os, zipfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 C = os.path.join(ROOT, 'cms')
 out = os.path.join(ROOT, 'dist', 'chasing-stories-server.zip')
-skip_files = {'includes/config.php', 'router.php'}
+skip_files = {'includes/config.php', 'includes/secrets.php', 'router.php'}
 n = 0
 with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
     for dp, dn, fn in os.walk(C):

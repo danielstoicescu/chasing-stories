@@ -23,9 +23,12 @@ MIGRAREA DE PE WORDPRESS (prima instalare)
 4. Baza de date. Poți folosi baza WordPress existentă: tabelele noi încep cu cs_,
    deci nu se amestecă cu cele wp_. Sau creează o bază nouă din panoul hostingului.
 
-5. Copiază includes/config.example.php în includes/config.php și completează:
-      DB_NAME, DB_USER, DB_PASS (din panoul hostingului / wp-config.php vechi)
-      APP_SECRET = un șir aleatoriu lung (min. 32 de caractere)
+5. Configurarea, fără să tastezi parole:
+      redenumește includes/config.server.php în includes/config.php.
+   La prima accesare citește datele bazei de date din wp-config.php al vechiului
+   WordPress (din _wordpress-vechi/), generează APP_SECRET și le salvează în
+   includes/secrets.php. După aceea folderul WordPress se poate șterge.
+   (Alternativ: copiază config.example.php în config.php și completează manual.)
 
 6. Permisiuni 755 pe uploads/ și cache/ (serverul trebuie să poată scrie acolo).
 
