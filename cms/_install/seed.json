@@ -1,0 +1,1370 @@
+{
+ "projects": [
+  {
+   "slug": "palau",
+   "name": "Four Seasons Explorer",
+   "client": "Four Seasons",
+   "location": "Palau",
+   "year": "2026",
+   "services": [
+    "Photography",
+    "Film",
+    "Drone",
+    "Lifestyle Production"
+   ],
+   "logo": "four-seasons.svg",
+   "hero": "film-palau-1",
+   "heroM": "w-palau",
+   "coverV": "w-palau",
+   "coverL": "film-palau-1",
+   "blocks": [
+    {
+     "t": "large",
+     "k": "palau-1"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "palau-2",
+      "palau-3"
+     ]
+    },
+    {
+     "t": "full",
+     "k": "palau-4"
+    },
+    {
+     "t": "mixed",
+     "k": [
+      "palau-5",
+      "film-palau-2"
+     ],
+     "video": 1
+    },
+    {
+     "t": "pair",
+     "k": [
+      "palau-6",
+      "palau-7"
+     ]
+    },
+    {
+     "t": "video",
+     "k": "film-palau-3"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "palau-8",
+      "palau-9"
+     ]
+    },
+    {
+     "t": "large",
+     "k": "palau-10",
+     "side": "right"
+    }
+   ]
+  },
+  {
+   "slug": "heritance",
+   "name": "Heritance Aarah",
+   "client": "Heritance Hotels & Resorts",
+   "location": "Raa Atoll, Maldives",
+   "year": "2026",
+   "services": [
+    "Photography",
+    "Film",
+    "Drone"
+   ],
+   "logo": "heritance-aarah.svg",
+   "hero": "film-heritance-1",
+   "heroM": "hv-heritance",
+   "coverV": "hv-heritance",
+   "coverL": "w-heritance",
+   "blocks": [
+    {
+     "t": "drone",
+     "k": "heritance-1"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "heritance-2",
+      "heritance-3"
+     ]
+    },
+    {
+     "t": "video",
+     "k": "film-heritance-2"
+    },
+    {
+     "t": "large",
+     "k": "heritance-4"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "heritance-5",
+      "heritance-6"
+     ]
+    },
+    {
+     "t": "mixed",
+     "k": [
+      "heritance-7",
+      "film-heritance-3"
+     ],
+     "video": 1
+    },
+    {
+     "t": "pair",
+     "k": [
+      "heritance-8",
+      "heritance-9"
+     ]
+    },
+    {
+     "t": "large",
+     "k": "heritance-10",
+     "side": "right"
+    }
+   ]
+  },
+  {
+   "slug": "sixsenses",
+   "name": "Six Senses Kocataş Mansions",
+   "client": "Six Senses",
+   "location": "Istanbul, Türkiye",
+   "year": "",
+   "services": [
+    "Photography",
+    "Film"
+   ],
+   "logo": "six-senses.png",
+   "hero": "pl-sixsenses",
+   "heroM": "w-sixsenses",
+   "coverV": "w-sixsenses",
+   "coverL": "pl-sixsenses",
+   "blocks": [
+    {
+     "t": "large",
+     "k": "sixsenses-1"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "sixsenses-2",
+      "sixsenses-3"
+     ]
+    },
+    {
+     "t": "video",
+     "k": "pl-sixsenses-2"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "sixsenses-4",
+      "sixsenses-5"
+     ]
+    },
+    {
+     "t": "large",
+     "k": "sixsenses-6",
+     "side": "right"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "sixsenses-7",
+      "sixsenses-8"
+     ]
+    },
+    {
+     "t": "pair",
+     "k": [
+      "sixsenses-9",
+      "sixsenses-10"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "hoiana",
+   "name": "Hoiana Resort & Golf",
+   "client": "Hoiana Resort & Golf",
+   "location": "Hội An, Vietnam",
+   "year": "",
+   "services": [
+    "Photography",
+    "Film"
+   ],
+   "logo": "hoiana.png",
+   "hero": "pl-hoiana",
+   "heroM": "hv-hoiana",
+   "coverV": "hv-hoiana",
+   "coverL": "w-hoiana",
+   "blocks": [
+    {
+     "t": "large",
+     "k": "hoiana-1"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "hoiana-2",
+      "hoiana-3"
+     ]
+    },
+    {
+     "t": "video",
+     "k": "pl-hoiana-2"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "hoiana-4",
+      "hoiana-5"
+     ]
+    },
+    {
+     "t": "large",
+     "k": "hoiana-6",
+     "side": "right"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "hoiana-7",
+      "hoiana-8"
+     ]
+    },
+    {
+     "t": "pair",
+     "k": [
+      "hoiana-9",
+      "hoiana-10"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "bangkok",
+   "name": "Four Seasons Bangkok",
+   "client": "Four Seasons",
+   "location": "Bangkok, Thailand",
+   "year": "",
+   "services": [
+    "Photography",
+    "Film"
+   ],
+   "logo": "four-seasons.svg",
+   "hero": "film-bangkok-2",
+   "heroM": "w-bangkok",
+   "coverV": "w-bangkok",
+   "coverL": "film-bangkok-2",
+   "blocks": [
+    {
+     "t": "large",
+     "k": "bangkok-1"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "bangkok-2",
+      "bangkok-3"
+     ]
+    },
+    {
+     "t": "video",
+     "k": "film-bangkok-1"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "bangkok-4",
+      "bangkok-5"
+     ]
+    },
+    {
+     "t": "large",
+     "k": "bangkok-6",
+     "side": "right"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "bangkok-7",
+      "bangkok-8"
+     ]
+    },
+    {
+     "t": "pair",
+     "k": [
+      "bangkok-9",
+      "bangkok-10"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "hideaway",
+   "name": "Hideaway Beach Resort & Spa",
+   "client": "Hideaway Beach Resort & Spa",
+   "location": "Haa Alifu Atoll, Maldives",
+   "year": "2026",
+   "services": [
+    "Photography",
+    "Film",
+    "Drone"
+   ],
+   "logo": null,
+   "hero": "w-hideaway",
+   "heroM": "hv-hideaway",
+   "coverV": "hv-hideaway",
+   "coverL": "w-hideaway",
+   "blocks": [
+    {
+     "t": "large",
+     "k": "hideaway-1"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "hideaway-2",
+      "hideaway-3"
+     ]
+    },
+    {
+     "t": "drone",
+     "k": "hideaway-9"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "hideaway-4",
+      "hideaway-5"
+     ]
+    },
+    {
+     "t": "large",
+     "k": "hideaway-6",
+     "side": "right"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "hideaway-7",
+      "hideaway-8"
+     ]
+    },
+    {
+     "t": "large",
+     "k": "hideaway-10"
+    }
+   ]
+  },
+  {
+   "slug": "millennium",
+   "name": "Millennium Hotels",
+   "client": "Millennium Hotels and Resorts",
+   "location": "Singapore",
+   "year": "",
+   "services": [
+    "Photography",
+    "Film"
+   ],
+   "logo": "millenium.png",
+   "hero": "pl-millennium",
+   "heroM": "hv-millennium",
+   "coverV": "hv-millennium",
+   "coverL": "pl-millennium",
+   "blocks": [
+    {
+     "t": "large",
+     "k": "millennium-1"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "millennium-2",
+      "millennium-3"
+     ]
+    },
+    {
+     "t": "video",
+     "k": "pl-millennium-2"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "millennium-4",
+      "millennium-5"
+     ]
+    },
+    {
+     "t": "large",
+     "k": "millennium-6",
+     "side": "right"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "millennium-7",
+      "millennium-8"
+     ]
+    },
+    {
+     "t": "pair",
+     "k": [
+      "millennium-9",
+      "millennium-10"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "westin",
+   "name": "Westin",
+   "client": "The Westin",
+   "location": "",
+   "year": "",
+   "services": [
+    "Photography",
+    "Film",
+    "Drone"
+   ],
+   "logo": "westin.svg",
+   "hero": "film-westin-3",
+   "heroM": "westin-2",
+   "coverV": "westin-2",
+   "coverL": "film-westin-1",
+   "blocks": [
+    {
+     "t": "drone",
+     "k": "film-westin-1"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "westin-1",
+      "westin-2"
+     ]
+    },
+    {
+     "t": "large",
+     "k": "westin-3"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "westin-4",
+      "westin-6"
+     ]
+    },
+    {
+     "t": "video",
+     "k": "film-westin-2"
+    },
+    {
+     "t": "pair",
+     "k": [
+      "westin-7",
+      "westin-8"
+     ]
+    },
+    {
+     "t": "pair",
+     "k": [
+      "westin-9",
+      "westin-10"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "intercontinental",
+   "name": "InterContinental",
+   "client": "InterContinental Hotels & Resorts",
+   "location": "",
+   "year": "",
+   "services": [
+    "Film"
+   ],
+   "logo": "intercontinental.png",
+   "hero": "film-intercontinental-2",
+   "heroM": "hv-intercontinental",
+   "coverV": "hv-intercontinental",
+   "coverL": "film-intercontinental-1",
+   "blocks": [
+    {
+     "t": "large",
+     "k": "hv-intercontinental"
+    },
+    {
+     "t": "video",
+     "k": "film-intercontinental-1"
+    },
+    {
+     "t": "video",
+     "k": "film-intercontinental-3"
+    }
+   ]
+  }
+ ],
+ "cats": [
+  [
+   "hospitality",
+   "Hospitality"
+  ],
+  [
+   "lifestyle",
+   "Lifestyle"
+  ],
+  [
+   "food-beverage",
+   "Food & Beverage"
+  ],
+  [
+   "nature",
+   "Nature"
+  ],
+  [
+   "interiors",
+   "Interiors"
+  ],
+  [
+   "drone",
+   "Drone"
+  ],
+  [
+   "product",
+   "Product"
+  ]
+ ],
+ "photos": [
+  {
+   "k": "palau-1",
+   "cats": [
+    "drone",
+    "nature"
+   ],
+   "project": "palau",
+   "loc": "Palau"
+  },
+  {
+   "k": "p-1",
+   "cats": [
+    "hospitality"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "ph-food-3",
+   "cats": [
+    "food-beverage"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "heritance-2",
+   "cats": [
+    "lifestyle",
+    "nature"
+   ],
+   "project": "heritance",
+   "loc": "Raa Atoll, Maldives"
+  },
+  {
+   "k": "ph-interiors-4",
+   "cats": [
+    "interiors"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "sixsenses-2",
+   "cats": [
+    "interiors",
+    "hospitality"
+   ],
+   "project": "sixsenses",
+   "loc": "Istanbul, Türkiye"
+  },
+  {
+   "k": "heritance-1",
+   "cats": [
+    "drone"
+   ],
+   "project": "heritance",
+   "loc": "Raa Atoll, Maldives"
+  },
+  {
+   "k": "ph-hospitality-1",
+   "cats": [
+    "hospitality"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "hoiana-4",
+   "cats": [
+    "interiors",
+    "hospitality"
+   ],
+   "project": "hoiana",
+   "loc": "Hội An, Vietnam"
+  },
+  {
+   "k": "ph-food-6",
+   "cats": [
+    "food-beverage"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "palau-4",
+   "cats": [
+    "nature"
+   ],
+   "project": "palau",
+   "loc": "Palau"
+  },
+  {
+   "k": "ph-lifestyle-1",
+   "cats": [
+    "lifestyle"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "ph-product-2",
+   "cats": [
+    "product"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "hideaway-4",
+   "cats": [
+    "lifestyle",
+    "hospitality"
+   ],
+   "project": "hideaway",
+   "loc": "Haa Alifu Atoll, Maldives"
+  },
+  {
+   "k": "p-3",
+   "cats": [
+    "drone",
+    "hospitality"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "ph-interiors-7",
+   "cats": [
+    "interiors"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "millennium-1",
+   "cats": [
+    "lifestyle"
+   ],
+   "project": "millennium",
+   "loc": "Singapore"
+  },
+  {
+   "k": "ph-food-8",
+   "cats": [
+    "food-beverage"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "heritance-10",
+   "cats": [
+    "nature",
+    "drone"
+   ],
+   "project": "heritance",
+   "loc": "Raa Atoll, Maldives"
+  },
+  {
+   "k": "ph-hospitality-3",
+   "cats": [
+    "hospitality",
+    "interiors"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "bangkok-2",
+   "cats": [
+    "lifestyle"
+   ],
+   "project": "bangkok",
+   "loc": "Bangkok, Thailand"
+  },
+  {
+   "k": "ph-product-3",
+   "cats": [
+    "product"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "westin-1",
+   "cats": [
+    "drone",
+    "hospitality"
+   ],
+   "project": "westin",
+   "loc": ""
+  },
+  {
+   "k": "ph-lifestyle-6",
+   "cats": [
+    "lifestyle",
+    "hospitality"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "hoiana-10",
+   "cats": [
+    "food-beverage"
+   ],
+   "project": "hoiana",
+   "loc": "Hội An, Vietnam"
+  },
+  {
+   "k": "ph-nature-7",
+   "cats": [
+    "nature"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "sixsenses-6",
+   "cats": [
+    "nature",
+    "lifestyle"
+   ],
+   "project": "sixsenses",
+   "loc": "Istanbul, Türkiye"
+  },
+  {
+   "k": "ph-interiors-5",
+   "cats": [
+    "interiors"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "hideaway-9",
+   "cats": [
+    "drone",
+    "nature"
+   ],
+   "project": "hideaway",
+   "loc": "Haa Alifu Atoll, Maldives"
+  },
+  {
+   "k": "ph-food-5",
+   "cats": [
+    "food-beverage"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "palau-6",
+   "cats": [
+    "interiors",
+    "lifestyle"
+   ],
+   "project": "palau",
+   "loc": "Palau"
+  },
+  {
+   "k": "ph-product-6",
+   "cats": [
+    "product"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "ph-hospitality-5",
+   "cats": [
+    "hospitality"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "ph-lifestyle-8",
+   "cats": [
+    "lifestyle"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "millennium-8",
+   "cats": [
+    "food-beverage"
+   ],
+   "project": "millennium",
+   "loc": "Singapore"
+  },
+  {
+   "k": "ph-nature-2",
+   "cats": [
+    "nature"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "westin-8",
+   "cats": [
+    "drone",
+    "nature"
+   ],
+   "project": "westin",
+   "loc": ""
+  },
+  {
+   "k": "ph-interiors-1",
+   "cats": [
+    "interiors"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "ph-food-1",
+   "cats": [
+    "food-beverage"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "ph-product-1",
+   "cats": [
+    "product"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "ph-hospitality-8",
+   "cats": [
+    "hospitality",
+    "drone"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "ph-lifestyle-3",
+   "cats": [
+    "lifestyle"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "hideaway-6",
+   "cats": [
+    "nature",
+    "drone"
+   ],
+   "project": "hideaway",
+   "loc": "Haa Alifu Atoll, Maldives"
+  },
+  {
+   "k": "ph-interiors-3",
+   "cats": [
+    "interiors"
+   ],
+   "project": null,
+   "loc": ""
+  },
+  {
+   "k": "ph-product-4",
+   "cats": [
+    "product"
+   ],
+   "project": null,
+   "loc": ""
+  }
+ ],
+ "films": [
+  {
+   "k": "film-heritance-1",
+   "title": "Heritance Aarah",
+   "client": "Heritance Hotels & Resorts",
+   "loc": "Raa Atoll, Maldives",
+   "cat": "Hospitality",
+   "project": "heritance"
+  },
+  {
+   "k": "film-bangkok-2",
+   "title": "Four Seasons Bangkok",
+   "client": "Four Seasons",
+   "loc": "Bangkok, Thailand",
+   "cat": "Hospitality",
+   "project": "bangkok"
+  },
+  {
+   "k": "film-hideaway-1",
+   "title": "Hideaway Beach Resort & Spa",
+   "client": "Hideaway",
+   "loc": "Haa Alifu Atoll, Maldives",
+   "cat": "Hospitality",
+   "project": "hideaway"
+  },
+  {
+   "k": "film-intercontinental-1",
+   "title": "InterContinental",
+   "client": "InterContinental",
+   "loc": "",
+   "cat": "Hospitality",
+   "project": "intercontinental"
+  },
+  {
+   "k": "film-westin-1",
+   "title": "The Westin",
+   "client": "The Westin",
+   "loc": "",
+   "cat": "Hospitality",
+   "project": "westin"
+  },
+  {
+   "k": "film-palau-1",
+   "title": "Four Seasons Explorer",
+   "client": "Four Seasons",
+   "loc": "Palau",
+   "cat": "Destination",
+   "project": "palau"
+  },
+  {
+   "k": "film-italy-1",
+   "title": "Italy",
+   "client": "",
+   "loc": "Italy",
+   "cat": "Destination",
+   "project": null
+  },
+  {
+   "k": "film-italy-4",
+   "title": "Italy, coast",
+   "client": "",
+   "loc": "Italy",
+   "cat": "Destination",
+   "project": null
+  },
+  {
+   "k": "film-mazda-1",
+   "title": "Mazda",
+   "client": "Mazda Europe",
+   "loc": "",
+   "cat": "Brand & Commercial",
+   "project": null
+  },
+  {
+   "k": "film-garmin-2",
+   "title": "Garmin × Mazda",
+   "client": "Mazda Europe",
+   "loc": "",
+   "cat": "Brand & Commercial",
+   "project": null
+  },
+  {
+   "k": "film-dior-1",
+   "title": "Dior",
+   "client": "Dior",
+   "loc": "",
+   "cat": "Brand & Commercial",
+   "project": null
+  }
+ ],
+ "homeFilms": [
+  {
+   "k": "f-01",
+   "title": "Film 01",
+   "meta": "Client and location to confirm"
+  },
+  {
+   "k": "f-02",
+   "title": "InterContinental",
+   "meta": "Film 02",
+   "project": "intercontinental"
+  },
+  {
+   "k": "f-03",
+   "title": "InterContinental",
+   "meta": "Film 03",
+   "project": "intercontinental"
+  }
+ ],
+ "services": [
+  {
+   "id": "photography",
+   "name": "Photography",
+   "short": "Hospitality, lifestyle, interiors, food and destinations.",
+   "img": "s-photography",
+   "body": "High-end photography for hospitality, lifestyle, architecture, interiors, food and beverage, and destinations. Every shoot is planned around the light, the guest journey and the way the property wants to be seen.",
+   "deliv": "Retouched image libraries, campaign and editorial imagery, website and OTA sets."
+  },
+  {
+   "id": "film",
+   "name": "Film",
+   "short": "Property films, brand films and short-form stories.",
+   "img": "s-film",
+   "body": "Property films, brand films and short-form stories, from a single hero film to a full series for web and social. Graded to the brand and delivered in every ratio a campaign needs.",
+   "deliv": "Hero films, cut-downs, vertical edits for social."
+  },
+  {
+   "id": "creative-direction",
+   "name": "Creative direction",
+   "short": "Concept, moodboards, shot planning and on-location direction.",
+   "img": "s-creative-direction",
+   "body": "Concept development, visual direction, moodboards and shot planning, carried through on location. The direction is agreed before we arrive, so time on site goes into production.",
+   "deliv": "Concept deck, moodboards, shot list, production schedule."
+  },
+  {
+   "id": "lifestyle-production",
+   "name": "Lifestyle production",
+   "short": "Talent, styling and production planning.",
+   "img": "s-lifestyle-production",
+   "body": "Talent, styling, props and production planning for lifestyle scenes that feel natural and on brand.",
+   "deliv": "Casting, styling, scene planning."
+  },
+  {
+   "id": "drone",
+   "name": "Drone",
+   "short": "Aerial photography and cinematography.",
+   "img": "s-drone",
+   "body": "Aerial photography and cinematography that shows the setting, scale and surroundings of a property. Flights planned in line with local regulations.",
+   "deliv": "Aerial stills, aerial footage."
+  },
+  {
+   "id": "content-libraries",
+   "name": "Content libraries",
+   "short": "One production, planned for every channel.",
+   "img": "s-content-libraries",
+   "body": "One production, planned to cover every channel. Photography and film delivered as a cohesive library for websites, campaigns, PR, marketing and social media.",
+   "deliv": ""
+  }
+ ],
+ "logos": [
+  [
+   "four-seasons.svg",
+   "Four Seasons",
+   "palau",
+   58,
+   50
+  ],
+  [
+   "soneva.png",
+   "Soneva",
+   null,
+   40,
+   64
+  ],
+  [
+   "anantara.png",
+   "Anantara",
+   null,
+   44,
+   58
+  ],
+  [
+   "banyan-tree.svg",
+   "Banyan Tree",
+   null,
+   30,
+   64
+  ],
+  [
+   "six-senses.png",
+   "Six Senses",
+   "sixsenses",
+   40,
+   62
+  ],
+  [
+   "heritance-aarah.svg",
+   "Heritance",
+   "heritance",
+   50,
+   54
+  ],
+  [
+   "hoiana.png",
+   "Hoiana Resort & Golf",
+   "hoiana",
+   56,
+   38
+  ],
+  [
+   "intercontinental.png",
+   "InterContinental",
+   "intercontinental",
+   54,
+   40
+  ],
+  [
+   "westin.svg",
+   "Westin",
+   "westin",
+   50,
+   40
+  ],
+  [
+   "millenium.png",
+   "Millennium Hotels",
+   "millennium",
+   60,
+   30
+  ],
+  [
+   "rixos.svg",
+   "Rixos",
+   null,
+   52,
+   40
+  ],
+  [
+   "lux.svg",
+   "LUX* Resorts",
+   null,
+   40,
+   44
+  ],
+  [
+   "dior.svg",
+   "Dior",
+   null,
+   42,
+   28
+  ],
+  [
+   "mazda.svg",
+   "Mazda",
+   null,
+   50,
+   40
+  ],
+  [
+   "animawings.svg",
+   "Animawings",
+   null,
+   52,
+   40
+  ]
+ ],
+ "homeWork": [
+  "palau",
+  "heritance",
+  "sixsenses",
+  "hoiana",
+  "bangkok",
+  "hideaway"
+ ],
+ "homePhotos": [
+  [
+   "p-1",
+   "Hospitality"
+  ],
+  [
+   "p-2",
+   "Interiors"
+  ],
+  [
+   "p-3",
+   "Drone"
+  ],
+  [
+   "p-4",
+   "Lifestyle"
+  ],
+  [
+   "p-5",
+   "Hospitality"
+  ],
+  [
+   "p-7",
+   "Interiors"
+  ],
+  [
+   "p-8",
+   "Food & Beverage"
+  ]
+ ],
+ "copy": {
+  "brand": "Chasing Stories",
+  "available": "Available worldwide.",
+  "home": {
+   "display": "Chasing Stories",
+   "h1": "Visual storytelling for luxury hospitality, travel & lifestyle brands.",
+   "sub": "Photography, film & creative production.",
+   "button": "View our work",
+   "heroAlt": "A guest reading on an overwater deck in the Maldives, villas on the horizon",
+   "workLabel": "Selected work",
+   "workLine": "Recent productions for hotels, resorts and destinations.",
+   "photoLabel": "Photography",
+   "photoLine": "Hotels, resorts, food, people and places, composed with an editorial eye.",
+   "trustedLabel": "Trusted by",
+   "trustedLine": "Hotels, resorts and brands we have worked with.",
+   "filmLabel": "Film",
+   "filmLine": "Short films and brand films that carry the pace, light and sound of a place.",
+   "studioLabel": "The studio",
+   "studioLead": "We are a visual storytelling studio specializing in luxury hospitality, travel and lifestyle content.",
+   "studioText": "Through cinematic photography, refined videography and emotionally driven storytelling, we help hotels, resorts and premium brands translate experiences into compelling visual narratives.\n\nOur work blends creative direction with production expertise to capture the atmosphere, emotion and identity of a place, creating imagery that feels lived-in, elevated and deeply experiential.",
+   "studioAlt": "Guest in a stone-walled suite at dusk",
+   "servicesLabel": "What we do"
+  },
+  "cta": {
+   "h2": "Have a project in mind?",
+   "lead": "Let's create something meaningful.",
+   "projectH2": "Planning a similar production?",
+   "button": "Get in touch"
+  },
+  "pages": {
+   "workTitle": "Work",
+   "workIntro": "Selected productions for hotels, resorts, destinations and brands.",
+   "photoTitle": "Photography",
+   "photoIntro": "Photography is where our work began and where it remains strongest. Every image is composed for the brand it belongs to, in natural light wherever possible.",
+   "filmTitle": "Film",
+   "filmIntro": "Our films follow the same principle as our photography: composed, unhurried and true to the place. Property films, brand films and short-form stories, shot for the big screen and cut for every channel.",
+   "servicesTitle": "Services",
+   "servicesIntro": "From a single photography brief to a full production across photo, film and drone, we plan, direct and deliver the visual content a property needs.",
+   "servicesBand": "Every production is scoped individually. Tell us about your project and we will prepare a proposal."
+  },
+  "about": {
+   "title": "About Chasing Stories",
+   "intro": "Chasing Stories is a creative production studio for luxury hospitality, travel and lifestyle brands. We produce photography and film for hotels, resorts and destinations across Asia, the Indian Ocean and beyond.",
+   "openAlt": "Overwater villas and lagoon from above, Maldives",
+   "approachTitle": "Our approach",
+   "approach": "We treat every property as a place with its own character. Before we shoot, we study how guests move through it, when the light is at its best and what sets it apart. On location, we direct rather than document: every frame is planned, with room left for the moments that cannot be.",
+   "productionTitle": "Creative production",
+   "production": "Photography, film, drone and lifestyle production are handled by one team, under one creative direction. One brief, one visual language and a single library of assets that works across your website, campaigns, PR and social channels.",
+   "disc": [
+    {
+     "label": "Photography",
+     "meta": "Six Senses Kocataş Mansions",
+     "img": "ab-photo",
+     "project": "sixsenses",
+     "film": ""
+    },
+    {
+     "label": "Film",
+     "meta": "Four Seasons Explorer",
+     "img": "film-palau-2",
+     "project": "",
+     "film": "poster:film-palau-2"
+    },
+    {
+     "label": "Drone",
+     "meta": "Hoiana Resort & Golf",
+     "img": "ab-drone",
+     "project": "hoiana",
+     "film": ""
+    }
+   ],
+   "stepsTitle": "How we work",
+   "steps": [
+    {
+     "t": "Discover",
+     "d": "We learn the property, the brand and the audience, and agree on what the content needs to achieve.",
+     "img": "heritance-6"
+    },
+    {
+     "t": "Concept",
+     "d": "Visual direction, moodboards, shot lists and schedules, approved before we arrive.",
+     "img": "sixsenses-4"
+    },
+    {
+     "t": "Produce",
+     "d": "Photography, film and drone on location, with talent and styling where the story needs it.",
+     "img": "palau-3"
+    },
+    {
+     "t": "Curate",
+     "d": "We edit with restraint. Only the strongest frames make the final selection.",
+     "img": "hoiana-5"
+    },
+    {
+     "t": "Deliver",
+     "d": "Retouched images and graded films, prepared in the formats each channel requires.",
+     "img": "bangkok-6"
+    }
+   ],
+   "worldTitle": "Available worldwide",
+   "worldText": "We travel for every production. Recent work has taken us to the Maldives, Thailand, Vietnam, Palau, Singapore, Hong Kong, Malaysia, Turkey and Tanzania.",
+   "worldCta": "Have a project in mind? Let's create something meaningful."
+  },
+  "contact": {
+   "title": "Let's create something",
+   "intro": "Tell us a little about your project, location and requirements. We reply to every enquiry within two working days.",
+   "success": "Your enquiry is with us and we will reply within two working days.",
+   "email": "hello@chasingstories.org",
+   "instagram": "https://www.instagram.com/andra.oprea",
+   "linkedin": "https://www.linkedin.com/in/andra-oprea-2a620b310/",
+   "imgAlt": "Evening light on a terrace",
+   "types": [
+    "Photography",
+    "Film",
+    "Photography + Film",
+    "Creative Direction",
+    "Full Production"
+   ]
+  },
+  "footer": {
+   "line": "Creative production for luxury hospitality, travel and lifestyle brands."
+  },
+  "privacy": "",
+  "notfound": {
+   "h1": "This story has moved on.",
+   "p": "The page you are looking for does not exist or has been moved."
+  },
+  "img": {
+   "hero": "hero",
+   "heroM": "hero-m",
+   "prefooter": "prefooter",
+   "studio": "studio",
+   "aboutOpen": "ab-open",
+   "world": "ab-dest",
+   "contact": "contact",
+   "notfound": "film-palau-1"
+  },
+  "video": {
+   "hero": "",
+   "heroM": ""
+  }
+ }
+}

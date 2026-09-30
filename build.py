@@ -9,6 +9,7 @@ import base64, json, os, re, sys
 ROOT = os.path.dirname(os.path.abspath(__file__))
 dev = '--dev' in sys.argv
 web = '--web' in sys.argv   # real server: images stay separate files next to index.html
+cms = '--cms' in sys.argv   # the PHP site in cms/: template with slots PHP fills, every asset, seed content
 src = lambda f: open(os.path.join(ROOT, 'src', f), encoding='utf-8').read()
 
 shell, css, data, app = src('shell.html'), src('styles.css'), src('data.js') + '\n' + src('videos.js'), src('app.js')
@@ -48,6 +49,29 @@ out = (shell.replace('/*STYLES*/', css)
             .replace('/*APP*/', app))
 
 os.makedirs(os.path.join(ROOT, 'dist'), exist_ok=True)
+if cms:
+    import shutil, subprocess
+    C = os.path.join(ROOT, 'cms')
+    # 1. page template: PHP puts <title>/meta in <!--HEAD--> and window.SITE_DATA + ASSETS/MANIFEST/AVOID in /*BOOT*/
+    body = re.sub(r'^<title>.*?</title>\s*', '', shell, count=1)
+    tpl = (body.replace('/*STYLES*/', css).replace('/*ASSETS*/', '/*BOOT*/').replace('/*DATA*/', data).replace('/*APP*/', app))
+    open(os.path.join(C, 'site.template.html'), 'w', encoding='utf-8').write(
+        '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><!--HEAD--></head><body>' + tpl + '</body></html>')
+    # 2. every shipped image (the whole Drive selection, so the panel's library has them), logos, manifest, face boxes
+    A = os.path.join(C, 'assets')
+    os.makedirs(os.path.join(A, 'logo'), exist_ok=True)
+    for f in os.listdir(os.path.join(ROOT, 'assets')):
+        src_f = os.path.join(ROOT, 'assets', f)
+        if f.endswith('.webp') or f in ('manifest.json', 'avoid.json', 'avoid_manual.json'):
+            shutil.copy(src_f, os.path.join(A, f))
+    for f in logos:
+        shutil.copy(os.path.join(ROOT, 'assets', 'logo', f), os.path.join(A, 'logo', f))
+    open(os.path.join(A, 'favicon.svg'), 'w').write('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 3"><rect width="3" height="3" fill="#0F1514"/><rect x="0" y="2" width="1" height="1" fill="#fff"/><rect x="1" y="1" width="1" height="1" fill="#fff"/><rect x="2" y="0" width="1" height="1" fill="#fff"/></svg>')
+    # 3. starting content for the installer
+    subprocess.run(['node', os.path.join(ROOT, 'tools', 'make_seed.mjs')], check=True)
+    print('cms build: cms/site.template.html + %d images' % len([f for f in os.listdir(A) if f.endswith('.webp')]))
+    sys.exit(0)
 if web:
     import shutil
     out_dir = os.path.join(ROOT, 'public')   # document root on the server; committed to git

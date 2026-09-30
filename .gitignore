@@ -6,3 +6,9 @@ tools/node_modules/
 Chasing Stories - site.html
 tools/py/
 tools/models/*.onnx
+cms/includes/config.php
+cms/cache/*
+!cms/cache/.htaccess
+cms/uploads/*
+!cms/uploads/.htaccess
+tools/php/

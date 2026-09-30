@@ -1,7 +1,12 @@
-/* Site content. Everything Andra will later edit in the CMS lives here.
-   Image values are asset keys (see assets/manifest.json); build.py inlines them. */
+/* Site content. On the live server the CMS (admin/) writes window.SITE_DATA into the page and every list
+   and text below is taken from there; the values here are the defaults the prototype ships with.
+   Image values are asset keys (see assets/manifest.json) or upload paths ("uploads/..."). */
+const SITE_DATA = (typeof window !== 'undefined' && window.SITE_DATA) || null;
+const S_ = (k, d) => (SITE_DATA && SITE_DATA[k] != null) ? SITE_DATA[k] : d;
+const deepMerge = (a, b) => { if (!b || typeof b !== 'object' || Array.isArray(b)) return b ?? a; const o = { ...a };
+  for (const k of Object.keys(b)) o[k] = (a && typeof a[k] === 'object' && !Array.isArray(a[k]) && a[k]) ? deepMerge(a[k], b[k]) : (b[k] ?? a[k]); return o };
 
-const PROJECTS = [
+const PROJECTS = S_('projects', [
   { slug:'palau', name:'Four Seasons Explorer', client:'Four Seasons', location:'Palau', year:'2026',
     services:['Photography','Film','Drone','Lifestyle Production'], logo:'four-seasons.svg',
     hero:'film-palau-1', heroM:'w-palau', coverV:'w-palau', coverL:'film-palau-1',
@@ -99,14 +104,14 @@ const PROJECTS = [
       {t:'large', k:'hv-intercontinental'},
       {t:'video', k:'film-intercontinental-1'},
       {t:'video', k:'film-intercontinental-3'} ]},
-];
+]);
 
 /* Photography: one list, multi-category, manually ordered. */
-const CATS = [
+const CATS = S_('cats', [
   ['hospitality','Hospitality'],['lifestyle','Lifestyle'],['food-beverage','Food & Beverage'],
-  ['nature','Nature'],['interiors','Interiors'],['drone','Drone'],['product','Product']];
+  ['nature','Nature'],['interiors','Interiors'],['drone','Drone'],['product','Product']]);
 const P = (k,cats,project,loc) => ({k,cats,project,loc});
-const PHOTOS = [
+const PHOTOS = S_('photos', [
   P('palau-1',['drone','nature'],'palau','Palau'),
   P('p-1',['hospitality'],null,''),
   P('ph-food-3',['food-beverage'],null,''),
@@ -152,10 +157,10 @@ const PHOTOS = [
   P('hideaway-6',['nature','drone'],'hideaway','Haa Alifu Atoll, Maldives'),
   P('ph-interiors-3',['interiors'],null,''),
   P('ph-product-4',['product'],null,''),
-];
+]);
 
 /* Film: grouped by category; a group with fewer than two films folds into "More films". */
-const FILMS = [
+const FILMS = S_('films', [
   {k:'film-heritance-1', title:'Heritance Aarah', client:'Heritance Hotels & Resorts', loc:'Raa Atoll, Maldives', cat:'Hospitality', project:'heritance'},
   {k:'film-bangkok-2', title:'Four Seasons Bangkok', client:'Four Seasons', loc:'Bangkok, Thailand', cat:'Hospitality', project:'bangkok'},
   {k:'film-hideaway-1', title:'Hideaway Beach Resort & Spa', client:'Hideaway', loc:'Haa Alifu Atoll, Maldives', cat:'Hospitality', project:'hideaway'},
@@ -167,14 +172,14 @@ const FILMS = [
   {k:'film-mazda-1', title:'Mazda', client:'Mazda Europe', loc:'', cat:'Brand & Commercial', project:null},
   {k:'film-garmin-2', title:'Garmin × Mazda', client:'Mazda Europe', loc:'', cat:'Brand & Commercial', project:null},
   {k:'film-dior-1', title:'Dior', client:'Dior', loc:'', cat:'Brand & Commercial', project:null},
-];
-const HOME_FILMS = [
+]);
+const HOME_FILMS = S_('homeFilms', [
   {k:'f-01', title:'Film 01', meta:'Client and location to confirm'},
   {k:'f-02', title:'InterContinental', meta:'Film 02', project:'intercontinental'},
   {k:'f-03', title:'InterContinental', meta:'Film 03', project:'intercontinental'},
-];
+]);
 
-const SERVICES = [
+const SERVICES = S_('services', [
   {id:'photography', name:'Photography', short:'Hospitality, lifestyle, interiors, food and destinations.', img:'s-photography',
    body:'High-end photography for hospitality, lifestyle, architecture, interiors, food and beverage, and destinations. Every shoot is planned around the light, the guest journey and the way the property wants to be seen.',
    deliv:'Retouched image libraries, campaign and editorial imagery, website and OTA sets.'},
@@ -193,15 +198,85 @@ const SERVICES = [
   {id:'content-libraries', name:'Content libraries', short:'One production, planned for every channel.', img:'s-content-libraries',
    body:'One production, planned to cover every channel. Photography and film delivered as a cohesive library for websites, campaigns, PR, marketing and social media.',
    deliv:''},
-];
+]);
 
-const LOGOS = [
+const LOGOS = S_('logos', [
  ['four-seasons.svg','Four Seasons','palau',58,50],['soneva.png','Soneva',null,40,64],['anantara.png','Anantara',null,44,58],
  ['banyan-tree.svg','Banyan Tree',null,30,64],['six-senses.png','Six Senses','sixsenses',40,62],['heritance-aarah.svg','Heritance','heritance',50,54],
  ['hoiana.png','Hoiana Resort & Golf','hoiana',56,38],['intercontinental.png','InterContinental','intercontinental',54,40],['westin.svg','Westin','westin',50,40],
  ['millenium.png','Millennium Hotels','millennium',60,30],['rixos.svg','Rixos',null,52,40],['lux.svg','LUX* Resorts',null,40,44],
- ['dior.svg','Dior',null,42,28],['mazda.svg','Mazda',null,50,40],['animawings.svg','Animawings',null,52,40]];
+ ['dior.svg','Dior',null,42,28],['mazda.svg','Mazda',null,50,40],['animawings.svg','Animawings',null,52,40]]);
 
-const HOME_WORK = ['palau','heritance','sixsenses','hoiana','bangkok','hideaway'];
-const HOME_PHOTOS = [
-  ['p-1','Hospitality'],['p-2','Interiors'],['p-3','Drone'],['p-4','Lifestyle'],['p-5','Hospitality'],['p-7','Interiors'],['p-8','Food & Beverage']];
+const HOME_WORK = S_('homeWork', ['palau','heritance','sixsenses','hoiana','bangkok','hideaway']);
+const HOME_PHOTOS = S_('homePhotos', [
+  ['p-1','Hospitality'],['p-2','Interiors'],['p-3','Drone'],['p-4','Lifestyle'],['p-5','Hospitality'],['p-7','Interiors'],['p-8','Food & Beverage']]);
+
+/* Every fixed text and image on the site. Editable in the CMS (Homepage, About, Contact, Pages). */
+const C = deepMerge({
+  brand: 'Chasing Stories',
+  available: 'Available worldwide.',
+  home: {
+    display: 'Chasing Stories',
+    h1: 'Visual storytelling for luxury hospitality, travel & lifestyle brands.',
+    sub: 'Photography, film & creative production.',
+    button: 'View our work',
+    heroAlt: 'A guest reading on an overwater deck in the Maldives, villas on the horizon',
+    workLabel: 'Selected work', workLine: 'Recent productions for hotels, resorts and destinations.',
+    photoLabel: 'Photography', photoLine: 'Hotels, resorts, food, people and places, composed with an editorial eye.',
+    trustedLabel: 'Trusted by', trustedLine: 'Hotels, resorts and brands we have worked with.',
+    filmLabel: 'Film', filmLine: 'Short films and brand films that carry the pace, light and sound of a place.',
+    studioLabel: 'The studio',
+    studioLead: 'We are a visual storytelling studio specializing in luxury hospitality, travel and lifestyle content.',
+    studioText: 'Through cinematic photography, refined videography and emotionally driven storytelling, we help hotels, resorts and premium brands translate experiences into compelling visual narratives.\n\nOur work blends creative direction with production expertise to capture the atmosphere, emotion and identity of a place, creating imagery that feels lived-in, elevated and deeply experiential.',
+    studioAlt: 'Guest in a stone-walled suite at dusk',
+    servicesLabel: 'What we do',
+  },
+  cta: { h2: 'Have a project in mind?', lead: "Let's create something meaningful.", projectH2: 'Planning a similar production?', button: 'Get in touch' },
+  pages: {
+    workTitle: 'Work', workIntro: 'Selected productions for hotels, resorts, destinations and brands.',
+    photoTitle: 'Photography', photoIntro: 'Photography is where our work began and where it remains strongest. Every image is composed for the brand it belongs to, in natural light wherever possible.',
+    filmTitle: 'Film', filmIntro: 'Our films follow the same principle as our photography: composed, unhurried and true to the place. Property films, brand films and short-form stories, shot for the big screen and cut for every channel.',
+    servicesTitle: 'Services', servicesIntro: 'From a single photography brief to a full production across photo, film and drone, we plan, direct and deliver the visual content a property needs.',
+    servicesBand: 'Every production is scoped individually. Tell us about your project and we will prepare a proposal.',
+  },
+  about: {
+    title: 'About Chasing Stories',
+    intro: 'Chasing Stories is a creative production studio for luxury hospitality, travel and lifestyle brands. We produce photography and film for hotels, resorts and destinations across Asia, the Indian Ocean and beyond.',
+    openAlt: 'Overwater villas and lagoon from above, Maldives',
+    approachTitle: 'Our approach',
+    approach: 'We treat every property as a place with its own character. Before we shoot, we study how guests move through it, when the light is at its best and what sets it apart. On location, we direct rather than document: every frame is planned, with room left for the moments that cannot be.',
+    productionTitle: 'Creative production',
+    production: 'Photography, film, drone and lifestyle production are handled by one team, under one creative direction. One brief, one visual language and a single library of assets that works across your website, campaigns, PR and social channels.',
+    disc: [
+      { label: 'Photography', meta: 'Six Senses Kocataş Mansions', img: 'ab-photo', project: 'sixsenses', film: '' },
+      { label: 'Film', meta: 'Four Seasons Explorer', img: 'film-palau-2', project: '', film: 'poster:film-palau-2' },
+      { label: 'Drone', meta: 'Hoiana Resort & Golf', img: 'ab-drone', project: 'hoiana', film: '' },
+    ],
+    stepsTitle: 'How we work',
+    steps: [
+      { t: 'Discover', d: 'We learn the property, the brand and the audience, and agree on what the content needs to achieve.', img: 'heritance-6' },
+      { t: 'Concept', d: 'Visual direction, moodboards, shot lists and schedules, approved before we arrive.', img: 'sixsenses-4' },
+      { t: 'Produce', d: 'Photography, film and drone on location, with talent and styling where the story needs it.', img: 'palau-3' },
+      { t: 'Curate', d: 'We edit with restraint. Only the strongest frames make the final selection.', img: 'hoiana-5' },
+      { t: 'Deliver', d: 'Retouched images and graded films, prepared in the formats each channel requires.', img: 'bangkok-6' },
+    ],
+    worldTitle: 'Available worldwide',
+    worldText: 'We travel for every production. Recent work has taken us to the Maldives, Thailand, Vietnam, Palau, Singapore, Hong Kong, Malaysia, Turkey and Tanzania.',
+    worldCta: "Have a project in mind? Let's create something meaningful.",
+  },
+  contact: {
+    title: "Let's create something",
+    intro: 'Tell us a little about your project, location and requirements. We reply to every enquiry within two working days.',
+    success: 'Your enquiry is with us and we will reply within two working days.',
+    email: 'hello@chasingstories.org',
+    instagram: 'https://www.instagram.com/andra.oprea',
+    linkedin: 'https://www.linkedin.com/in/andra-oprea-2a620b310/',
+    imgAlt: 'Evening light on a terrace',
+    types: ['Photography', 'Film', 'Photography + Film', 'Creative Direction', 'Full Production'],
+  },
+  footer: { line: 'Creative production for luxury hospitality, travel and lifestyle brands.' },
+  privacy: '',
+  notfound: { h1: 'This story has moved on.', p: 'The page you are looking for does not exist or has been moved.' },
+  img: { hero: 'hero', heroM: 'hero-m', prefooter: 'prefooter', studio: 'studio', aboutOpen: 'ab-open', world: 'ab-dest', contact: 'contact', notfound: 'film-palau-1' },
+  video: { hero: '', heroM: '' },
+}, S_('copy', null));

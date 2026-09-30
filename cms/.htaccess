@@ -1,0 +1,43 @@
+# Chasing Stories
+#   /            the site (index.php renders every page URL)
+#   /admin/      the content panel
+#   /api/        the enquiry endpoint
+#   /assets/     shipped images   /uploads/  images and films added from the panel
+
+Options -Indexes
+DirectoryIndex index.php
+RewriteEngine On
+
+# Force HTTPS once the certificate is active (leave commented until then).
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+RewriteRule ^robots\.txt$ robots.php [L]
+
+# never serve internals
+RewriteRule ^(includes|cache)(/|$) - [F,L]
+<FilesMatch "\.(sql|md|json|sqlite|log|example\.php)$">
+  Require all denied
+</FilesMatch>
+<Files "manifest.json">
+  Require all granted
+</Files>
+
+# real files and folders are served as they are; every other path is a page of the site
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+RewriteRule ^ index.php [L]
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png  "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType video/mp4  "access plus 1 month"
+</IfModule>
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

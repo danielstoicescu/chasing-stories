@@ -428,6 +428,13 @@ html.sq-cursor input,html.sq-cursor textarea{cursor:text}
 .sq[data-s="click"] i{width:24px;height:24px;rotate:45deg;background:transparent}
 .sq[data-s="field"] i{width:var(--fs,26px);height:var(--fs,26px);background:transparent}
 .sq[data-s="text"] i{width:2px;height:20px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-err{grid-column:1/-1;color:#B3261E;margin:0}
+.form-msg.bad::before{background:#B3261E}
+.pdesc{max-width:62ch;padding-top:clamp(32px,4vw,56px);font-family:var(--display);font-size:var(--t-lead);line-height:1.5}
+.pdesc p{margin:0 0 1em}
+.blk-text{max-width:56ch;margin-inline:auto;font-size:1.05rem}
+.blk-text p{margin:0 0 1em}
 /* merged closing folds */
 .world-cta{display:grid;justify-items:center;gap:18px;margin-top:clamp(28px,4vw,48px);padding-top:clamp(28px,4vw,48px);border-top:1px solid rgba(255,255,255,.35);width:min(100%,560px)}
 .world-cta .lead{font-family:var(--display);font-style:italic;font-size:var(--t-lead)}

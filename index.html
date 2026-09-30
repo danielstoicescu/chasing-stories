@@ -433,6 +433,13 @@ html.sq-cursor input,html.sq-cursor textarea{cursor:text}
 .sq[data-s="click"] i{width:24px;height:24px;rotate:45deg;background:transparent}
 .sq[data-s="field"] i{width:var(--fs,26px);height:var(--fs,26px);background:transparent}
 .sq[data-s="text"] i{width:2px;height:20px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-err{grid-column:1/-1;color:#B3261E;margin:0}
+.form-msg.bad::before{background:#B3261E}
+.pdesc{max-width:62ch;padding-top:clamp(32px,4vw,56px);font-family:var(--display);font-size:var(--t-lead);line-height:1.5}
+.pdesc p{margin:0 0 1em}
+.blk-text{max-width:56ch;margin-inline:auto;font-size:1.05rem}
+.blk-text p{margin:0 0 1em}
 /* merged closing folds */
 .world-cta{display:grid;justify-items:center;gap:18px;margin-top:clamp(28px,4vw,48px);padding-top:clamp(28px,4vw,48px);border-top:1px solid rgba(255,255,255,.35);width:min(100%,560px)}
 .world-cta .lead{font-family:var(--display);font-style:italic;font-size:var(--t-lead)}
@@ -623,7 +630,7 @@ a:hover > .roll > span + span{transform:none}
     <li><a href="#about">About</a></li>
     <li><a href="#contact">Enquire</a></li>
   </ul>
-  <div class="foot meta"><span>hello@chasingstories.org</span><span>Instagram</span></div>
+  <div class="foot meta"><span data-c="contact.email">hello@chasingstories.org</span><a data-c-hide="contact.instagram" data-c="contact.instagram" data-attr="href" href="https://www.instagram.com/andra.oprea" target="_blank" rel="noopener">Instagram</a></div>
 </div>
 
 
@@ -634,13 +641,13 @@ a:hover > .roll > span + span{transform:none}
     <div class="grid fcols">
       <div class="f-a">
         <span class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="wordmark">Chasing Stories</span></span>
-        <p>Creative production for luxury hospitality, travel and lifestyle brands.</p>
+        <p data-c="footer.line">Creative production for luxury hospitality, travel and lifestyle brands.</p>
       </div>
       <div class="f-b"><span class="meta">Navigate</span>
         <ul><li><a href="#work">Work</a></li><li><a href="#photography">Photography</a></li><li><a href="#film">Film</a></li><li><a href="#services">Services</a></li><li><a href="#about">About</a></li><li><a href="#contact">Contact</a></li></ul>
       </div>
-      <div class="f-c"><span class="meta">Email</span><span style="user-select:all">hello@chasingstories.org</span></div>
-      <div class="f-d"><span class="meta">Social</span><ul><li><a href="https://www.instagram.com/andra.oprea" target="_blank" rel="noopener">Instagram</a></li><li><a href="https://www.linkedin.com/in/andra-oprea-2a620b310/" target="_blank" rel="noopener">LinkedIn</a></li></ul></div>
+      <div class="f-c"><span class="meta">Email</span><span style="user-select:all" data-c="contact.email">hello@chasingstories.org</span></div>
+      <div class="f-d"><span class="meta">Social</span><ul><li data-c-hide="contact.instagram"><a data-c="contact.instagram" data-attr="href" href="https://www.instagram.com/andra.oprea" target="_blank" rel="noopener">Instagram</a></li><li data-c-hide="contact.linkedin"><a data-c="contact.linkedin" data-attr="href" href="https://www.linkedin.com/in/andra-oprea-2a620b310/" target="_blank" rel="noopener">LinkedIn</a></li></ul></div>
     </div>
     <div class="legal meta">
       <span>© <span id="yr">2026</span> Chasing Stories. All rights reserved.</span>
@@ -679,10 +686,15 @@ const MANIFEST={"ab-dest": [1800, 1012], "ab-drone": [900, 1200], "ab-open": [90
 const AVOID={"ab-open": {"h": [[0.3922, 0.3518, 0.9402, 0.5489]], "s": [[0.43, 0.3717, 0.9024, 0.7698]]}, "bangkok-1": {"h": [[0.5706, 0.4624, 0.7137, 0.5601], [0.5269, 0.4558, 0.7903, 0.6047]], "s": [[0.5451, 0.4815, 0.7721, 0.9949]]}, "bangkok-10": {"h": [[0.1841, 0.0, 1.0, 0.2504], [0.0, 0.0, 0.759, 0.2318]], "s": [[0.2442, 0.0, 0.9957, 0.6355], [0.0077, 0.0, 0.7034, 0.6728]]}, "bangkok-2": {"h": [[0.3037, 0.3258, 0.6514, 0.5634], [0.0, 0.2783, 0.4186, 0.4406], [0.0568, 0.1983, 0.7561, 0.4366]], "s": [[0.0004, 0.3062, 0.3876, 0.8659], [0.105, 0.2357, 0.7079, 0.9843]]}, "bangkok-3": {"h": [[0.5818, 0.4895, 0.7888, 0.5909]], "s": [[0.5961, 0.507, 0.7745, 0.8565]]}, "bangkok-5": {"h": [[0.5365, 0.1994, 0.7383, 0.3372], [0.4629, 0.2068, 0.9486, 0.366]], "s": [[0.4964, 0.2265, 0.9151, 0.6189]]}, "bangkok-6": {"h": [[0.0, 0.2187, 0.6252, 0.4314], [0.0, 0.2174, 0.2681, 0.3111]], "s": [[0.0, 0.2385, 0.5789, 0.6347], [0.0, 0.2284, 0.2482, 0.4494]]}, "bangkok-7": {"h": [[0.4289, 0.3194, 0.6557, 0.4245]], "s": [[0.4446, 0.3375, 0.6401, 0.6999]]}, "bangkok-8": {"h": [[0.2316, 0.381, 0.4069, 0.5008], [0.1444, 0.3748, 0.468, 0.5168]], "s": [[0.1667, 0.3993, 0.4457, 0.8888]]}, "contact": {"h": [[0.2198, 0.0, 0.8567, 0.3423]], "s": []}, "f-01": {"h": [[0.4421, 0.3677, 0.9785, 0.8027]], "s": [[0.4791, 0.3916, 0.9415, 0.8696]]}, "f-02": {"h": [[0.6654, 0.0088, 0.7511, 0.1648], [0.5795, 0.0, 0.7751, 0.2183]], "s": [[0.593, 0.0181, 0.7616, 0.8523]]}, "f-03": {"h": [[0.1832, 0.0953, 0.2519, 0.2206], [0.1083, 0.074, 0.3464, 0.2927]], "s": [[0.1247, 0.1102, 0.3299, 0.8335]]}, "film-bangkok-1": {"h": [[0.297, 0.0, 0.6647, 0.6665], [0.1132, 0.1055, 0.7443, 0.6309], [0.0, 0.2132, 0.3961, 0.5753], [0.0, 0.0, 0.2595, 0.2281]], "s": [[0.1567, 0.1475, 0.7007, 0.988], [0.0014, 0.2506, 0.3669, 0.9986], [0.0, 0.0146, 0.2402, 0.7787]]}, "film-garmin-2": {"h": [[0.1291, 0.1216, 1.0, 0.8509]], "s": [[0.191, 0.1631, 0.9638, 0.9937]]}, "film-heritance-1": {"h": [[0.6888, 0.4575, 0.7457, 0.5611]], "s": []}, "film-heritance-3": {"h": [[0.3887, 0.409, 0.5461, 0.5382]], "s": [[0.3996, 0.4177, 0.5352, 0.5934]]}, "film-hideaway-1": {"h": [[0.1665, 0.436, 0.2161, 0.5263]], "s": []}, "film-intercontinental-1": {"h": [[0.664, 0.0214, 0.7511, 0.1801], [0.5816, 0.0, 0.7737, 0.2251]], "s": [[0.5948, 0.0309, 0.7604, 0.84]]}, "film-intercontinental-2": {"h": [[0.1884, 0.0, 0.5014, 0.4011], [0.0072, 0.0, 0.6674, 0.5242]], "s": [[0.0527, 0.0185, 0.6219, 0.8495]]}, "film-intercontinental-3": {"h": [[0.5228, 0.2181, 0.597, 0.3533], [0.6411, 0.0, 0.9999, 0.2989]], "s": [[0.6658, 0.0241, 0.9751, 0.8576]]}, "film-italy-1": {"h": [[0.2282, 0.4927, 0.2633, 0.5214]], "s": [[0.2306, 0.4945, 0.2609, 0.5299]]}, "film-mazda-1": {"h": [[0.1857, 0.0, 0.3045, 0.1573]], "s": []}, "film-palau-2": {"h": [[0.2464, 0.0, 0.7415, 0.4117]], "s": [[0.2806, 0.0324, 0.7074, 0.8707]]}, "film-palau-3": {"h": [[0.7624, 0.1305, 0.8635, 0.3147], [0.433, 0.1015, 0.5583, 0.3296], [0.7075, 0.1335, 1.0, 0.4149], [0.1333, 0.1285, 0.6355, 0.5542], [0.2207, 0.1294, 0.9881, 0.7582]], "s": [[0.7292, 0.1743, 1.0, 0.9893], [0.1679, 0.1695, 0.6009, 0.9895], [0.2736, 0.1704, 0.9352, 0.99]]}, "heritance-2": {"h": [[0.4209, 0.7034, 1.0, 0.8955], [0.7522, 0.0, 1.0, 0.2214]], "s": [[0.4636, 0.7175, 0.9979, 1.0], [0.7703, 0.0257, 0.9967, 0.8411]]}, "heritance-3": {"h": [[0.682, 0.6144, 0.7493, 0.6604], [0.6555, 0.6033, 0.7844, 0.6629]], "s": [[0.6644, 0.6136, 0.7755, 0.8192]]}, "heritance-4": {"h": [[0.0897, 0.3297, 0.5827, 0.5142]], "s": [[0.1237, 0.3615, 0.5487, 0.9976]]}, "heritance-5": {"h": [[0.5858, 0.5776, 0.6701, 0.6231]], "s": [[0.5916, 0.5855, 0.6643, 0.7424]]}, "heritance-6": {"h": [[0.0416, 0.002, 0.825, 0.2564]], "s": [[0.0956, 0.0314, 0.7709, 0.6184]]}, "heritance-7": {"h": [[0.4038, 0.4517, 0.6346, 0.5286]], "s": [[0.4197, 0.4623, 0.6187, 0.6753]]}, "heritance-8": {"h": [[0.1488, 0.3739, 0.7497, 0.5594], [0.1745, 0.3669, 1.0, 0.6331]], "s": [[0.1902, 0.3868, 0.7082, 0.6461], [0.2343, 0.3838, 0.9825, 0.723]]}, "hero-m": {"h": [[0.0, 0.5669, 0.7734, 0.8134]], "s": [[0.0264, 0.5829, 0.718, 0.902]]}, "hero": {"h": [[0.0291, 0.4328, 0.3132, 0.6344], [0.0494, 0.4493, 0.0889, 0.479]], "s": [[0.0487, 0.4506, 0.2936, 0.8075], [0.0521, 0.4534, 0.0862, 0.5359]]}, "hideaway-1": {"h": [[0.3109, 0.5277, 0.4953, 0.6136]], "s": [[0.3236, 0.5425, 0.4826, 0.8386]]}, "hideaway-10": {"h": [[0.3223, 0.2952, 0.5462, 0.4481], [0.1838, 0.2922, 0.669, 0.4853]], "s": [[0.2173, 0.3255, 0.6355, 0.9913]]}, "hideaway-2": {"h": [[0.3913, 0.4909, 0.6232, 0.5654]], "s": [[0.4073, 0.4988, 0.6072, 0.6574]]}, "hideaway-3": {"h": [[0.4644, 0.3817, 1.0, 0.5764], [0.0, 0.1527, 0.4037, 0.3837], [0.2525, 0.0533, 1.0, 0.318]], "s": [[0.504, 0.4112, 1.0, 1.0], [0.007, 0.1926, 0.3743, 0.9891], [0.3077, 0.088, 0.998, 0.7804]]}, "hideaway-5": {"h": [[0.0, 0.1741, 0.7978, 0.4568], [0.231, 0.2133, 1.0, 0.48]], "s": [[0.0085, 0.2133, 0.7393, 0.9987], [0.2861, 0.2504, 0.9752, 0.9907]]}, "hideaway-8": {"h": [[0.0, 0.0, 0.4787, 0.2907], [0.0, 0.0, 0.7537, 0.2325]], "s": [[0.0002, 0.0, 0.6979, 0.7294]]}, "hideaway-9": {"h": [[0.5382, 0.3831, 0.9172, 0.6138]], "s": [[0.5643, 0.3959, 0.8911, 0.6514]]}, "hoiana-1": {"h": [[0.3275, 0.5459, 0.4462, 0.627], [0.2413, 0.5429, 0.569, 0.6491]], "s": [[0.2639, 0.5549, 0.5464, 0.7956]]}, "hoiana-10": {"h": [[0.0982, 0.3122, 0.4013, 0.5192], [0.5044, 0.1589, 0.7998, 0.3607], [0.0325, 0.335, 0.4617, 0.4769], [0.5209, 0.1034, 1.0, 0.2777], [0.0, 0.0, 0.503, 0.1551], [0.0001, 0.0, 0.7907, 0.245]], "s": [[0.0621, 0.3537, 0.4321, 0.7263], [0.5558, 0.1319, 0.9932, 0.703], [0.0004, 0.0, 0.4657, 0.3771], [0.0547, 0.018, 0.7362, 0.6915]]}, "hoiana-2": {"h": [[0.5375, 0.3986, 0.6972, 0.5078], [0.5404, 0.3781, 0.7963, 0.478]], "s": [[0.5581, 0.3953, 0.7786, 0.7398]]}, "hoiana-3": {"h": [[0.587, 0.5001, 0.6462, 0.5406], [0.563, 0.4937, 0.7009, 0.5522]], "s": [[0.5725, 0.5038, 0.6914, 0.7056]]}, "hoiana-4": {"h": [[0.7083, 0.7112, 0.7929, 0.769], [0.7015, 0.7058, 0.7983, 0.7732]], "s": [[0.7081, 0.7174, 0.7916, 0.9501]]}, "hoiana-5": {"h": [[0.0, 0.0, 0.5782, 0.1784]], "s": [[0.0, 0.0, 0.5353, 0.2928]]}, "hoiana-6": {"h": [[0.6973, 0.6139, 0.8414, 0.7146], [0.3315, 0.2946, 0.3816, 0.3296], [0.3795, 0.305, 0.4236, 0.3359], [0.3226, 0.288, 0.3983, 0.3319], [0.3818, 0.3005, 0.4849, 0.3518], [0.2746, 0.3488, 0.35, 0.3773]], "s": [[0.3278, 0.2956, 0.3931, 0.4469], [0.3889, 0.3094, 0.4778, 0.4864], [0.2798, 0.3537, 0.3448, 0.4519]]}, "hoiana-7": {"h": [[0.5179, 0.5509, 0.6584, 0.6286]], "s": [[0.5276, 0.5643, 0.6487, 0.832]]}, "hoiana-8": {"h": [[0.0439, 0.4522, 0.2077, 0.5641]], "s": []}, "hoiana-9": {"h": [[0.2721, 0.5078, 0.5744, 0.7143], [0.1721, 0.5127, 0.6441, 0.6642]], "s": [[0.2047, 0.5286, 0.6116, 0.8467]]}, "hv-heritance": {"h": [[0.4175, 0.6915, 1.0, 0.8859], [0.7556, 0.0, 1.0, 0.2253]], "s": [[0.4607, 0.7062, 0.9997, 1.0], [0.7735, 0.0292, 0.9964, 0.846]]}, "hv-hoiana": {"h": [[0.4983, 0.5507, 0.6588, 0.6283]], "s": [[0.5094, 0.5641, 0.6477, 0.8316]]}, "hv-intercontinental": {"h": [[0.6586, 0.3682, 0.7517, 0.4318], [0.5993, 0.3493, 0.7583, 0.4537]], "s": [[0.6102, 0.3673, 0.7473, 0.7275]]}, "hv-millennium": {"h": [[0.0, 0.1827, 0.5841, 0.3891]], "s": [[0.0273, 0.2172, 0.5428, 0.9073]]}, "millennium-1": {"h": [[0.4289, 0.153, 1.0, 0.3834]], "s": [[0.4706, 0.1928, 0.991, 0.9872]]}, "millennium-10": {"h": [[0.6187, 0.4086, 0.8811, 0.5879], [0.4413, 0.4129, 0.9719, 0.5931]], "s": [[0.4779, 0.4407, 0.9353, 0.9971]]}, "millennium-2": {"h": [[0.3318, 0.5866, 0.4083, 0.6388], [0.2943, 0.574, 0.437, 0.6438], [0.0, 0.4007, 0.1247, 0.5104]], "s": [[0.3042, 0.5861, 0.4271, 0.8267], [0.0, 0.4196, 0.1154, 0.7977]]}, "millennium-3": {"h": [[0.137, 0.2933, 0.2835, 0.3934], [0.0763, 0.2788, 0.4308, 0.3979]], "s": [[0.1007, 0.2961, 0.4063, 0.6418]]}, "millennium-7": {"h": [[0.0, 0.0, 0.4576, 0.3119]], "s": []}, "millennium-8": {"h": [[0.5668, 0.2195, 0.719, 0.3235], [0.4296, 0.1883, 0.8774, 0.3759]], "s": [[0.4605, 0.2207, 0.8466, 0.8676]]}, "millennium-9": {"h": [[0.5918, 0.6227, 0.7848, 0.6852]], "s": [[0.6051, 0.6298, 0.7715, 0.7713]]}, "p-1": {"h": [[0.2423, 0.5527, 0.4237, 0.6164]], "s": [[0.2548, 0.5636, 0.4112, 0.7835]]}, "p-2": {"h": [[0.3879, 0.4041, 0.4758, 0.4642], [0.3582, 0.3905, 0.4822, 0.4703], [0.739, 0.2629, 0.9942, 0.41]], "s": [[0.3668, 0.4043, 0.4737, 0.6794], [0.7566, 0.2882, 0.9766, 0.7955]]}, "p-4": {"h": [[0.1762, 0.4932, 1.0, 0.7698], [0.0, 0.5967, 0.8092, 0.8645], [0.0, 0.1788, 0.8405, 0.475]], "s": [[0.2373, 0.5156, 1.0, 0.9654], [0.002, 0.6154, 0.7494, 0.991], [0.0, 0.2157, 0.7782, 0.9544]]}, "p-7": {"h": [[0.7117, 0.7128, 0.7897, 0.7661], [0.701, 0.7055, 0.7982, 0.7733]], "s": [[0.7077, 0.7172, 0.7915, 0.951]]}, "p-8": {"h": [[0.1525, 0.2638, 0.9423, 0.5257], [0.2314, 0.5377, 1.0, 0.7962], [0.4741, 0.3255, 0.8817, 0.4498], [0.4646, 0.1693, 1.0, 0.3492]], "s": [[0.2069, 0.2989, 0.8879, 1.0], [0.2882, 0.5595, 0.9986, 0.9968], [0.5022, 0.3327, 0.8536, 0.4763], [0.5035, 0.1872, 0.9895, 0.5461]]}, "palau-2": {"h": [[0.4344, 0.3926, 0.5503, 0.4718], [0.7555, 0.3936, 0.8635, 0.4674], [0.2791, 0.3752, 0.6006, 0.5017], [0.7141, 0.3801, 0.9377, 0.4839]], "s": [[0.3013, 0.397, 0.5785, 0.8331], [0.7295, 0.398, 0.9222, 0.756]]}, "palau-3": {"h": [[0.3038, 0.3077, 0.5901, 0.5033], [0.1623, 0.3239, 0.6215, 0.4754]], "s": [[0.194, 0.3435, 0.5898, 0.7358]]}, "palau-5": {"h": [[0.2507, 0.4309, 1.0, 0.68]], "s": [[0.306, 0.4497, 0.9974, 0.826]]}, "palau-6": {"h": [[0.3604, 0.4121, 0.6441, 0.527]], "s": [[0.38, 0.4319, 0.6245, 0.8283]]}, "palau-7": {"h": [[0.6485, 0.0, 1.0, 0.1069], [0.0, 0.1877, 0.4136, 0.3312], [0.4954, 0.6798, 1.0, 0.8507]], "s": [[0.6742, 0.0, 0.9951, 0.4195], [0.0, 0.2036, 0.383, 0.5201], [0.5328, 0.6951, 1.0, 1.0]]}, "palau-9": {"h": [[0.4145, 0.4077, 1.0, 0.6165]], "s": [[0.4579, 0.4358, 1.0, 0.9996]]}, "ph-food-3": {"h": [[0.0, 0.2117, 0.2471, 0.4666], [0.451, 0.1267, 1.0, 0.6145], [0.6387, 0.2592, 1.0, 0.3791], [0.2633, 0.1372, 1.0, 0.3844], [0.0, 0.0, 0.8008, 0.2489], [0.1719, 0.0, 1.0, 0.2553]], "s": [[0.6655, 0.2676, 1.0, 0.4363], [0.3178, 0.1573, 0.999, 0.5608], [0.0027, 0.0026, 0.7417, 0.4101], [0.2331, 0.0, 0.9989, 0.4458]]}, "ph-food-5": {"h": [[0.597, 0.0, 1.0, 0.1486], [0.0, 0.5517, 0.3708, 0.6875], [0.0, 0.5655, 0.3323, 0.6763]], "s": [[0.6268, 0.0049, 1.0, 0.6035], [0.0, 0.5731, 0.3434, 1.0], [0.0024, 0.5745, 0.3079, 0.7539]]}, "ph-food-8": {"h": [[0.3047, 0.0, 0.9168, 0.1915]], "s": [[0.3469, 0.0031, 0.8746, 0.363]]}, "ph-hospitality-1": {"h": [[0.5027, 0.4368, 0.5804, 0.4937], [0.4927, 0.4254, 0.6375, 0.5026]], "s": [[0.5027, 0.4387, 0.6275, 0.7049]]}, "ph-hospitality-3": {"h": [[0.6984, 0.6754, 0.7661, 0.7216]], "s": []}, "ph-hospitality-5": {"h": [[0.6338, 0.4179, 0.8119, 0.4794]], "s": [[0.6461, 0.4282, 0.7996, 0.6333]]}, "ph-interiors-1": {"h": [[0.7274, 0.3943, 0.8334, 0.4667], [0.5933, 0.3893, 0.6971, 0.4603], [0.4748, 0.3794, 0.7578, 0.5043], [0.6925, 0.394, 0.945, 0.4755]], "s": [[0.4943, 0.4009, 0.7383, 0.8317], [0.7099, 0.403, 0.9276, 0.5817]]}, "ph-interiors-3": {"h": [[0.6346, 0.3921, 0.7398, 0.464], [0.4699, 0.3755, 0.5533, 0.4325], [0.619, 0.3787, 0.7649, 0.4843], [0.3958, 0.3714, 0.5771, 0.4306]], "s": [[0.6291, 0.3969, 0.7548, 0.7611], [0.4083, 0.3785, 0.5646, 0.5205]]}, "ph-interiors-5": {"h": [[0.1405, 0.0, 0.5025, 0.267]], "s": [[0.1654, 0.0329, 0.4776, 0.737]]}, "ph-lifestyle-1": {"h": [[0.3016, 0.458, 0.4155, 0.5359], [0.2422, 0.4497, 0.4726, 0.5291]], "s": [[0.2581, 0.4629, 0.4567, 0.7277]]}, "ph-lifestyle-3": {"h": [[0.3313, 0.0, 1.0, 0.2057]], "s": [[0.3806, 0.0003, 0.9968, 0.6184]]}, "ph-lifestyle-6": {"h": [[0.1272, 0.197, 0.3121, 0.3233], [0.0742, 0.1911, 0.4225, 0.3358]], "s": [[0.0982, 0.2161, 0.3985, 0.7149]]}, "ph-lifestyle-8": {"h": [[0.353, 0.0495, 1.0, 0.2763], [0.2481, 0.2726, 1.0, 0.5298]], "s": [[0.4008, 0.0773, 0.9978, 0.633], [0.3038, 0.2977, 1.0, 0.8001]]}, "ph-nature-2": {"h": [[0.2786, 0.5277, 0.502, 0.6157]], "s": [[0.294, 0.5429, 0.4866, 0.8465]]}, "ph-product-1": {"h": [[0.4569, 0.3694, 0.892, 0.6667]], "s": []}, "ph-product-3": {"h": [[0.0583, 0.0, 0.9179, 0.4747], [0.019, 0.0, 0.8998, 0.2813]], "s": [[0.0797, 0.0282, 0.839, 0.7875]]}, "ph-product-6": {"h": [[0.6714, 0.5252, 0.9488, 0.6549]], "s": [[0.6906, 0.5475, 0.9297, 0.9947]]}, "pl-hoiana-2": {"h": [[0.4614, 0.2828, 0.5706, 0.3831]], "s": [[0.4689, 0.2994, 0.563, 0.6318]]}, "pl-hoiana": {"h": [[0.2352, 0.1194, 0.5799, 0.4254]], "s": [[0.259, 0.1613, 0.5561, 0.9987]]}, "pl-millennium-2": {"h": [[0.4734, 0.1416, 0.6671, 0.3741]], "s": [[0.4868, 0.1817, 0.6537, 0.9835]]}, "pl-millennium": {"h": [[0.0874, 0.1522, 0.5229, 0.4736], [0.4252, 0.1927, 0.4948, 0.2451], [0.0816, 0.0, 0.4315, 0.2333], [0.5023, 0.2092, 0.5533, 0.2488], [0.5532, 0.5984, 0.6732, 0.6868], [0.3833, 0.2072, 0.4344, 0.2471]], "s": [[0.1174, 0.1921, 0.4928, 0.9891], [0.43, 0.2001, 0.49, 0.3493], [0.1057, 0.0071, 0.4073, 0.776], [0.5058, 0.2158, 0.5498, 0.348], [0.5615, 0.6092, 0.6649, 0.8263], [0.3868, 0.2141, 0.4309, 0.3513]]}, "s-creative-direction": {"h": [[0.3879, 0.4041, 0.4758, 0.4642], [0.3582, 0.3905, 0.4822, 0.4703], [0.739, 0.2629, 0.9942, 0.41]], "s": [[0.3668, 0.4043, 0.4737, 0.6794], [0.7566, 0.2882, 0.9766, 0.7955]]}, "s-film": {"h": [[0.2423, 0.5527, 0.4237, 0.6164]], "s": [[0.2548, 0.5636, 0.4112, 0.7835]]}, "s-lifestyle-production": {"h": [[0.7117, 0.7128, 0.7897, 0.7661], [0.701, 0.7055, 0.7982, 0.7733]], "s": [[0.7077, 0.7172, 0.7915, 0.951]]}, "s-photography": {"h": [[0.1762, 0.4932, 1.0, 0.7698], [0.0, 0.5967, 0.8092, 0.8645], [0.0, 0.1788, 0.8405, 0.475]], "s": [[0.2373, 0.5156, 1.0, 0.9654], [0.002, 0.6154, 0.7494, 0.991], [0.0, 0.2157, 0.7782, 0.9544]]}, "sixsenses-10": {"h": [[0.4459, 0.3578, 0.5665, 0.4402], [0.3757, 0.3381, 0.6068, 0.4771]], "s": [[0.3916, 0.3621, 0.5909, 0.8412]]}, "sixsenses-2": {"h": [[0.33, 0.52, 0.56, 0.68]], "s": [[0.32, 0.52, 0.58, 0.85]]}, "sixsenses-4": {"h": [[0.4093, 0.5216, 0.5149, 0.5938], [0.3712, 0.505, 0.5555, 0.6163]], "s": [[0.3839, 0.5242, 0.5427, 0.9079]]}, "sixsenses-5": {"h": [[0.2812, 0.505, 0.5384, 0.6807], [0.1524, 0.4953, 0.535, 0.6278]], "s": [[0.1788, 0.5179, 0.5086, 0.9697]]}, "sixsenses-6": {"h": [[0.3487, 0.6146, 0.5796, 0.6903]], "s": [[0.3646, 0.624, 0.5637, 0.811]]}, "sixsenses-7": {"h": [[0.5608, 0.2575, 0.7237, 0.3332]], "s": [[0.572, 0.2705, 0.7124, 0.5316]]}, "sixsenses-8": {"h": [[0.469, 0.4172, 0.5902, 0.5], [0.4041, 0.3992, 0.6524, 0.5323]], "s": [[0.4212, 0.4222, 0.6352, 0.881]]}, "studio": {"h": [[0.5655, 0.4325, 0.6875, 0.5158], [0.5068, 0.4122, 0.7431, 0.5429]], "s": [[0.5231, 0.4347, 0.7268, 0.8854]]}, "w-heritance": {"h": [[0.689, 0.4585, 0.7458, 0.562]], "s": []}, "w-hideaway": {"h": [[0.1639, 0.4309, 0.2187, 0.5306]], "s": []}, "w-hoiana": {"h": [[0.3381, 0.2451, 0.4386, 0.4283], [0.2562, 0.2253, 0.5711, 0.5011]], "s": [[0.2779, 0.2598, 0.5493, 0.9508]]}, "w-palau": {"h": [[0.5636, 0.4208, 0.6626, 0.4879], [0.3899, 0.3965, 0.6964, 0.5248], [0.5222, 0.4107, 0.713, 0.521]], "s": [[0.4111, 0.4186, 0.6752, 0.861], [0.5354, 0.4297, 0.6999, 0.81]]}, "westin-2": {"h": [[0.1796, 0.4798, 0.7977, 0.902], [0.5105, 0.5447, 0.6874, 0.6119]], "s": [[0.5227, 0.5563, 0.6752, 0.788]]}, "westin-4": {"h": [[0.1991, 0.6413, 0.5537, 0.7523]], "s": [[0.2235, 0.6504, 0.5293, 0.8339]]}, "westin-6": {"h": [[0.2651, 0.0265, 0.6633, 0.2985], [0.0061, 0.0462, 0.8634, 0.3292]], "s": [[0.0652, 0.083, 0.8043, 0.8193]]}, "ab-photo": {"h": [[0.33, 0.52, 0.56, 0.68]], "s": [[0.32, 0.52, 0.58, 0.85]]}, "w-sixsenses": {"h": [[0.33, 0.52, 0.56, 0.68]], "s": [[0.32, 0.52, 0.58, 0.85]]}, "film-bangkok-2": {"h": [[0.26, 0.18, 0.42, 0.42]], "s": [[0.22, 0.18, 0.44, 0.85]]}, "film-heritance-2": {"h": [[0.55, 0.34, 0.67, 0.54]], "s": [[0.54, 0.34, 0.68, 0.95]]}, "film-westin-2": {"h": [[0.49, 0.38, 0.59, 0.54]], "s": [[0.48, 0.38, 0.6, 0.8]]}, "film-westin-3": {"h": [[0.52, 0.38, 0.64, 0.52]], "s": []}, "hideaway-4": {"h": [[0.22, 0.58, 0.75, 0.74]], "s": []}, "hv-hideaway": {"h": [[0.28, 0.58, 0.78, 0.75]], "s": []}, "p-5": {"h": [[0.66, 0.39, 0.79, 0.52]], "s": [[0.64, 0.39, 0.8, 0.66]]}, "palau-8": {"h": [[0.54, 0.36, 0.8, 0.6]], "s": [[0.52, 0.36, 0.85, 0.85]]}, "ph-nature-7": {"h": [[0.58, 0.6, 0.68, 0.72]], "s": []}, "sixsenses-1": {"h": [[0.47, 0.56, 0.6, 0.68]], "s": [[0.46, 0.56, 0.61, 0.76]]}, "w-bangkok": {"h": [[0.44, 0.3, 0.62, 0.48]], "s": [[0.42, 0.3, 0.65, 0.88]]}};
 </script>
 <script>
-/* Site content. Everything Andra will later edit in the CMS lives here.
-   Image values are asset keys (see assets/manifest.json); build.py inlines them. */
+/* Site content. On the live server the CMS (admin/) writes window.SITE_DATA into the page and every list
+   and text below is taken from there; the values here are the defaults the prototype ships with.
+   Image values are asset keys (see assets/manifest.json) or upload paths ("uploads/..."). */
+const SITE_DATA = (typeof window !== 'undefined' && window.SITE_DATA) || null;
+const S_ = (k, d) => (SITE_DATA && SITE_DATA[k] != null) ? SITE_DATA[k] : d;
+const deepMerge = (a, b) => { if (!b || typeof b !== 'object' || Array.isArray(b)) return b ?? a; const o = { ...a };
+  for (const k of Object.keys(b)) o[k] = (a && typeof a[k] === 'object' && !Array.isArray(a[k]) && a[k]) ? deepMerge(a[k], b[k]) : (b[k] ?? a[k]); return o };
 
-const PROJECTS = [
+const PROJECTS = S_('projects', [
   { slug:'palau', name:'Four Seasons Explorer', client:'Four Seasons', location:'Palau', year:'2026',
     services:['Photography','Film','Drone','Lifestyle Production'], logo:'four-seasons.svg',
     hero:'film-palau-1', heroM:'w-palau', coverV:'w-palau', coverL:'film-palau-1',
@@ -780,14 +792,14 @@ const PROJECTS = [
       {t:'large', k:'hv-intercontinental'},
       {t:'video', k:'film-intercontinental-1'},
       {t:'video', k:'film-intercontinental-3'} ]},
-];
+]);
 
 /* Photography: one list, multi-category, manually ordered. */
-const CATS = [
+const CATS = S_('cats', [
   ['hospitality','Hospitality'],['lifestyle','Lifestyle'],['food-beverage','Food & Beverage'],
-  ['nature','Nature'],['interiors','Interiors'],['drone','Drone'],['product','Product']];
+  ['nature','Nature'],['interiors','Interiors'],['drone','Drone'],['product','Product']]);
 const P = (k,cats,project,loc) => ({k,cats,project,loc});
-const PHOTOS = [
+const PHOTOS = S_('photos', [
   P('palau-1',['drone','nature'],'palau','Palau'),
   P('p-1',['hospitality'],null,''),
   P('ph-food-3',['food-beverage'],null,''),
@@ -833,10 +845,10 @@ const PHOTOS = [
   P('hideaway-6',['nature','drone'],'hideaway','Haa Alifu Atoll, Maldives'),
   P('ph-interiors-3',['interiors'],null,''),
   P('ph-product-4',['product'],null,''),
-];
+]);
 
 /* Film: grouped by category; a group with fewer than two films folds into "More films". */
-const FILMS = [
+const FILMS = S_('films', [
   {k:'film-heritance-1', title:'Heritance Aarah', client:'Heritance Hotels & Resorts', loc:'Raa Atoll, Maldives', cat:'Hospitality', project:'heritance'},
   {k:'film-bangkok-2', title:'Four Seasons Bangkok', client:'Four Seasons', loc:'Bangkok, Thailand', cat:'Hospitality', project:'bangkok'},
   {k:'film-hideaway-1', title:'Hideaway Beach Resort & Spa', client:'Hideaway', loc:'Haa Alifu Atoll, Maldives', cat:'Hospitality', project:'hideaway'},
@@ -848,14 +860,14 @@ const FILMS = [
   {k:'film-mazda-1', title:'Mazda', client:'Mazda Europe', loc:'', cat:'Brand & Commercial', project:null},
   {k:'film-garmin-2', title:'Garmin × Mazda', client:'Mazda Europe', loc:'', cat:'Brand & Commercial', project:null},
   {k:'film-dior-1', title:'Dior', client:'Dior', loc:'', cat:'Brand & Commercial', project:null},
-];
-const HOME_FILMS = [
+]);
+const HOME_FILMS = S_('homeFilms', [
   {k:'f-01', title:'Film 01', meta:'Client and location to confirm'},
   {k:'f-02', title:'InterContinental', meta:'Film 02', project:'intercontinental'},
   {k:'f-03', title:'InterContinental', meta:'Film 03', project:'intercontinental'},
-];
+]);
 
-const SERVICES = [
+const SERVICES = S_('services', [
   {id:'photography', name:'Photography', short:'Hospitality, lifestyle, interiors, food and destinations.', img:'s-photography',
    body:'High-end photography for hospitality, lifestyle, architecture, interiors, food and beverage, and destinations. Every shoot is planned around the light, the guest journey and the way the property wants to be seen.',
    deliv:'Retouched image libraries, campaign and editorial imagery, website and OTA sets.'},
@@ -874,18 +886,88 @@ const SERVICES = [
   {id:'content-libraries', name:'Content libraries', short:'One production, planned for every channel.', img:'s-content-libraries',
    body:'One production, planned to cover every channel. Photography and film delivered as a cohesive library for websites, campaigns, PR, marketing and social media.',
    deliv:''},
-];
+]);
 
-const LOGOS = [
+const LOGOS = S_('logos', [
  ['four-seasons.svg','Four Seasons','palau',58,50],['soneva.png','Soneva',null,40,64],['anantara.png','Anantara',null,44,58],
  ['banyan-tree.svg','Banyan Tree',null,30,64],['six-senses.png','Six Senses','sixsenses',40,62],['heritance-aarah.svg','Heritance','heritance',50,54],
  ['hoiana.png','Hoiana Resort & Golf','hoiana',56,38],['intercontinental.png','InterContinental','intercontinental',54,40],['westin.svg','Westin','westin',50,40],
  ['millenium.png','Millennium Hotels','millennium',60,30],['rixos.svg','Rixos',null,52,40],['lux.svg','LUX* Resorts',null,40,44],
- ['dior.svg','Dior',null,42,28],['mazda.svg','Mazda',null,50,40],['animawings.svg','Animawings',null,52,40]];
+ ['dior.svg','Dior',null,42,28],['mazda.svg','Mazda',null,50,40],['animawings.svg','Animawings',null,52,40]]);
 
-const HOME_WORK = ['palau','heritance','sixsenses','hoiana','bangkok','hideaway'];
-const HOME_PHOTOS = [
-  ['p-1','Hospitality'],['p-2','Interiors'],['p-3','Drone'],['p-4','Lifestyle'],['p-5','Hospitality'],['p-7','Interiors'],['p-8','Food & Beverage']];
+const HOME_WORK = S_('homeWork', ['palau','heritance','sixsenses','hoiana','bangkok','hideaway']);
+const HOME_PHOTOS = S_('homePhotos', [
+  ['p-1','Hospitality'],['p-2','Interiors'],['p-3','Drone'],['p-4','Lifestyle'],['p-5','Hospitality'],['p-7','Interiors'],['p-8','Food & Beverage']]);
+
+/* Every fixed text and image on the site. Editable in the CMS (Homepage, About, Contact, Pages). */
+const C = deepMerge({
+  brand: 'Chasing Stories',
+  available: 'Available worldwide.',
+  home: {
+    display: 'Chasing Stories',
+    h1: 'Visual storytelling for luxury hospitality, travel & lifestyle brands.',
+    sub: 'Photography, film & creative production.',
+    button: 'View our work',
+    heroAlt: 'A guest reading on an overwater deck in the Maldives, villas on the horizon',
+    workLabel: 'Selected work', workLine: 'Recent productions for hotels, resorts and destinations.',
+    photoLabel: 'Photography', photoLine: 'Hotels, resorts, food, people and places, composed with an editorial eye.',
+    trustedLabel: 'Trusted by', trustedLine: 'Hotels, resorts and brands we have worked with.',
+    filmLabel: 'Film', filmLine: 'Short films and brand films that carry the pace, light and sound of a place.',
+    studioLabel: 'The studio',
+    studioLead: 'We are a visual storytelling studio specializing in luxury hospitality, travel and lifestyle content.',
+    studioText: 'Through cinematic photography, refined videography and emotionally driven storytelling, we help hotels, resorts and premium brands translate experiences into compelling visual narratives.\n\nOur work blends creative direction with production expertise to capture the atmosphere, emotion and identity of a place, creating imagery that feels lived-in, elevated and deeply experiential.',
+    studioAlt: 'Guest in a stone-walled suite at dusk',
+    servicesLabel: 'What we do',
+  },
+  cta: { h2: 'Have a project in mind?', lead: "Let's create something meaningful.", projectH2: 'Planning a similar production?', button: 'Get in touch' },
+  pages: {
+    workTitle: 'Work', workIntro: 'Selected productions for hotels, resorts, destinations and brands.',
+    photoTitle: 'Photography', photoIntro: 'Photography is where our work began and where it remains strongest. Every image is composed for the brand it belongs to, in natural light wherever possible.',
+    filmTitle: 'Film', filmIntro: 'Our films follow the same principle as our photography: composed, unhurried and true to the place. Property films, brand films and short-form stories, shot for the big screen and cut for every channel.',
+    servicesTitle: 'Services', servicesIntro: 'From a single photography brief to a full production across photo, film and drone, we plan, direct and deliver the visual content a property needs.',
+    servicesBand: 'Every production is scoped individually. Tell us about your project and we will prepare a proposal.',
+  },
+  about: {
+    title: 'About Chasing Stories',
+    intro: 'Chasing Stories is a creative production studio for luxury hospitality, travel and lifestyle brands. We produce photography and film for hotels, resorts and destinations across Asia, the Indian Ocean and beyond.',
+    openAlt: 'Overwater villas and lagoon from above, Maldives',
+    approachTitle: 'Our approach',
+    approach: 'We treat every property as a place with its own character. Before we shoot, we study how guests move through it, when the light is at its best and what sets it apart. On location, we direct rather than document: every frame is planned, with room left for the moments that cannot be.',
+    productionTitle: 'Creative production',
+    production: 'Photography, film, drone and lifestyle production are handled by one team, under one creative direction. One brief, one visual language and a single library of assets that works across your website, campaigns, PR and social channels.',
+    disc: [
+      { label: 'Photography', meta: 'Six Senses Kocataş Mansions', img: 'ab-photo', project: 'sixsenses', film: '' },
+      { label: 'Film', meta: 'Four Seasons Explorer', img: 'film-palau-2', project: '', film: 'poster:film-palau-2' },
+      { label: 'Drone', meta: 'Hoiana Resort & Golf', img: 'ab-drone', project: 'hoiana', film: '' },
+    ],
+    stepsTitle: 'How we work',
+    steps: [
+      { t: 'Discover', d: 'We learn the property, the brand and the audience, and agree on what the content needs to achieve.', img: 'heritance-6' },
+      { t: 'Concept', d: 'Visual direction, moodboards, shot lists and schedules, approved before we arrive.', img: 'sixsenses-4' },
+      { t: 'Produce', d: 'Photography, film and drone on location, with talent and styling where the story needs it.', img: 'palau-3' },
+      { t: 'Curate', d: 'We edit with restraint. Only the strongest frames make the final selection.', img: 'hoiana-5' },
+      { t: 'Deliver', d: 'Retouched images and graded films, prepared in the formats each channel requires.', img: 'bangkok-6' },
+    ],
+    worldTitle: 'Available worldwide',
+    worldText: 'We travel for every production. Recent work has taken us to the Maldives, Thailand, Vietnam, Palau, Singapore, Hong Kong, Malaysia, Turkey and Tanzania.',
+    worldCta: "Have a project in mind? Let's create something meaningful.",
+  },
+  contact: {
+    title: "Let's create something",
+    intro: 'Tell us a little about your project, location and requirements. We reply to every enquiry within two working days.',
+    success: 'Your enquiry is with us and we will reply within two working days.',
+    email: 'hello@chasingstories.org',
+    instagram: 'https://www.instagram.com/andra.oprea',
+    linkedin: 'https://www.linkedin.com/in/andra-oprea-2a620b310/',
+    imgAlt: 'Evening light on a terrace',
+    types: ['Photography', 'Film', 'Photography + Film', 'Creative Direction', 'Full Production'],
+  },
+  footer: { line: 'Creative production for luxury hospitality, travel and lifestyle brands.' },
+  privacy: '',
+  notfound: { h1: 'This story has moved on.', p: 'The page you are looking for does not exist or has been moved.' },
+  img: { hero: 'hero', heroM: 'hero-m', prefooter: 'prefooter', studio: 'studio', aboutOpen: 'ab-open', world: 'ab-dest', contact: 'contact', notfound: 'film-palau-1' },
+  video: { hero: '', heroM: '' },
+}, S_('copy', null));
 
 /* Films: poster asset key -> Google Drive id of the web-sized [SMALL] mp4 (Drive refuses cross-site playback, so these are the SOURCE files to re-encode and host).
    The page plays them through videoURL(). Generated from the Drive listing; see tools/ for the mapping rules. */
@@ -932,9 +1014,10 @@ const videoURL = k => (VIDEO_BASE && VIDEOS[k]) ? `${VIDEO_BASE}/${k}.mp4` : '';
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s,r=document)=>r.querySelector(s), $$ = (s,r=document)=>[...r.querySelectorAll(s)];
 const esc = s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const I = k=>ASSETS[k]||'';
+const I = k=>ASSETS[k]||(k&&/[\/.]/.test(k)?k:'');          // asset key, or an upload path from the CMS
 const DIM = k=>(MANIFEST[k]||[4,5]);
-const LOGO = f=>ASSETS['logo/'+f]||'';
+const LOGO = f=>ASSETS['logo/'+f]||(f&&/[\/.]/.test(f)?f:'');
+const vsrc = f=>{const v=f&&f.video||'';if(v.startsWith('poster:'))return videoURL(v.slice(7));return v||videoURL(f&&f.k)};
 const byslug = s=>PROJECTS.find(p=>p.slug===s);
 const nf = n=>String(n).padStart(2,'0');
 document.getElementById('yr').textContent = new Date().getFullYear();
@@ -1130,33 +1213,33 @@ function frame(k,alt,{ratio,px,pal}={}){
 }
 function projCard(p,cls,land,withSvc){
   const loc=[p.location,p.year].filter(Boolean).join(' · ')||'Location to confirm';
-  return `<a class="card ${land?'land ':''}${cls}" href="#work-${p.slug}" data-cursor="View">
+  return `<a class="card ${land?'land ':''}${cls}" href="#work-${p.slug}">
     ${frame(land?p.coverL:p.coverV,p.name,{ratio:land?'3/2':'4/5'})}
-    <div class="row"><div><h3>${esc(p.name)}</h3><div class="meta">${esc(loc)}</div>${withSvc?`<div class="meta svc">${p.services.join(', ')}</div>`:''}</div><span class="arrow" aria-hidden="true">↗</span></div></a>`;
+    <div class="row"><div><h3>${esc(p.name)}</h3><div class="meta">${esc(loc)}</div>${withSvc?`<div class="meta svc">${esc((p.services||[]).join(', '))}</div>`:''}</div><span class="arrow" aria-hidden="true">↗</span></div></a>`;
 }
-const intro=(lab,line)=>`<div class="intro"><div class="l">${label(lab)}<p>${line}</p></div></div>`;
+const intro=(lab,line)=>`<div class="intro"><div class="l">${label(esc(lab))}${line?`<p>${esc(line)}</p>`:''}</div></div>`;
+const paras=t=>String(t||'').split(/\n\s*\n/).filter(Boolean).map(x=>`<p>${esc(x.trim())}</p>`).join('');
 function cta(project){
-  const h=project?'Planning a similar production?':'Have a project in mind?';
   return `<section class="cta" id="enquire" data-field="prefooter">
-    <img class="bg" src="${I('prefooter')}" alt="" loading="lazy">
+    <img class="bg" src="${I(C.img.prefooter)}" alt="" loading="lazy">
     <div class="scrim"></div>
-    <div class="copy"><h2>${h}</h2>${project?'':`<p class="lead">Let's create something meaningful.</p>`}
-      ${btn(project?'contact-'+project:'contact','Get in touch','light')}<p class="meta" style="color:inherit;opacity:.85">Available worldwide.</p></div></section>`;
+    <div class="copy"><h2>${esc(project?C.cta.projectH2:C.cta.h2)}</h2>${project?'':`<p class="lead">${esc(C.cta.lead)}</p>`}
+      ${btn(project?'contact-'+project:'contact',esc(C.cta.button),'light')}<p class="meta" style="color:inherit;opacity:.85">${esc(C.available)}</p></div></section>`;
 }
 function logoGrid(){
   return `<div class="logos">${LOGOS.map(([f,n,slug,w,h])=>{const s=`<img src="${LOGO(f)}" alt="" style="--w:${w}%;--h:${h}%" loading="lazy">`;
-    return slug?`<a class="logo" href="#work-${slug}" title="${esc(n)}" aria-label="${esc(n)}, view project">${s}</a>`:`<div class="logo" role="img" title="${esc(n)}" aria-label="${esc(n)}">${s}</div>`}).join('')}</div>`;
+    return slug&&byslug(slug)?`<a class="logo" href="#work-${slug}" title="${esc(n)}" aria-label="${esc(n)}, view project">${s}</a>`:`<div class="logo" role="img" title="${esc(n)}" aria-label="${esc(n)}">${s}</div>`}).join('')}</div>`;
 }
 function filmBtn(f,i,big){
   const meta=esc(f.meta||[f.client!==f.title?f.client:'',f.loc].filter(Boolean).join(' · ')||f.cat);
-  if(f.project)return `<a class="film linked${big?' big':''}" href="#work-${f.project}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="go" aria-hidden="true">↗</span></div>
+  if(f.project&&byslug(f.project))return `<a class="film linked${big?' big':''}" href="#work-${f.project}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="go" aria-hidden="true">↗</span></div>
     <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${meta}</div></div><span class="vp">View project</span></div></a>`;
   return `<button class="film${big?' big':''}" data-film="${i}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></div>
     <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${meta}</div></div><span class="vp">Play film</span></div></button>`;
 }
 
 function hrail(lab,cards,title){
-  return `<section class="hscroll"><div class="hs-sticky"><div class="wrap hs-head">${label(lab)}${title?`<h2>${title}</h2>`:''}<span class="hs-count meta"><b>01</b> / ${nf(cards.length)}</span></div>
+  return `<section class="hscroll"><div class="hs-sticky"><div class="wrap hs-head">${label(esc(lab))}${title?`<h2>${esc(title)}</h2>`:''}<span class="hs-count meta"><b>01</b> / ${nf(cards.length)}</span></div>
     <div class="hs-view"><div class="hs-track">${cards.join('')}</div></div>
     <div class="wrap"><div class="hs-bar"><i></i></div></div></div></section>`;
 }
@@ -1164,35 +1247,33 @@ let PAL_PAGE=false; // set while a page that shows palettes everywhere (home, se
 const PAGES={};
 
 PAGES.home=()=>{
-  const W=HOME_WORK.map(byslug);const cls=['c1','c2','c3','c4','c5','c6'];
+  const W=HOME_WORK.map(byslug).filter(Boolean).slice(0,6);const cls=['c1','c2','c3','c4','c5','c6'];const H=C.home;
   return {hero:true,filmList:HOME_FILMS,lightbox:HOME_PHOTOS.map(([k,c])=>({k,cap:c})),html:`
   <section class="hero" id="hero" data-field="hero">
-    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I('hero-m')}"><img src="${I('hero')}" alt="A guest reading on an overwater deck in the Maldives, villas on the horizon" fetchpriority="high"></picture>
+    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(C.img.heroM)}"><img src="${I(C.img.hero)}" alt="${esc(H.heroAlt)}" fetchpriority="high"></picture>
     <div class="scrim"></div>
-    <div class="copy"><p class="display" aria-hidden="true">Chasing Stories</p>
-      <h1>Visual storytelling for luxury hospitality, travel &amp; lifestyle brands.</h1>
-      <p class="sub">Photography, film &amp; creative production.</p>${btn('work','View our work','light')}</div>
+    <div class="copy"><p class="display" aria-hidden="true">${esc(H.display)}</p>
+      <h1>${esc(H.h1)}</h1>
+      <p class="sub">${esc(H.sub)}</p>${btn('work',esc(H.button),'light')}</div>
     <span class="cue" aria-hidden="true"><i></i></span>
   </section>
-  <section class="sec"><div class="wrap">${intro('Selected work','Recent productions for hotels, resorts and destinations.')}
+  <section class="sec"><div class="wrap">${intro(H.workLabel,H.workLine)}
     <div class="grid work">${W.map((p,i)=>projCard(p,cls[i],i%2===1)).join('')}</div>
     <div class="more">${btn('work','View all work')}</div></div></section>
-  <section class="sec photo"><div class="wrap">${intro('Photography','Hotels, resorts, food, people and places, composed with an editorial eye.')}
-    <div class="grid gal">${HOME_PHOTOS.map(([k,c],i)=>`<figure class="g${i+1}"><button data-lb="${i}" data-cursor="Open" aria-label="Open photograph ${i+1}">${frame(k,c,{ratio:'2/3'})}</button><figcaption class="meta">${c}</figcaption></figure>`).join('')}</div>
+  <section class="sec photo"><div class="wrap">${intro(H.photoLabel,H.photoLine)}
+    <div class="grid gal">${HOME_PHOTOS.slice(0,7).map(([k,c],i)=>`<figure class="g${i+1}"><button data-lb="${i}" aria-label="Open photograph ${i+1}">${frame(k,c,{ratio:'2/3'})}</button><figcaption class="meta">${esc(c)}</figcaption></figure>`).join('')}</div>
     <div class="more">${btn('photography','View photography')}</div></div></section>
-  <section class="sec"><div class="wrap">${intro('Trusted by','Hotels, resorts and brands we have worked with.')}${logoGrid()}</div></section>
-  <section class="sec photo"><div class="wrap">${intro('Film','Short films and brand films that carry the pace, light and sound of a place.')}
-    <div class="grid films">${HOME_FILMS.map((f,i)=>`<div class="f${i+1}">${filmBtn(f,i,i===0)}</div>`).join('')}</div>
+  <section class="sec"><div class="wrap">${intro(H.trustedLabel,H.trustedLine)}${logoGrid()}</div></section>
+  <section class="sec photo"><div class="wrap">${intro(H.filmLabel,H.filmLine)}
+    <div class="grid films">${HOME_FILMS.slice(0,3).map((f,i)=>`<div class="f${i+1}">${filmBtn(f,i,i===0)}</div>`).join('')}</div>
     <div class="more">${btn('film','View film')}</div></div></section>
   <section class="sec studio"><div class="wrap grid">
-    <div class="lab">${label('The studio')}</div>
-    <div class="txt"><p class="lead">We are a visual storytelling studio specializing in luxury hospitality, travel and lifestyle content.</p>
-      <p>Through cinematic photography, refined videography and emotionally driven storytelling, we help hotels, resorts and premium brands translate experiences into compelling visual narratives.</p>
-      <p>Our work blends creative direction with production expertise to capture the atmosphere, emotion and identity of a place, creating imagery that feels lived-in, elevated and deeply experiential.</p>
-      <p class="meta">Available worldwide.</p><div>${btn('about','About Chasing Stories')}</div></div>
-    <div class="img">${frame('studio','Guest in a stone-walled suite at dusk',{ratio:'2/3'})}</div></div></section>
-  <section class="sec" style="padding-top:0"><div class="wrap"><div class="intro"><div class="l">${label('What we do')}</div></div>
-    <ul class="svc">${SERVICES.map(s=>`<li><a href="#services-${s.id}" data-img="${I(s.img)}"><span class="dot" data-k="${s.img}"></span><h3>${s.name}</h3><p>${s.short}</p><span class="arr" aria-hidden="true">→</span></a></li>`).join('')}</ul>
+    <div class="lab">${label(esc(H.studioLabel))}</div>
+    <div class="txt"><p class="lead">${esc(H.studioLead)}</p>${paras(H.studioText)}
+      <p class="meta">${esc(C.available)}</p><div>${btn('about','About '+esc(C.brand))}</div></div>
+    <div class="img">${frame(C.img.studio,H.studioAlt,{ratio:'2/3'})}</div></div></section>
+  <section class="sec" style="padding-top:0"><div class="wrap"><div class="intro"><div class="l">${label(esc(H.servicesLabel))}</div></div>
+    <ul class="svc">${SERVICES.map(s=>`<li><a href="#services-${s.id}" data-img="${I(s.img)}"><span class="dot" data-k="${s.img}"></span><h3>${esc(s.name)}</h3><p>${esc(s.short)}</p><span class="arr" aria-hidden="true">→</span></a></li>`).join('')}</ul>
     <div class="more">${btn('services','Explore services')}</div></div></section>
   ${cta()}`};
 };
@@ -1200,7 +1281,7 @@ PAGES.home=()=>{
 PAGES.work=()=>{
   const cls=['w-a','w-b','w-c','w-d','w-e'];const land=[true,false,false,true,true];
   return {html:`
-  <section class="pintro"><div class="wrap"><h1>Work</h1><p>Selected productions for hotels, resorts, destinations and brands.</p><span class="count">${nf(PROJECTS.length)} projects</span></div></section>
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.workTitle)}</h1><p>${esc(C.pages.workIntro)}</p><span class="count">${nf(PROJECTS.length)} projects</span></div></section>
   <section style="padding-bottom:clamp(88px,12vw,180px)"><div class="wrap"><div class="grid wgrid">
     ${PROJECTS.map((p,i)=>projCard(p,cls[i%5],land[i%5],true)).join('')}
   </div></div></section>${cta()}`};
@@ -1211,29 +1292,32 @@ PAGES.project=slug=>{
   const i=PROJECTS.indexOf(p),next=PROJECTS[(i+1)%PROJECTS.length];
   const tbc=v=>v?`<span class="v">${esc(v)}</span>`:`<span class="v tbc">To confirm</span>`;
   let vids=[];
-  const vid=k=>{vids.push({k,title:p.name,meta:p.client});return `<button class="vid" data-film="${vids.length-1}" data-cursor="Play">${frame(k,'',{ratio:'16/9'})}<span class="play" aria-hidden="true"></span></button>`};
-  const palAt=new Set([0,Math.floor(p.blocks.length/2)]);
-  const b=p.blocks.map((bl,bi)=>{const pal=palAt.has(bi);
+  const vid=(k,v)=>{vids.push({k,video:v||'',title:p.name,meta:p.client});return `<button class="vid" data-film="${vids.length-1}">${frame(k,'',{ratio:'16/9'})}<span class="play" aria-hidden="true"></span></button>`};
+  const blocks=p.blocks||[];
+  const palAt=new Set([0,Math.floor(blocks.length/2)]);
+  const b=blocks.map((bl,bi)=>{const pal=palAt.has(bi);const K=[].concat(bl.k);
     switch(bl.t){
-      case 'large':return `<div class="blk blk-large ${bl.side||''}">${frame(bl.k,p.name,{pal})}</div>`;
-      case 'pair':return `<div class="blk blk-pair">${bl.k.map((k,j)=>frame(k,p.name,{pal:pal&&j===0})).join('')}</div>`;
-      case 'full':return `<div class="blk blk-full">${frame(bl.k,p.name,{ratio:'16/9',pal})}</div>`;
-      case 'drone':return `<div class="blk blk-drone">${frame(bl.k,p.name+', aerial',{ratio:'16/9',pal})}</div>`;
-      case 'mixed':return `<div class="blk blk-mixed">${frame(bl.k[0],p.name,{pal})}${bl.video?vid(bl.k[1]):frame(bl.k[1],p.name)}</div>`;
-      case 'video':return `<div class="blk blk-video">${vid(bl.k)}</div>`;
-    }}).join('');
+      case 'large':return `<div class="blk blk-large ${bl.side||''}">${frame(K[0],p.name,{pal})}</div>`;
+      case 'pair':return `<div class="blk blk-pair">${K.slice(0,2).map((k,j)=>frame(k,p.name,{pal:pal&&j===0})).join('')}</div>`;
+      case 'full':return `<div class="blk blk-full">${frame(K[0],p.name,{ratio:'16/9',pal})}</div>`;
+      case 'drone':return `<div class="blk blk-drone">${frame(K[0],p.name+', aerial',{ratio:'16/9',pal})}</div>`;
+      case 'mixed':return `<div class="blk blk-mixed">${frame(K[0],p.name,{pal})}${bl.video?vid(K[1],bl.src):frame(K[1],p.name)}</div>`;
+      case 'video':return `<div class="blk blk-video">${vid(K[0],bl.src)}</div>`;
+      case 'text':return `<div class="blk blk-text">${paras(bl.text)}</div>`;
+    }return ''}).join('');
   return {hero:true,filmList:vids,html:`
   <section class="phero" data-field="phero">
-    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(p.heroM)}"><img src="${I(p.hero)}" alt="${esc(p.name)}"></picture>
+    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(p.heroM||p.coverV)}"><img src="${I(p.hero||p.coverL)}" alt="${esc(p.name)}"></picture>
     <div class="scrim"></div>
     <div class="copy"><h1>${esc(p.name)}</h1><span class="loc">${esc(p.location||'Location to confirm')}</span></div>
   </section>
   <div class="wrap">
-    <div class="metab"><div>${label('Client')}${tbc(p.client)}</div><div>${label('Location')}${tbc(p.location)}</div><div>${label('Year')}${tbc(p.year)}</div><div>${label('Services')}${tbc(p.services.join(', '))}</div></div>
+    <div class="metab"><div>${label('Client')}${tbc(p.client)}</div><div>${label('Location')}${tbc(p.location)}</div><div>${label('Year')}${tbc(p.year)}</div><div>${label('Services')}${tbc((p.services||[]).join(', '))}</div></div>
+    ${p.desc?`<div class="pdesc">${paras(p.desc)}</div>`:''}
     <div class="blocks">${b}</div>
     ${p.logo?`<div class="clogo"><span class="meta">Client</span><img class="m" src="${LOGO(p.logo)}" alt="${esc(p.client)}"></div>`:''}
   </div>
-  <section class="band pcta"><h2>Planning a similar production?</h2>${btn('contact-'+p.slug,'Get in touch')}<span class="meta">Available worldwide.</span></section>
+  <section class="band pcta"><h2>${esc(C.cta.projectH2)}</h2>${btn('contact-'+p.slug,esc(C.cta.button))}<span class="meta">${esc(C.available)}</span></section>
   <a class="nextp" href="#work-${next.slug}"><img src="${I(next.coverL)}" alt="" loading="lazy"><div class="sc"></div>
     <div class="copy"><span class="label" style="color:inherit">Next project</span><h2>${esc(next.name)}</h2><span class="meta" style="color:inherit">${esc(next.location||'')}</span></div></a>`,next:next.coverL};
 };
@@ -1246,18 +1330,19 @@ function layoutPhotos(list){
   return list.map((ph,i)=>{const [w,h]=DIM(ph.k);const landscape=w>h*1.15;let col,mt=0;
     if(landscape){col=patL[l++%2]}else{[col,mt]=pat[v++%pat.length]}
     const pr=ph.project?byslug(ph.project):null;
-    const cap=[ph.loc,pr?pr.name:''].filter(Boolean).join(' / ')||CATS.find(c=>c[0]===ph.cats[0])[1];
+    const cap=photoCap(ph);
     if(pr)return `<figure style="grid-column:${col};margin-top:${mt}"><a class="plink" href="#work-${pr.slug}" aria-label="${esc(pr.name)}, view project">${frame(ph.k,cap)}<figcaption class="meta"><span>${esc(cap)}</span><span class="vp">View project</span></figcaption></a></figure>`;
     return `<figure style="grid-column:${col};margin-top:${mt}"><button data-lb="${i}" aria-label="Open photograph">${frame(ph.k,cap)}</button><figcaption class="meta">${esc(cap)}</figcaption></figure>`}).join('');
 }
+function photoCap(ph){const pr=ph.project?byslug(ph.project):null;const c=CATS.find(c=>c[0]===(ph.cats||[])[0]);return [ph.loc,pr?pr.name:''].filter(Boolean).join(' / ')||(c?c[1]:'')}
 PAGES.photography=cat=>{
-  const valid=CATS.find(c=>c[0]===cat);const list=valid?PHOTOS.filter(p=>p.cats.includes(cat)):PHOTOS;
-  const count=c=>PHOTOS.filter(p=>p.cats.includes(c)).length;
-  return {lightbox:list.map(ph=>{const pr=ph.project?byslug(ph.project):null;return {k:ph.k,cap:[ph.loc,pr?pr.name:''].filter(Boolean).join(' / ')||CATS.find(c=>c[0]===ph.cats[0])[1],project:ph.project}}),html:`
-  <section class="pintro"><div class="wrap"><h1>Photography</h1><p>Photography is where our work began and where it remains strongest. Every image is composed for the brand it belongs to, in natural light wherever possible.</p></div></section>
+  const valid=CATS.find(c=>c[0]===cat);const list=valid?PHOTOS.filter(p=>(p.cats||[]).includes(cat)):PHOTOS;
+  const count=c=>PHOTOS.filter(p=>(p.cats||[]).includes(c)).length;
+  return {lightbox:list.map(ph=>({k:ph.k,cap:photoCap(ph),project:ph.project})),html:`
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.photoTitle)}</h1><p>${esc(C.pages.photoIntro)}</p></div></section>
   <nav class="filters" aria-label="Photography categories"><div class="wrap">
     <a class="chip${valid?'':' on'}" href="#photography">All <span class="n">${PHOTOS.length}</span></a>
-    ${CATS.map(([id,n])=>`<a class="chip${cat===id?' on':''}" href="#photography-${id}">${n} <span class="n">${count(id)}</span></a>`).join('')}
+    ${CATS.map(([id,n])=>`<a class="chip${cat===id?' on':''}" href="#photography-${id}">${esc(n)} <span class="n">${count(id)}</span></a>`).join('')}
   </div></nav>
   <section><div class="wrap"><div class="grid pgrid">${layoutPhotos(list)}</div></div></section>${cta()}`};
 };
@@ -1267,86 +1352,96 @@ PAGES.film=()=>{
   const big=[],rest=[];Object.entries(groups).forEach(([c,l])=>l.length>=2?big.push([c,l]):rest.push(...l));
   let idx=0;const all=[];
   const cards=l=>l.map(f=>{all.push(f);return filmBtn(f,idx++)}).join('');
-  const html=big.map(([c,l])=>`<section class="fgroup">${label(c)}<div class="fcards">${cards(l)}</div></section>`).join('')+
+  const html=big.map(([c,l])=>`<section class="fgroup">${label(esc(c))}<div class="fcards">${cards(l)}</div></section>`).join('')+
     (rest.length?`<section class="fgroup">${label('More films')}<div class="fcards">${cards(rest)}</div></section>`:'');
   return {filmList:all,html:`
-  <section class="pintro"><div class="wrap"><h1>Film</h1><p>Our films follow the same principle as our photography: composed, unhurried and true to the place. Property films, brand films and short-form stories, shot for the big screen and cut for every channel.</p></div></section>
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.filmTitle)}</h1><p>${esc(C.pages.filmIntro)}</p></div></section>
   <div class="wrap" style="padding-bottom:clamp(88px,12vw,180px)">${html}</div>${cta()}`};
 };
 
 PAGES.services=anchor=>({anchor,html:`
-  <section class="pintro"><div class="wrap"><h1>Services</h1><p>From a single photography brief to a full production across photo, film and drone, we plan, direct and deliver the visual content a property needs.</p></div></section>
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.servicesTitle)}</h1><p>${esc(C.pages.servicesIntro)}</p></div></section>
   <div class="wrap">${SERVICES.map((s,i)=>`<section class="split${i%2?' flip':''}" id="svc-${s.id}">
     <div class="media">${frame(s.img,s.name,{ratio:'4/5'})}</div>
-    <div class="t"><h2>${s.name}</h2><p>${s.body}</p>${s.deliv?`<div class="deliv"><span class="meta">Typical deliverables</span><span>${s.deliv}</span></div>`:''}</div></section>`).join('')}</div>
-  <section class="band"><p>Every production is scoped individually. Tell us about your project and we will prepare a proposal.</p>${btn('contact','Start a project')}</section>`});
+    <div class="t"><h2>${esc(s.name)}</h2>${paras(s.body)}${s.deliv?`<div class="deliv"><span class="meta">Typical deliverables</span><span>${esc(s.deliv)}</span></div>`:''}</div></section>`).join('')}</div>
+  <section class="band"><p>${esc(C.pages.servicesBand)}</p>${btn('contact','Start a project')}</section>`});
 
-PAGES.about=()=>({html:`
+PAGES.about=()=>{const A=C.about;const films=[];
+  const disc=(A.disc||[]).slice(0,3).map((d,i)=>{const cls='dcard d'+(i+1),ratio=['4/5','16/10','1/1'][i];
+    const inner=`${frame(d.img,d.label+(d.meta?', '+d.meta:''),{ratio})}${d.film?'<span class="play" aria-hidden="true"></span>':''}<div class="dcap"><span class="label">${esc(d.label)}</span><span class="meta">${esc(d.meta||'')}</span></div>`;
+    if(d.film){films.push({k:d.img,video:d.film,title:d.meta||d.label,meta:''});return `<button class="${cls} vid" data-film="${films.length-1}">${inner}</button>`}
+    return d.project&&byslug(d.project)?`<a class="${cls}" href="#work-${d.project}">${inner}</a>`:`<div class="${cls}">${inner}</div>`}).join('');
+  return {filmList:films,html:`
   <section class="about-open"><div class="wrap grid">
-    <div class="t"><h1>About Chasing Stories</h1><p>Chasing Stories is a creative production studio for luxury hospitality, travel and lifestyle brands. We produce photography and film for hotels, resorts and destinations across Asia, the Indian Ocean and beyond.</p></div>
-    <div class="i">${frame('ab-open','Overwater villas and lagoon from above, Maldives',{ratio:'3/4',px:.3})}</div></div></section>
-  <section class="txtblock"><div class="wrap grid"><div class="l">${label('Our approach')}</div><div class="r"><h2>Our approach</h2>
-    <p>We treat every property as a place with its own character. Before we shoot, we study how guests move through it, when the light is at its best and what sets it apart. On location, we direct rather than document: every frame is planned, with room left for the moments that cannot be.</p></div></div></section>
-  <section class="txtblock" style="padding-top:0;padding-bottom:0"><div class="wrap"><div class="grid"><div class="l">${label('Creative production')}</div><div class="r"><h2>Creative production</h2>
-    <p>Photography, film, drone and lifestyle production are handled by one team, under one creative direction. One brief, one visual language and a single library of assets that works across your website, campaigns, PR and social channels.</p></div></div></div></section>
-  <section class="disc"><div class="wrap"><div class="grid disc-g">
-    <a class="dcard d1" href="#work-sixsenses">${frame('ab-photo','Photography, Six Senses Kocataş Mansions',{ratio:'4/5'})}<div class="dcap"><span class="label">Photography</span><span class="meta">Six Senses Kocataş Mansions</span></div></a>
-    <button class="dcard d2 vid" data-film="0">${frame('film-palau-2','Film still, Four Seasons Explorer',{ratio:'16/10'})}<span class="play" aria-hidden="true"></span><div class="dcap"><span class="label">Film</span><span class="meta">Four Seasons Explorer</span></div></button>
-    <a class="dcard d3" href="#work-hoiana">${frame('ab-drone','Drone, Hoiana Resort & Golf',{ratio:'1/1'})}<div class="dcap"><span class="label">Drone</span><span class="meta">Hoiana Resort &amp; Golf</span></div></a>
-  </div></div></section>
-  ${hrail('How we work',[['Discover','We learn the property, the brand and the audience, and agree on what the content needs to achieve.','heritance-6'],
-      ['Concept','Visual direction, moodboards, shot lists and schedules, approved before we arrive.','sixsenses-4'],
-      ['Produce','Photography, film and drone on location, with talent and styling where the story needs it.','palau-3'],
-      ['Curate','We edit with restraint. Only the strongest frames make the final selection.','hoiana-5'],
-      ['Deliver','Retouched images and graded films, prepared in the formats each channel requires.','bangkok-6']]
-      .map(([t,d,k],i)=>`<article class="hs-card step">${frame(k,t,{ratio:'4/5'})}<div class="hs-cap"><span class="num">${nf(i+1)}</span><h3>${t}</h3><p>${d}</p></div></article>`),'How we work')}
-  <section class="world" data-field="world"><img src="${I('ab-dest')}" alt="" loading="lazy"><div class="sc"></div>
-    <div class="copy"><h2>Available worldwide</h2><p>We travel for every production. Recent work has taken us to the Maldives, Thailand, Vietnam, Palau, Singapore, Hong Kong, Malaysia, Turkey and Tanzania.</p>
-      <div class="world-cta"><span class="lead">Have a project in mind? Let's create something meaningful.</span>${btn('contact','Get in touch','light')}</div></div></section>`,filmList:[{k:'film-palau-2',title:'Four Seasons Explorer',meta:'Palau'}]});
+    <div class="t"><h1>${esc(A.title)}</h1>${paras(A.intro)}</div>
+    <div class="i">${frame(C.img.aboutOpen,A.openAlt,{ratio:'3/4'})}</div></div></section>
+  <section class="txtblock"><div class="wrap grid"><div class="l">${label(esc(A.approachTitle))}</div><div class="r"><h2>${esc(A.approachTitle)}</h2>${paras(A.approach)}</div></div></section>
+  <section class="txtblock" style="padding-top:0;padding-bottom:0"><div class="wrap"><div class="grid"><div class="l">${label(esc(A.productionTitle))}</div><div class="r"><h2>${esc(A.productionTitle)}</h2>${paras(A.production)}</div></div></div></section>
+  <section class="disc"><div class="wrap"><div class="grid disc-g">${disc}</div></div></section>
+  ${hrail(A.stepsTitle,(A.steps||[]).map((s,i)=>`<article class="hs-card step">${frame(s.img,s.t,{ratio:'4/5'})}<div class="hs-cap"><span class="num">${nf(i+1)}</span><h3>${esc(s.t)}</h3><p>${esc(s.d)}</p></div></article>`),A.stepsTitle)}
+  <section class="world" data-field="world"><img src="${I(C.img.world)}" alt="" loading="lazy"><div class="sc"></div>
+    <div class="copy"><h2>${esc(A.worldTitle)}</h2>${paras(A.worldText)}
+      <div class="world-cta"><span class="lead">${esc(A.worldCta)}</span>${btn('contact',esc(C.cta.button),'light')}</div></div></section>`};
+};
 
 PAGES.contact=project=>{
-  const p=project?byslug(project):null;
-  const types=['Photography','Film','Photography + Film','Creative Direction','Full Production'];
+  const p=project?byslug(project):null;const K=C.contact;
+  const types=K.types&&K.types.length?K.types:['Photography','Film','Photography + Film','Creative Direction','Full Production'];
   const F=(id,lab,{type='text',req=true,ph='',w=false}={})=>`<div class="field${w?' w':''}"><label for="${id}">${lab}${req?'':' <span class="opt">(optional)</span>'}</label>
     <input id="${id}" name="${id}" type="${type}" ${req?'required':''} placeholder="${esc(ph)}" autocomplete="${type==='email'?'email':id==='f-name'?'name':id==='f-company'?'organization':'off'}"><span class="err" aria-live="polite"></span></div>`;
   return {html:`
   <section class="contact"><div class="wrap grid">
-    <div class="l"><h1>Let's create something</h1>
-      <p class="intro-t">Tell us a little about your project, location and requirements. We reply to every enquiry within two working days.</p>
+    <div class="l"><h1>${esc(K.title)}</h1>
+      <p class="intro-t">${esc(K.intro)}</p>
       <form class="form" id="enq" novalidate>
         ${F('f-name','Name')}${F('f-company','Company / Brand')}
         ${F('f-email','Email',{type:'email'})}${F('f-web','Website / Instagram',{req:false,ph:'e.g. www.yourhotel.com or @yourhotel'})}
         ${F('f-loc','Project location',{ph:'City, country'})}${F('f-dates','Preferred dates',{req:false,ph:'e.g. March 2027, flexible'})}
-        <div class="field w"><label for="f-type">Project type</label><select id="f-type" name="f-type" required><option value="">Select</option>${types.map(t=>`<option>${t}</option>`).join('')}</select><span class="err" aria-live="polite"></span></div>
+        <div class="field w"><label for="f-type">Project type</label><select id="f-type" name="f-type" required><option value="">Select</option>${types.map(t=>`<option>${esc(t)}</option>`).join('')}</select><span class="err" aria-live="polite"></span></div>
         <div class="field w"><label for="f-details">Project details</label><textarea id="f-details" name="f-details" required placeholder="Tell us about the property, the goal and what you have in mind."></textarea><span class="err" aria-live="polite"></span></div>
         <input type="hidden" name="source" value="${esc(p?'project:'+p.slug:'contact')}">
-        <label class="consent"><input type="checkbox" id="f-consent" required><span>I agree to Chasing Stories processing my details to respond to this enquiry. <a href="#privacy">Privacy Policy</a></span></label>
+        <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website_url" tabindex="-1" autocomplete="off"></label></div>
+        <label class="consent"><input type="checkbox" id="f-consent" required><span>I agree to ${esc(C.brand)} processing my details to respond to this enquiry. <a href="#privacy">Privacy Policy</a></span></label>
         <div class="field w" style="margin-top:-18px"><span class="err" id="consentErr" aria-live="polite"></span></div>
         <div class="actions"><button class="btn" type="submit">Send enquiry <i></i></button>${p?`<span class="meta">About: ${esc(p.name)}</span>`:''}</div>
       </form>
       <div class="direct"><span class="label">Direct contact</span>
-        <span>Email: <span style="user-select:all">hello@chasingstories.org</span></span>
-        <a href="https://www.instagram.com/andra.oprea" target="_blank" rel="noopener">Instagram ↗</a>
-        <a href="https://www.linkedin.com/in/andra-oprea-2a620b310/" target="_blank" rel="noopener">LinkedIn ↗</a>
-        <span class="meta">Available worldwide.</span></div>
+        ${K.email?`<span>Email: <span style="user-select:all">${esc(K.email)}</span></span>`:''}
+        ${K.instagram?`<a href="${esc(K.instagram)}" target="_blank" rel="noopener">Instagram ↗</a>`:''}
+        ${K.linkedin?`<a href="${esc(K.linkedin)}" target="_blank" rel="noopener">LinkedIn ↗</a>`:''}
+        <span class="meta">${esc(C.available)}</span></div>
     </div>
-    <div class="r">${frame('contact','Evening light on a terrace',{ratio:'4/5',px:.3})}</div>
+    <div class="r">${frame(C.img.contact,K.imgAlt,{ratio:'4/5'})}</div>
   </div></section><div style="height:clamp(80px,10vw,160px)"></div>`};
 };
 
 PAGES.privacy=()=>({html:`<section class="legal-p"><div class="wrap"><h1>Privacy &amp; Cookies</h1><div class="body">
-  <p>The legal text is being prepared. It will cover the points below.</p>
+  ${C.privacy&&C.privacy.trim()?paras(C.privacy):`<p>The legal text is being prepared. It will cover the points below.</p>
   ${['Who operates this website','What the enquiry form collects and why','How long data is kept','Your rights as a visitor','The analytics tool and its cookies','How to change your cookie choice','Contact for data requests']
-   .map(t=>`<h2>${t}</h2><p>To be supplied.</p>`).join('')}
+   .map(t=>`<h2>${t}</h2><p>To be supplied.</p>`).join('')}`}
   <div style="margin-top:24px"><button class="btn" id="cookieOpen" type="button">Cookie settings <i></i></button></div></div></div></section>${cta()}`});
 
-PAGES.notfound=()=>({hero:true,html:`<section class="nf" data-field="nf"><picture><img src="${I('film-palau-1')}" alt=""></picture><div class="scrim"></div>
-  <div class="copy"><span class="label" style="color:inherit">404</span><h1>This story has moved on.</h1><p style="margin:0">The page you are looking for does not exist or has been moved.</p>
+PAGES.notfound=()=>({hero:true,status:404,html:`<section class="nf" data-field="nf"><picture><img src="${I(C.img.notfound)}" alt=""></picture><div class="scrim"></div>
+  <div class="copy"><span class="label" style="color:inherit">404</span><h1>${esc(C.notfound.h1)}</h1><p style="margin:0">${esc(C.notfound.p)}</p>
   <div class="b">${btn('work','View our work','light')}${btn('','Back to home','light')}</div></div></section>`});
 
 /* ============================================================
    ROUTER
    ============================================================ */
+/* Two addressing modes, one set of route tokens ('work-palau', 'photography-drone', ...):
+   hash (#work-palau) for the prototype and the artifact, real paths (/work/palau) on the live server. */
+const PATH_MODE=!!(SITE_DATA&&SITE_DATA.routing==='path');
+function tokenToPath(t){t=(t||'').replace(/^#/,'');if(!t||t==='top')return '/';
+  for(const [a,b] of [['work-','/work/'],['photography-','/photography/'],['services-','/services/'],['contact-','/contact?project=']])if(t.startsWith(a))return b+encodeURIComponent(t.slice(a.length));
+  return '/'+t}
+function pathToToken(){const p=location.pathname.replace(/\/+$/,'')||'/',q=new URLSearchParams(location.search);if(p==='/')return '';
+  const seg=p.slice(1).split('/').map(decodeURIComponent);
+  if(seg[0]==='contact'&&seg.length===1&&q.get('project'))return 'contact-'+q.get('project');
+  if(seg.length===2&&['work','photography','services'].includes(seg[0]))return seg[0]+'-'+seg[1];
+  return seg.length===1?seg[0]:'__none'}
+const curToken=()=>PATH_MODE?pathToToken():location.hash.slice(1);
+const isRoute=t=>{t=(t||'').replace(/^#/,'');return t===''||t==='top'||parse(t)[0]!=='notfound'};
+function pathLinks(root){if(!PATH_MODE)return;$$('a[href^="#"]',root).forEach(a=>{const t=a.getAttribute('href').slice(1);if(isRoute(t))a.setAttribute('href',tokenToPath(t))})}
 function parse(h){
   h=(h||'').replace(/^#/,'');
   if(!h||h==='top')return ['home'];
@@ -1365,10 +1460,10 @@ function parse(h){
 }
 const app=$('#app');let cleanups=[],current=null,filmList=[],lbList=[];
 const navKey={home:null,work:'work',project:'work',photography:'photography',film:'film',services:'services',about:'about',contact:'contact'};
-const TITLES={home:'Chasing Stories',work:'Work',photography:'Photography',film:'Film',services:'Services',about:'About',contact:'Contact',privacy:'Privacy & Cookies',notfound:'Page not found'};
+const TITLES={home:C.brand,work:'Work',photography:'Photography',film:'Film',services:'Services',about:'About',contact:'Contact',privacy:'Privacy & Cookies',notfound:'Page not found'};
 
 async function go(first){
-  const [name,arg]=parse(location.hash);
+  const [name,arg]=parse(curToken());
   const key=name+(arg||'');
   if(key===current)return;
   const soft=current&&current.startsWith('photography')&&name==='photography';
@@ -1385,9 +1480,11 @@ async function go(first){
   }
   cleanups.forEach(f=>{try{f()}catch(e){}});cleanups=[];
   app.innerHTML=`<div class="page">${view.html}</div>`;
-  document.title=(name==='project'&&byslug(arg)?byslug(arg).name+' | ':TITLES[name]&&name!=='home'?TITLES[name]+' | ':'')+'Chasing Stories';
+  document.title=(name==='project'&&byslug(arg)?byslug(arg).name+' | ':TITLES[name]&&name!=='home'?TITLES[name]+' | ':'')+C.brand;
+  pathLinks(app);
   filmList=view.filmList||[];lbList=view.lightbox||[];
-  $$('.nav a.link').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+navKey[name]));
+  const navHref=PATH_MODE?tokenToPath(navKey[name]||''):'#'+navKey[name];
+  $$('.nav a.link').forEach(a=>a.classList.toggle('on',!!navKey[name]&&a.getAttribute('href')===navHref));
   if(view.anchor){const t=$('#svc-'+view.anchor);if(t)requestAnimationFrame(()=>scrollToY(t.getBoundingClientRect().top+scrollY-60,first))}
   else if(!sameAnchor)scrollToY(soft?keepY:0,true);
   if(animate){
@@ -1397,7 +1494,15 @@ async function go(first){
   hydrate(first);onScroll();
 }
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-addEventListener('hashchange',()=>go(false));
+if(PATH_MODE){
+  // internal links change the address without a reload; everything else (assets, admin, other sites) behaves normally
+  document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||a.target==='_blank')return;
+    const u=new URL(a.href,location.href);if(u.origin!==location.origin||/^\/(admin|api|assets|uploads)\b/.test(u.pathname)||/\.[a-z0-9]{2,5}$/i.test(u.pathname))return;
+    e.preventDefault();if(u.pathname+u.search!==location.pathname+location.search){history.pushState(null,'',u.pathname+u.search);go(false)}});
+  addEventListener('popstate',()=>go(false));
+  if(location.hash&&isRoute(location.hash))history.replaceState(null,'',tokenToPath(location.hash));   // old #links keep working
+  pathLinks(document);
+}else addEventListener('hashchange',()=>go(false));
 
 /* smooth, weighted scrolling */
 let lenis=null;
@@ -1470,7 +1575,7 @@ function hydrate(first){
 
 /* hero loop: the [SMALL] master from Drive, muted and looping; drives the WebGL field when there is one */
 function heroLoop(host,field){
-  if(RM)return;const portrait=innerWidth<760&&innerHeight>innerWidth;const url=videoURL(portrait?'hero-m':'hero');if(!url)return;
+  if(RM)return;const portrait=innerWidth<760&&innerHeight>innerWidth;const url=(portrait?C.video.heroM||C.video.hero:C.video.hero)||videoURL(portrait?'hero-m':'hero');if(!url)return;
   const v=document.createElement('video');Object.assign(v,{muted:true,loop:true,playsInline:true,autoplay:true,preload:'auto'});
   v.setAttribute('muted','');v.setAttribute('playsinline','');v.crossOrigin='anonymous';v.className='hero-vid';v.src=url;
   host.querySelector('picture').appendChild(v);
@@ -1528,7 +1633,15 @@ function wireForm(form){
     $$('input:not([type=hidden]):not([type=checkbox]),select,textarea',form).forEach(el=>{if(!check(el)){ok=false;first=first||el}});
     const c=$('#f-consent',form);$('#consentErr').textContent=c.checked?'':'Please confirm you agree so we can reply.';if(!c.checked){ok=false;first=first||c}
     if(!ok){first.focus();return}
-    form.innerHTML=`<div class="form-msg" role="status"><div><strong>Thank you.</strong> Your enquiry is with us and we will reply within two working days.<br><span class="meta">Prototype: nothing was sent. The live site posts this to the studio inbox.</span></div></div>`});
+    const done=(ok,msg)=>{form.innerHTML=`<div class="form-msg${ok?'':' bad'}" role="status"><div>${msg}</div></div>`};
+    if(!(SITE_DATA&&SITE_DATA.api)){done(true,`<strong>Thank you.</strong> ${esc(C.contact.success)}<br><span class="meta">Prototype: nothing was sent. The live site posts this to the studio inbox.</span>`);return}
+    const btnS=form.querySelector('button[type=submit]');btnS.disabled=true;btnS.style.opacity=.5;
+    const fd=new FormData(form);fd.set('consent',$('#f-consent',form).checked?'1':'');fd.set('page',location.pathname+location.search);
+    fetch(SITE_DATA.api,{method:'POST',body:fd,headers:{'X-Requested-With':'fetch'}}).then(r=>r.json().catch(()=>({ok:false}))).then(j=>{
+      if(j&&j.ok)done(true,`<strong>Thank you.</strong> ${esc(C.contact.success)}`);
+      else{btnS.disabled=false;btnS.style.opacity='';const er=form.querySelector('.form-err')||form.insertAdjacentElement('beforeend',Object.assign(document.createElement('p'),{className:'form-err'}));
+        er.textContent=(j&&j.error)||('Something went wrong. Please try again or write to us at '+(C.contact.email||'')+'.')}
+    }).catch(()=>{btnS.disabled=false;btnS.style.opacity='';done(false,'Something went wrong. Please try again or write to us at '+esc(C.contact.email||'')+'.')})});
 }
 
 /* ---------- lightbox ---------- */
@@ -1551,7 +1664,7 @@ $('#lbStage').addEventListener('pointerup',e=>{if(sx==null)return;const d=e.clie
 /* ---------- film player shell ---------- */
 const fm=$('#fm');
 function openFilm(i,from){const f=filmList[i];if(!f)return;$('#fmImg').src=I(f.k);
-  const v=$('#fmVid'),url=videoURL(f.k),has=!!url;v.hidden=!has;$('#fmImg').hidden=has;$('#fmPlay').hidden=has;$('#fmNote').hidden=has;
+  const v=$('#fmVid'),url=vsrc(f),has=!!url;v.hidden=!has;$('#fmImg').hidden=has;$('#fmPlay').hidden=has;$('#fmNote').hidden=has;
   if(has){v.poster=I(f.k);v.src=url;v.onerror=()=>{v.hidden=true;$('#fmImg').hidden=false;$('#fmPlay').hidden=false;$('#fmNote').hidden=false};v.play().catch(()=>{})}$('#fmTitle').textContent=[f.title,f.meta||f.client].filter(Boolean).join(' · ');
   lastFocus=from;fm.hidden=false;lockScroll(true);requestAnimationFrame(()=>fm.classList.add('open'));$('#fmClose').focus()}
 function closeFM(){const v=$('#fmVid');v.pause();v.removeAttribute('src');v.load();fm.classList.remove('open');setTimeout(()=>{fm.hidden=true},RM?0:320);lockScroll(false);lastFocus&&lastFocus.focus()}
@@ -1604,6 +1717,11 @@ if(matchMedia('(pointer:fine)').matches&&!RM){
   document.addEventListener('pointerleave',()=>sq.classList.remove('on'));
   addEventListener('blur',()=>sq.classList.remove('on'));
 }
+
+/* shell texts (footer, mobile menu) come from the CMS too */
+$$('[data-c]').forEach(el=>{const path=el.dataset.c.split('.');let v=C;for(const k of path)v=v&&v[k];if(v==null||v==='')return;
+  if(el.dataset.attr==='href')el.setAttribute('href',v);else el.textContent=v});
+$$('[data-c-hide]').forEach(el=>{const path=el.dataset.cHide.split('.');let v=C;for(const k of path)v=v&&v[k];if(!v)el.remove()});
 
 go(true);
 })();

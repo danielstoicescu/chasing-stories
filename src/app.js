@@ -2,9 +2,10 @@
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s,r=document)=>r.querySelector(s), $$ = (s,r=document)=>[...r.querySelectorAll(s)];
 const esc = s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const I = k=>ASSETS[k]||'';
+const I = k=>ASSETS[k]||(k&&/[\/.]/.test(k)?k:'');          // asset key, or an upload path from the CMS
 const DIM = k=>(MANIFEST[k]||[4,5]);
-const LOGO = f=>ASSETS['logo/'+f]||'';
+const LOGO = f=>ASSETS['logo/'+f]||(f&&/[\/.]/.test(f)?f:'');
+const vsrc = f=>{const v=f&&f.video||'';if(v.startsWith('poster:'))return videoURL(v.slice(7));return v||videoURL(f&&f.k)};
 const byslug = s=>PROJECTS.find(p=>p.slug===s);
 const nf = n=>String(n).padStart(2,'0');
 document.getElementById('yr').textContent = new Date().getFullYear();
@@ -200,33 +201,33 @@ function frame(k,alt,{ratio,px,pal}={}){
 }
 function projCard(p,cls,land,withSvc){
   const loc=[p.location,p.year].filter(Boolean).join(' · ')||'Location to confirm';
-  return `<a class="card ${land?'land ':''}${cls}" href="#work-${p.slug}" data-cursor="View">
+  return `<a class="card ${land?'land ':''}${cls}" href="#work-${p.slug}">
     ${frame(land?p.coverL:p.coverV,p.name,{ratio:land?'3/2':'4/5'})}
-    <div class="row"><div><h3>${esc(p.name)}</h3><div class="meta">${esc(loc)}</div>${withSvc?`<div class="meta svc">${p.services.join(', ')}</div>`:''}</div><span class="arrow" aria-hidden="true">↗</span></div></a>`;
+    <div class="row"><div><h3>${esc(p.name)}</h3><div class="meta">${esc(loc)}</div>${withSvc?`<div class="meta svc">${esc((p.services||[]).join(', '))}</div>`:''}</div><span class="arrow" aria-hidden="true">↗</span></div></a>`;
 }
-const intro=(lab,line)=>`<div class="intro"><div class="l">${label(lab)}<p>${line}</p></div></div>`;
+const intro=(lab,line)=>`<div class="intro"><div class="l">${label(esc(lab))}${line?`<p>${esc(line)}</p>`:''}</div></div>`;
+const paras=t=>String(t||'').split(/\n\s*\n/).filter(Boolean).map(x=>`<p>${esc(x.trim())}</p>`).join('');
 function cta(project){
-  const h=project?'Planning a similar production?':'Have a project in mind?';
   return `<section class="cta" id="enquire" data-field="prefooter">
-    <img class="bg" src="${I('prefooter')}" alt="" loading="lazy">
+    <img class="bg" src="${I(C.img.prefooter)}" alt="" loading="lazy">
     <div class="scrim"></div>
-    <div class="copy"><h2>${h}</h2>${project?'':`<p class="lead">Let's create something meaningful.</p>`}
-      ${btn(project?'contact-'+project:'contact','Get in touch','light')}<p class="meta" style="color:inherit;opacity:.85">Available worldwide.</p></div></section>`;
+    <div class="copy"><h2>${esc(project?C.cta.projectH2:C.cta.h2)}</h2>${project?'':`<p class="lead">${esc(C.cta.lead)}</p>`}
+      ${btn(project?'contact-'+project:'contact',esc(C.cta.button),'light')}<p class="meta" style="color:inherit;opacity:.85">${esc(C.available)}</p></div></section>`;
 }
 function logoGrid(){
   return `<div class="logos">${LOGOS.map(([f,n,slug,w,h])=>{const s=`<img src="${LOGO(f)}" alt="" style="--w:${w}%;--h:${h}%" loading="lazy">`;
-    return slug?`<a class="logo" href="#work-${slug}" title="${esc(n)}" aria-label="${esc(n)}, view project">${s}</a>`:`<div class="logo" role="img" title="${esc(n)}" aria-label="${esc(n)}">${s}</div>`}).join('')}</div>`;
+    return slug&&byslug(slug)?`<a class="logo" href="#work-${slug}" title="${esc(n)}" aria-label="${esc(n)}, view project">${s}</a>`:`<div class="logo" role="img" title="${esc(n)}" aria-label="${esc(n)}">${s}</div>`}).join('')}</div>`;
 }
 function filmBtn(f,i,big){
   const meta=esc(f.meta||[f.client!==f.title?f.client:'',f.loc].filter(Boolean).join(' · ')||f.cat);
-  if(f.project)return `<a class="film linked${big?' big':''}" href="#work-${f.project}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="go" aria-hidden="true">↗</span></div>
+  if(f.project&&byslug(f.project))return `<a class="film linked${big?' big':''}" href="#work-${f.project}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="go" aria-hidden="true">↗</span></div>
     <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${meta}</div></div><span class="vp">View project</span></div></a>`;
   return `<button class="film${big?' big':''}" data-film="${i}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></div>
     <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${meta}</div></div><span class="vp">Play film</span></div></button>`;
 }
 
 function hrail(lab,cards,title){
-  return `<section class="hscroll"><div class="hs-sticky"><div class="wrap hs-head">${label(lab)}${title?`<h2>${title}</h2>`:''}<span class="hs-count meta"><b>01</b> / ${nf(cards.length)}</span></div>
+  return `<section class="hscroll"><div class="hs-sticky"><div class="wrap hs-head">${label(esc(lab))}${title?`<h2>${esc(title)}</h2>`:''}<span class="hs-count meta"><b>01</b> / ${nf(cards.length)}</span></div>
     <div class="hs-view"><div class="hs-track">${cards.join('')}</div></div>
     <div class="wrap"><div class="hs-bar"><i></i></div></div></div></section>`;
 }
@@ -234,35 +235,33 @@ let PAL_PAGE=false; // set while a page that shows palettes everywhere (home, se
 const PAGES={};
 
 PAGES.home=()=>{
-  const W=HOME_WORK.map(byslug);const cls=['c1','c2','c3','c4','c5','c6'];
+  const W=HOME_WORK.map(byslug).filter(Boolean).slice(0,6);const cls=['c1','c2','c3','c4','c5','c6'];const H=C.home;
   return {hero:true,filmList:HOME_FILMS,lightbox:HOME_PHOTOS.map(([k,c])=>({k,cap:c})),html:`
   <section class="hero" id="hero" data-field="hero">
-    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I('hero-m')}"><img src="${I('hero')}" alt="A guest reading on an overwater deck in the Maldives, villas on the horizon" fetchpriority="high"></picture>
+    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(C.img.heroM)}"><img src="${I(C.img.hero)}" alt="${esc(H.heroAlt)}" fetchpriority="high"></picture>
     <div class="scrim"></div>
-    <div class="copy"><p class="display" aria-hidden="true">Chasing Stories</p>
-      <h1>Visual storytelling for luxury hospitality, travel &amp; lifestyle brands.</h1>
-      <p class="sub">Photography, film &amp; creative production.</p>${btn('work','View our work','light')}</div>
+    <div class="copy"><p class="display" aria-hidden="true">${esc(H.display)}</p>
+      <h1>${esc(H.h1)}</h1>
+      <p class="sub">${esc(H.sub)}</p>${btn('work',esc(H.button),'light')}</div>
     <span class="cue" aria-hidden="true"><i></i></span>
   </section>
-  <section class="sec"><div class="wrap">${intro('Selected work','Recent productions for hotels, resorts and destinations.')}
+  <section class="sec"><div class="wrap">${intro(H.workLabel,H.workLine)}
     <div class="grid work">${W.map((p,i)=>projCard(p,cls[i],i%2===1)).join('')}</div>
     <div class="more">${btn('work','View all work')}</div></div></section>
-  <section class="sec photo"><div class="wrap">${intro('Photography','Hotels, resorts, food, people and places, composed with an editorial eye.')}
-    <div class="grid gal">${HOME_PHOTOS.map(([k,c],i)=>`<figure class="g${i+1}"><button data-lb="${i}" data-cursor="Open" aria-label="Open photograph ${i+1}">${frame(k,c,{ratio:'2/3'})}</button><figcaption class="meta">${c}</figcaption></figure>`).join('')}</div>
+  <section class="sec photo"><div class="wrap">${intro(H.photoLabel,H.photoLine)}
+    <div class="grid gal">${HOME_PHOTOS.slice(0,7).map(([k,c],i)=>`<figure class="g${i+1}"><button data-lb="${i}" aria-label="Open photograph ${i+1}">${frame(k,c,{ratio:'2/3'})}</button><figcaption class="meta">${esc(c)}</figcaption></figure>`).join('')}</div>
     <div class="more">${btn('photography','View photography')}</div></div></section>
-  <section class="sec"><div class="wrap">${intro('Trusted by','Hotels, resorts and brands we have worked with.')}${logoGrid()}</div></section>
-  <section class="sec photo"><div class="wrap">${intro('Film','Short films and brand films that carry the pace, light and sound of a place.')}
-    <div class="grid films">${HOME_FILMS.map((f,i)=>`<div class="f${i+1}">${filmBtn(f,i,i===0)}</div>`).join('')}</div>
+  <section class="sec"><div class="wrap">${intro(H.trustedLabel,H.trustedLine)}${logoGrid()}</div></section>
+  <section class="sec photo"><div class="wrap">${intro(H.filmLabel,H.filmLine)}
+    <div class="grid films">${HOME_FILMS.slice(0,3).map((f,i)=>`<div class="f${i+1}">${filmBtn(f,i,i===0)}</div>`).join('')}</div>
     <div class="more">${btn('film','View film')}</div></div></section>
   <section class="sec studio"><div class="wrap grid">
-    <div class="lab">${label('The studio')}</div>
-    <div class="txt"><p class="lead">We are a visual storytelling studio specializing in luxury hospitality, travel and lifestyle content.</p>
-      <p>Through cinematic photography, refined videography and emotionally driven storytelling, we help hotels, resorts and premium brands translate experiences into compelling visual narratives.</p>
-      <p>Our work blends creative direction with production expertise to capture the atmosphere, emotion and identity of a place, creating imagery that feels lived-in, elevated and deeply experiential.</p>
-      <p class="meta">Available worldwide.</p><div>${btn('about','About Chasing Stories')}</div></div>
-    <div class="img">${frame('studio','Guest in a stone-walled suite at dusk',{ratio:'2/3'})}</div></div></section>
-  <section class="sec" style="padding-top:0"><div class="wrap"><div class="intro"><div class="l">${label('What we do')}</div></div>
-    <ul class="svc">${SERVICES.map(s=>`<li><a href="#services-${s.id}" data-img="${I(s.img)}"><span class="dot" data-k="${s.img}"></span><h3>${s.name}</h3><p>${s.short}</p><span class="arr" aria-hidden="true">→</span></a></li>`).join('')}</ul>
+    <div class="lab">${label(esc(H.studioLabel))}</div>
+    <div class="txt"><p class="lead">${esc(H.studioLead)}</p>${paras(H.studioText)}
+      <p class="meta">${esc(C.available)}</p><div>${btn('about','About '+esc(C.brand))}</div></div>
+    <div class="img">${frame(C.img.studio,H.studioAlt,{ratio:'2/3'})}</div></div></section>
+  <section class="sec" style="padding-top:0"><div class="wrap"><div class="intro"><div class="l">${label(esc(H.servicesLabel))}</div></div>
+    <ul class="svc">${SERVICES.map(s=>`<li><a href="#services-${s.id}" data-img="${I(s.img)}"><span class="dot" data-k="${s.img}"></span><h3>${esc(s.name)}</h3><p>${esc(s.short)}</p><span class="arr" aria-hidden="true">→</span></a></li>`).join('')}</ul>
     <div class="more">${btn('services','Explore services')}</div></div></section>
   ${cta()}`};
 };
@@ -270,7 +269,7 @@ PAGES.home=()=>{
 PAGES.work=()=>{
   const cls=['w-a','w-b','w-c','w-d','w-e'];const land=[true,false,false,true,true];
   return {html:`
-  <section class="pintro"><div class="wrap"><h1>Work</h1><p>Selected productions for hotels, resorts, destinations and brands.</p><span class="count">${nf(PROJECTS.length)} projects</span></div></section>
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.workTitle)}</h1><p>${esc(C.pages.workIntro)}</p><span class="count">${nf(PROJECTS.length)} projects</span></div></section>
   <section style="padding-bottom:clamp(88px,12vw,180px)"><div class="wrap"><div class="grid wgrid">
     ${PROJECTS.map((p,i)=>projCard(p,cls[i%5],land[i%5],true)).join('')}
   </div></div></section>${cta()}`};
@@ -281,29 +280,32 @@ PAGES.project=slug=>{
   const i=PROJECTS.indexOf(p),next=PROJECTS[(i+1)%PROJECTS.length];
   const tbc=v=>v?`<span class="v">${esc(v)}</span>`:`<span class="v tbc">To confirm</span>`;
   let vids=[];
-  const vid=k=>{vids.push({k,title:p.name,meta:p.client});return `<button class="vid" data-film="${vids.length-1}" data-cursor="Play">${frame(k,'',{ratio:'16/9'})}<span class="play" aria-hidden="true"></span></button>`};
-  const palAt=new Set([0,Math.floor(p.blocks.length/2)]);
-  const b=p.blocks.map((bl,bi)=>{const pal=palAt.has(bi);
+  const vid=(k,v)=>{vids.push({k,video:v||'',title:p.name,meta:p.client});return `<button class="vid" data-film="${vids.length-1}">${frame(k,'',{ratio:'16/9'})}<span class="play" aria-hidden="true"></span></button>`};
+  const blocks=p.blocks||[];
+  const palAt=new Set([0,Math.floor(blocks.length/2)]);
+  const b=blocks.map((bl,bi)=>{const pal=palAt.has(bi);const K=[].concat(bl.k);
     switch(bl.t){
-      case 'large':return `<div class="blk blk-large ${bl.side||''}">${frame(bl.k,p.name,{pal})}</div>`;
-      case 'pair':return `<div class="blk blk-pair">${bl.k.map((k,j)=>frame(k,p.name,{pal:pal&&j===0})).join('')}</div>`;
-      case 'full':return `<div class="blk blk-full">${frame(bl.k,p.name,{ratio:'16/9',pal})}</div>`;
-      case 'drone':return `<div class="blk blk-drone">${frame(bl.k,p.name+', aerial',{ratio:'16/9',pal})}</div>`;
-      case 'mixed':return `<div class="blk blk-mixed">${frame(bl.k[0],p.name,{pal})}${bl.video?vid(bl.k[1]):frame(bl.k[1],p.name)}</div>`;
-      case 'video':return `<div class="blk blk-video">${vid(bl.k)}</div>`;
-    }}).join('');
+      case 'large':return `<div class="blk blk-large ${bl.side||''}">${frame(K[0],p.name,{pal})}</div>`;
+      case 'pair':return `<div class="blk blk-pair">${K.slice(0,2).map((k,j)=>frame(k,p.name,{pal:pal&&j===0})).join('')}</div>`;
+      case 'full':return `<div class="blk blk-full">${frame(K[0],p.name,{ratio:'16/9',pal})}</div>`;
+      case 'drone':return `<div class="blk blk-drone">${frame(K[0],p.name+', aerial',{ratio:'16/9',pal})}</div>`;
+      case 'mixed':return `<div class="blk blk-mixed">${frame(K[0],p.name,{pal})}${bl.video?vid(K[1],bl.src):frame(K[1],p.name)}</div>`;
+      case 'video':return `<div class="blk blk-video">${vid(K[0],bl.src)}</div>`;
+      case 'text':return `<div class="blk blk-text">${paras(bl.text)}</div>`;
+    }return ''}).join('');
   return {hero:true,filmList:vids,html:`
   <section class="phero" data-field="phero">
-    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(p.heroM)}"><img src="${I(p.hero)}" alt="${esc(p.name)}"></picture>
+    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(p.heroM||p.coverV)}"><img src="${I(p.hero||p.coverL)}" alt="${esc(p.name)}"></picture>
     <div class="scrim"></div>
     <div class="copy"><h1>${esc(p.name)}</h1><span class="loc">${esc(p.location||'Location to confirm')}</span></div>
   </section>
   <div class="wrap">
-    <div class="metab"><div>${label('Client')}${tbc(p.client)}</div><div>${label('Location')}${tbc(p.location)}</div><div>${label('Year')}${tbc(p.year)}</div><div>${label('Services')}${tbc(p.services.join(', '))}</div></div>
+    <div class="metab"><div>${label('Client')}${tbc(p.client)}</div><div>${label('Location')}${tbc(p.location)}</div><div>${label('Year')}${tbc(p.year)}</div><div>${label('Services')}${tbc((p.services||[]).join(', '))}</div></div>
+    ${p.desc?`<div class="pdesc">${paras(p.desc)}</div>`:''}
     <div class="blocks">${b}</div>
     ${p.logo?`<div class="clogo"><span class="meta">Client</span><img class="m" src="${LOGO(p.logo)}" alt="${esc(p.client)}"></div>`:''}
   </div>
-  <section class="band pcta"><h2>Planning a similar production?</h2>${btn('contact-'+p.slug,'Get in touch')}<span class="meta">Available worldwide.</span></section>
+  <section class="band pcta"><h2>${esc(C.cta.projectH2)}</h2>${btn('contact-'+p.slug,esc(C.cta.button))}<span class="meta">${esc(C.available)}</span></section>
   <a class="nextp" href="#work-${next.slug}"><img src="${I(next.coverL)}" alt="" loading="lazy"><div class="sc"></div>
     <div class="copy"><span class="label" style="color:inherit">Next project</span><h2>${esc(next.name)}</h2><span class="meta" style="color:inherit">${esc(next.location||'')}</span></div></a>`,next:next.coverL};
 };
@@ -316,18 +318,19 @@ function layoutPhotos(list){
   return list.map((ph,i)=>{const [w,h]=DIM(ph.k);const landscape=w>h*1.15;let col,mt=0;
     if(landscape){col=patL[l++%2]}else{[col,mt]=pat[v++%pat.length]}
     const pr=ph.project?byslug(ph.project):null;
-    const cap=[ph.loc,pr?pr.name:''].filter(Boolean).join(' / ')||CATS.find(c=>c[0]===ph.cats[0])[1];
+    const cap=photoCap(ph);
     if(pr)return `<figure style="grid-column:${col};margin-top:${mt}"><a class="plink" href="#work-${pr.slug}" aria-label="${esc(pr.name)}, view project">${frame(ph.k,cap)}<figcaption class="meta"><span>${esc(cap)}</span><span class="vp">View project</span></figcaption></a></figure>`;
     return `<figure style="grid-column:${col};margin-top:${mt}"><button data-lb="${i}" aria-label="Open photograph">${frame(ph.k,cap)}</button><figcaption class="meta">${esc(cap)}</figcaption></figure>`}).join('');
 }
+function photoCap(ph){const pr=ph.project?byslug(ph.project):null;const c=CATS.find(c=>c[0]===(ph.cats||[])[0]);return [ph.loc,pr?pr.name:''].filter(Boolean).join(' / ')||(c?c[1]:'')}
 PAGES.photography=cat=>{
-  const valid=CATS.find(c=>c[0]===cat);const list=valid?PHOTOS.filter(p=>p.cats.includes(cat)):PHOTOS;
-  const count=c=>PHOTOS.filter(p=>p.cats.includes(c)).length;
-  return {lightbox:list.map(ph=>{const pr=ph.project?byslug(ph.project):null;return {k:ph.k,cap:[ph.loc,pr?pr.name:''].filter(Boolean).join(' / ')||CATS.find(c=>c[0]===ph.cats[0])[1],project:ph.project}}),html:`
-  <section class="pintro"><div class="wrap"><h1>Photography</h1><p>Photography is where our work began and where it remains strongest. Every image is composed for the brand it belongs to, in natural light wherever possible.</p></div></section>
+  const valid=CATS.find(c=>c[0]===cat);const list=valid?PHOTOS.filter(p=>(p.cats||[]).includes(cat)):PHOTOS;
+  const count=c=>PHOTOS.filter(p=>(p.cats||[]).includes(c)).length;
+  return {lightbox:list.map(ph=>({k:ph.k,cap:photoCap(ph),project:ph.project})),html:`
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.photoTitle)}</h1><p>${esc(C.pages.photoIntro)}</p></div></section>
   <nav class="filters" aria-label="Photography categories"><div class="wrap">
     <a class="chip${valid?'':' on'}" href="#photography">All <span class="n">${PHOTOS.length}</span></a>
-    ${CATS.map(([id,n])=>`<a class="chip${cat===id?' on':''}" href="#photography-${id}">${n} <span class="n">${count(id)}</span></a>`).join('')}
+    ${CATS.map(([id,n])=>`<a class="chip${cat===id?' on':''}" href="#photography-${id}">${esc(n)} <span class="n">${count(id)}</span></a>`).join('')}
   </div></nav>
   <section><div class="wrap"><div class="grid pgrid">${layoutPhotos(list)}</div></div></section>${cta()}`};
 };
@@ -337,86 +340,96 @@ PAGES.film=()=>{
   const big=[],rest=[];Object.entries(groups).forEach(([c,l])=>l.length>=2?big.push([c,l]):rest.push(...l));
   let idx=0;const all=[];
   const cards=l=>l.map(f=>{all.push(f);return filmBtn(f,idx++)}).join('');
-  const html=big.map(([c,l])=>`<section class="fgroup">${label(c)}<div class="fcards">${cards(l)}</div></section>`).join('')+
+  const html=big.map(([c,l])=>`<section class="fgroup">${label(esc(c))}<div class="fcards">${cards(l)}</div></section>`).join('')+
     (rest.length?`<section class="fgroup">${label('More films')}<div class="fcards">${cards(rest)}</div></section>`:'');
   return {filmList:all,html:`
-  <section class="pintro"><div class="wrap"><h1>Film</h1><p>Our films follow the same principle as our photography: composed, unhurried and true to the place. Property films, brand films and short-form stories, shot for the big screen and cut for every channel.</p></div></section>
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.filmTitle)}</h1><p>${esc(C.pages.filmIntro)}</p></div></section>
   <div class="wrap" style="padding-bottom:clamp(88px,12vw,180px)">${html}</div>${cta()}`};
 };
 
 PAGES.services=anchor=>({anchor,html:`
-  <section class="pintro"><div class="wrap"><h1>Services</h1><p>From a single photography brief to a full production across photo, film and drone, we plan, direct and deliver the visual content a property needs.</p></div></section>
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.servicesTitle)}</h1><p>${esc(C.pages.servicesIntro)}</p></div></section>
   <div class="wrap">${SERVICES.map((s,i)=>`<section class="split${i%2?' flip':''}" id="svc-${s.id}">
     <div class="media">${frame(s.img,s.name,{ratio:'4/5'})}</div>
-    <div class="t"><h2>${s.name}</h2><p>${s.body}</p>${s.deliv?`<div class="deliv"><span class="meta">Typical deliverables</span><span>${s.deliv}</span></div>`:''}</div></section>`).join('')}</div>
-  <section class="band"><p>Every production is scoped individually. Tell us about your project and we will prepare a proposal.</p>${btn('contact','Start a project')}</section>`});
+    <div class="t"><h2>${esc(s.name)}</h2>${paras(s.body)}${s.deliv?`<div class="deliv"><span class="meta">Typical deliverables</span><span>${esc(s.deliv)}</span></div>`:''}</div></section>`).join('')}</div>
+  <section class="band"><p>${esc(C.pages.servicesBand)}</p>${btn('contact','Start a project')}</section>`});
 
-PAGES.about=()=>({html:`
+PAGES.about=()=>{const A=C.about;const films=[];
+  const disc=(A.disc||[]).slice(0,3).map((d,i)=>{const cls='dcard d'+(i+1),ratio=['4/5','16/10','1/1'][i];
+    const inner=`${frame(d.img,d.label+(d.meta?', '+d.meta:''),{ratio})}${d.film?'<span class="play" aria-hidden="true"></span>':''}<div class="dcap"><span class="label">${esc(d.label)}</span><span class="meta">${esc(d.meta||'')}</span></div>`;
+    if(d.film){films.push({k:d.img,video:d.film,title:d.meta||d.label,meta:''});return `<button class="${cls} vid" data-film="${films.length-1}">${inner}</button>`}
+    return d.project&&byslug(d.project)?`<a class="${cls}" href="#work-${d.project}">${inner}</a>`:`<div class="${cls}">${inner}</div>`}).join('');
+  return {filmList:films,html:`
   <section class="about-open"><div class="wrap grid">
-    <div class="t"><h1>About Chasing Stories</h1><p>Chasing Stories is a creative production studio for luxury hospitality, travel and lifestyle brands. We produce photography and film for hotels, resorts and destinations across Asia, the Indian Ocean and beyond.</p></div>
-    <div class="i">${frame('ab-open','Overwater villas and lagoon from above, Maldives',{ratio:'3/4',px:.3})}</div></div></section>
-  <section class="txtblock"><div class="wrap grid"><div class="l">${label('Our approach')}</div><div class="r"><h2>Our approach</h2>
-    <p>We treat every property as a place with its own character. Before we shoot, we study how guests move through it, when the light is at its best and what sets it apart. On location, we direct rather than document: every frame is planned, with room left for the moments that cannot be.</p></div></div></section>
-  <section class="txtblock" style="padding-top:0;padding-bottom:0"><div class="wrap"><div class="grid"><div class="l">${label('Creative production')}</div><div class="r"><h2>Creative production</h2>
-    <p>Photography, film, drone and lifestyle production are handled by one team, under one creative direction. One brief, one visual language and a single library of assets that works across your website, campaigns, PR and social channels.</p></div></div></div></section>
-  <section class="disc"><div class="wrap"><div class="grid disc-g">
-    <a class="dcard d1" href="#work-sixsenses">${frame('ab-photo','Photography, Six Senses Kocataş Mansions',{ratio:'4/5'})}<div class="dcap"><span class="label">Photography</span><span class="meta">Six Senses Kocataş Mansions</span></div></a>
-    <button class="dcard d2 vid" data-film="0">${frame('film-palau-2','Film still, Four Seasons Explorer',{ratio:'16/10'})}<span class="play" aria-hidden="true"></span><div class="dcap"><span class="label">Film</span><span class="meta">Four Seasons Explorer</span></div></button>
-    <a class="dcard d3" href="#work-hoiana">${frame('ab-drone','Drone, Hoiana Resort & Golf',{ratio:'1/1'})}<div class="dcap"><span class="label">Drone</span><span class="meta">Hoiana Resort &amp; Golf</span></div></a>
-  </div></div></section>
-  ${hrail('How we work',[['Discover','We learn the property, the brand and the audience, and agree on what the content needs to achieve.','heritance-6'],
-      ['Concept','Visual direction, moodboards, shot lists and schedules, approved before we arrive.','sixsenses-4'],
-      ['Produce','Photography, film and drone on location, with talent and styling where the story needs it.','palau-3'],
-      ['Curate','We edit with restraint. Only the strongest frames make the final selection.','hoiana-5'],
-      ['Deliver','Retouched images and graded films, prepared in the formats each channel requires.','bangkok-6']]
-      .map(([t,d,k],i)=>`<article class="hs-card step">${frame(k,t,{ratio:'4/5'})}<div class="hs-cap"><span class="num">${nf(i+1)}</span><h3>${t}</h3><p>${d}</p></div></article>`),'How we work')}
-  <section class="world" data-field="world"><img src="${I('ab-dest')}" alt="" loading="lazy"><div class="sc"></div>
-    <div class="copy"><h2>Available worldwide</h2><p>We travel for every production. Recent work has taken us to the Maldives, Thailand, Vietnam, Palau, Singapore, Hong Kong, Malaysia, Turkey and Tanzania.</p>
-      <div class="world-cta"><span class="lead">Have a project in mind? Let's create something meaningful.</span>${btn('contact','Get in touch','light')}</div></div></section>`,filmList:[{k:'film-palau-2',title:'Four Seasons Explorer',meta:'Palau'}]});
+    <div class="t"><h1>${esc(A.title)}</h1>${paras(A.intro)}</div>
+    <div class="i">${frame(C.img.aboutOpen,A.openAlt,{ratio:'3/4'})}</div></div></section>
+  <section class="txtblock"><div class="wrap grid"><div class="l">${label(esc(A.approachTitle))}</div><div class="r"><h2>${esc(A.approachTitle)}</h2>${paras(A.approach)}</div></div></section>
+  <section class="txtblock" style="padding-top:0;padding-bottom:0"><div class="wrap"><div class="grid"><div class="l">${label(esc(A.productionTitle))}</div><div class="r"><h2>${esc(A.productionTitle)}</h2>${paras(A.production)}</div></div></div></section>
+  <section class="disc"><div class="wrap"><div class="grid disc-g">${disc}</div></div></section>
+  ${hrail(A.stepsTitle,(A.steps||[]).map((s,i)=>`<article class="hs-card step">${frame(s.img,s.t,{ratio:'4/5'})}<div class="hs-cap"><span class="num">${nf(i+1)}</span><h3>${esc(s.t)}</h3><p>${esc(s.d)}</p></div></article>`),A.stepsTitle)}
+  <section class="world" data-field="world"><img src="${I(C.img.world)}" alt="" loading="lazy"><div class="sc"></div>
+    <div class="copy"><h2>${esc(A.worldTitle)}</h2>${paras(A.worldText)}
+      <div class="world-cta"><span class="lead">${esc(A.worldCta)}</span>${btn('contact',esc(C.cta.button),'light')}</div></div></section>`};
+};
 
 PAGES.contact=project=>{
-  const p=project?byslug(project):null;
-  const types=['Photography','Film','Photography + Film','Creative Direction','Full Production'];
+  const p=project?byslug(project):null;const K=C.contact;
+  const types=K.types&&K.types.length?K.types:['Photography','Film','Photography + Film','Creative Direction','Full Production'];
   const F=(id,lab,{type='text',req=true,ph='',w=false}={})=>`<div class="field${w?' w':''}"><label for="${id}">${lab}${req?'':' <span class="opt">(optional)</span>'}</label>
     <input id="${id}" name="${id}" type="${type}" ${req?'required':''} placeholder="${esc(ph)}" autocomplete="${type==='email'?'email':id==='f-name'?'name':id==='f-company'?'organization':'off'}"><span class="err" aria-live="polite"></span></div>`;
   return {html:`
   <section class="contact"><div class="wrap grid">
-    <div class="l"><h1>Let's create something</h1>
-      <p class="intro-t">Tell us a little about your project, location and requirements. We reply to every enquiry within two working days.</p>
+    <div class="l"><h1>${esc(K.title)}</h1>
+      <p class="intro-t">${esc(K.intro)}</p>
       <form class="form" id="enq" novalidate>
         ${F('f-name','Name')}${F('f-company','Company / Brand')}
         ${F('f-email','Email',{type:'email'})}${F('f-web','Website / Instagram',{req:false,ph:'e.g. www.yourhotel.com or @yourhotel'})}
         ${F('f-loc','Project location',{ph:'City, country'})}${F('f-dates','Preferred dates',{req:false,ph:'e.g. March 2027, flexible'})}
-        <div class="field w"><label for="f-type">Project type</label><select id="f-type" name="f-type" required><option value="">Select</option>${types.map(t=>`<option>${t}</option>`).join('')}</select><span class="err" aria-live="polite"></span></div>
+        <div class="field w"><label for="f-type">Project type</label><select id="f-type" name="f-type" required><option value="">Select</option>${types.map(t=>`<option>${esc(t)}</option>`).join('')}</select><span class="err" aria-live="polite"></span></div>
         <div class="field w"><label for="f-details">Project details</label><textarea id="f-details" name="f-details" required placeholder="Tell us about the property, the goal and what you have in mind."></textarea><span class="err" aria-live="polite"></span></div>
         <input type="hidden" name="source" value="${esc(p?'project:'+p.slug:'contact')}">
-        <label class="consent"><input type="checkbox" id="f-consent" required><span>I agree to Chasing Stories processing my details to respond to this enquiry. <a href="#privacy">Privacy Policy</a></span></label>
+        <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website_url" tabindex="-1" autocomplete="off"></label></div>
+        <label class="consent"><input type="checkbox" id="f-consent" required><span>I agree to ${esc(C.brand)} processing my details to respond to this enquiry. <a href="#privacy">Privacy Policy</a></span></label>
         <div class="field w" style="margin-top:-18px"><span class="err" id="consentErr" aria-live="polite"></span></div>
         <div class="actions"><button class="btn" type="submit">Send enquiry <i></i></button>${p?`<span class="meta">About: ${esc(p.name)}</span>`:''}</div>
       </form>
       <div class="direct"><span class="label">Direct contact</span>
-        <span>Email: <span style="user-select:all">hello@chasingstories.org</span></span>
-        <a href="https://www.instagram.com/andra.oprea" target="_blank" rel="noopener">Instagram ↗</a>
-        <a href="https://www.linkedin.com/in/andra-oprea-2a620b310/" target="_blank" rel="noopener">LinkedIn ↗</a>
-        <span class="meta">Available worldwide.</span></div>
+        ${K.email?`<span>Email: <span style="user-select:all">${esc(K.email)}</span></span>`:''}
+        ${K.instagram?`<a href="${esc(K.instagram)}" target="_blank" rel="noopener">Instagram ↗</a>`:''}
+        ${K.linkedin?`<a href="${esc(K.linkedin)}" target="_blank" rel="noopener">LinkedIn ↗</a>`:''}
+        <span class="meta">${esc(C.available)}</span></div>
     </div>
-    <div class="r">${frame('contact','Evening light on a terrace',{ratio:'4/5',px:.3})}</div>
+    <div class="r">${frame(C.img.contact,K.imgAlt,{ratio:'4/5'})}</div>
   </div></section><div style="height:clamp(80px,10vw,160px)"></div>`};
 };
 
 PAGES.privacy=()=>({html:`<section class="legal-p"><div class="wrap"><h1>Privacy &amp; Cookies</h1><div class="body">
-  <p>The legal text is being prepared. It will cover the points below.</p>
+  ${C.privacy&&C.privacy.trim()?paras(C.privacy):`<p>The legal text is being prepared. It will cover the points below.</p>
   ${['Who operates this website','What the enquiry form collects and why','How long data is kept','Your rights as a visitor','The analytics tool and its cookies','How to change your cookie choice','Contact for data requests']
-   .map(t=>`<h2>${t}</h2><p>To be supplied.</p>`).join('')}
+   .map(t=>`<h2>${t}</h2><p>To be supplied.</p>`).join('')}`}
   <div style="margin-top:24px"><button class="btn" id="cookieOpen" type="button">Cookie settings <i></i></button></div></div></div></section>${cta()}`});
 
-PAGES.notfound=()=>({hero:true,html:`<section class="nf" data-field="nf"><picture><img src="${I('film-palau-1')}" alt=""></picture><div class="scrim"></div>
-  <div class="copy"><span class="label" style="color:inherit">404</span><h1>This story has moved on.</h1><p style="margin:0">The page you are looking for does not exist or has been moved.</p>
+PAGES.notfound=()=>({hero:true,status:404,html:`<section class="nf" data-field="nf"><picture><img src="${I(C.img.notfound)}" alt=""></picture><div class="scrim"></div>
+  <div class="copy"><span class="label" style="color:inherit">404</span><h1>${esc(C.notfound.h1)}</h1><p style="margin:0">${esc(C.notfound.p)}</p>
   <div class="b">${btn('work','View our work','light')}${btn('','Back to home','light')}</div></div></section>`});
 
 /* ============================================================
    ROUTER
    ============================================================ */
+/* Two addressing modes, one set of route tokens ('work-palau', 'photography-drone', ...):
+   hash (#work-palau) for the prototype and the artifact, real paths (/work/palau) on the live server. */
+const PATH_MODE=!!(SITE_DATA&&SITE_DATA.routing==='path');
+function tokenToPath(t){t=(t||'').replace(/^#/,'');if(!t||t==='top')return '/';
+  for(const [a,b] of [['work-','/work/'],['photography-','/photography/'],['services-','/services/'],['contact-','/contact?project=']])if(t.startsWith(a))return b+encodeURIComponent(t.slice(a.length));
+  return '/'+t}
+function pathToToken(){const p=location.pathname.replace(/\/+$/,'')||'/',q=new URLSearchParams(location.search);if(p==='/')return '';
+  const seg=p.slice(1).split('/').map(decodeURIComponent);
+  if(seg[0]==='contact'&&seg.length===1&&q.get('project'))return 'contact-'+q.get('project');
+  if(seg.length===2&&['work','photography','services'].includes(seg[0]))return seg[0]+'-'+seg[1];
+  return seg.length===1?seg[0]:'__none'}
+const curToken=()=>PATH_MODE?pathToToken():location.hash.slice(1);
+const isRoute=t=>{t=(t||'').replace(/^#/,'');return t===''||t==='top'||parse(t)[0]!=='notfound'};
+function pathLinks(root){if(!PATH_MODE)return;$$('a[href^="#"]',root).forEach(a=>{const t=a.getAttribute('href').slice(1);if(isRoute(t))a.setAttribute('href',tokenToPath(t))})}
 function parse(h){
   h=(h||'').replace(/^#/,'');
   if(!h||h==='top')return ['home'];
@@ -435,10 +448,10 @@ function parse(h){
 }
 const app=$('#app');let cleanups=[],current=null,filmList=[],lbList=[];
 const navKey={home:null,work:'work',project:'work',photography:'photography',film:'film',services:'services',about:'about',contact:'contact'};
-const TITLES={home:'Chasing Stories',work:'Work',photography:'Photography',film:'Film',services:'Services',about:'About',contact:'Contact',privacy:'Privacy & Cookies',notfound:'Page not found'};
+const TITLES={home:C.brand,work:'Work',photography:'Photography',film:'Film',services:'Services',about:'About',contact:'Contact',privacy:'Privacy & Cookies',notfound:'Page not found'};
 
 async function go(first){
-  const [name,arg]=parse(location.hash);
+  const [name,arg]=parse(curToken());
   const key=name+(arg||'');
   if(key===current)return;
   const soft=current&&current.startsWith('photography')&&name==='photography';
@@ -455,9 +468,11 @@ async function go(first){
   }
   cleanups.forEach(f=>{try{f()}catch(e){}});cleanups=[];
   app.innerHTML=`<div class="page">${view.html}</div>`;
-  document.title=(name==='project'&&byslug(arg)?byslug(arg).name+' | ':TITLES[name]&&name!=='home'?TITLES[name]+' | ':'')+'Chasing Stories';
+  document.title=(name==='project'&&byslug(arg)?byslug(arg).name+' | ':TITLES[name]&&name!=='home'?TITLES[name]+' | ':'')+C.brand;
+  pathLinks(app);
   filmList=view.filmList||[];lbList=view.lightbox||[];
-  $$('.nav a.link').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+navKey[name]));
+  const navHref=PATH_MODE?tokenToPath(navKey[name]||''):'#'+navKey[name];
+  $$('.nav a.link').forEach(a=>a.classList.toggle('on',!!navKey[name]&&a.getAttribute('href')===navHref));
   if(view.anchor){const t=$('#svc-'+view.anchor);if(t)requestAnimationFrame(()=>scrollToY(t.getBoundingClientRect().top+scrollY-60,first))}
   else if(!sameAnchor)scrollToY(soft?keepY:0,true);
   if(animate){
@@ -467,7 +482,15 @@ async function go(first){
   hydrate(first);onScroll();
 }
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-addEventListener('hashchange',()=>go(false));
+if(PATH_MODE){
+  // internal links change the address without a reload; everything else (assets, admin, other sites) behaves normally
+  document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||a.target==='_blank')return;
+    const u=new URL(a.href,location.href);if(u.origin!==location.origin||/^\/(admin|api|assets|uploads)\b/.test(u.pathname)||/\.[a-z0-9]{2,5}$/i.test(u.pathname))return;
+    e.preventDefault();if(u.pathname+u.search!==location.pathname+location.search){history.pushState(null,'',u.pathname+u.search);go(false)}});
+  addEventListener('popstate',()=>go(false));
+  if(location.hash&&isRoute(location.hash))history.replaceState(null,'',tokenToPath(location.hash));   // old #links keep working
+  pathLinks(document);
+}else addEventListener('hashchange',()=>go(false));
 
 /* smooth, weighted scrolling */
 let lenis=null;
@@ -540,7 +563,7 @@ function hydrate(first){
 
 /* hero loop: the [SMALL] master from Drive, muted and looping; drives the WebGL field when there is one */
 function heroLoop(host,field){
-  if(RM)return;const portrait=innerWidth<760&&innerHeight>innerWidth;const url=videoURL(portrait?'hero-m':'hero');if(!url)return;
+  if(RM)return;const portrait=innerWidth<760&&innerHeight>innerWidth;const url=(portrait?C.video.heroM||C.video.hero:C.video.hero)||videoURL(portrait?'hero-m':'hero');if(!url)return;
   const v=document.createElement('video');Object.assign(v,{muted:true,loop:true,playsInline:true,autoplay:true,preload:'auto'});
   v.setAttribute('muted','');v.setAttribute('playsinline','');v.crossOrigin='anonymous';v.className='hero-vid';v.src=url;
   host.querySelector('picture').appendChild(v);
@@ -598,7 +621,15 @@ function wireForm(form){
     $$('input:not([type=hidden]):not([type=checkbox]),select,textarea',form).forEach(el=>{if(!check(el)){ok=false;first=first||el}});
     const c=$('#f-consent',form);$('#consentErr').textContent=c.checked?'':'Please confirm you agree so we can reply.';if(!c.checked){ok=false;first=first||c}
     if(!ok){first.focus();return}
-    form.innerHTML=`<div class="form-msg" role="status"><div><strong>Thank you.</strong> Your enquiry is with us and we will reply within two working days.<br><span class="meta">Prototype: nothing was sent. The live site posts this to the studio inbox.</span></div></div>`});
+    const done=(ok,msg)=>{form.innerHTML=`<div class="form-msg${ok?'':' bad'}" role="status"><div>${msg}</div></div>`};
+    if(!(SITE_DATA&&SITE_DATA.api)){done(true,`<strong>Thank you.</strong> ${esc(C.contact.success)}<br><span class="meta">Prototype: nothing was sent. The live site posts this to the studio inbox.</span>`);return}
+    const btnS=form.querySelector('button[type=submit]');btnS.disabled=true;btnS.style.opacity=.5;
+    const fd=new FormData(form);fd.set('consent',$('#f-consent',form).checked?'1':'');fd.set('page',location.pathname+location.search);
+    fetch(SITE_DATA.api,{method:'POST',body:fd,headers:{'X-Requested-With':'fetch'}}).then(r=>r.json().catch(()=>({ok:false}))).then(j=>{
+      if(j&&j.ok)done(true,`<strong>Thank you.</strong> ${esc(C.contact.success)}`);
+      else{btnS.disabled=false;btnS.style.opacity='';const er=form.querySelector('.form-err')||form.insertAdjacentElement('beforeend',Object.assign(document.createElement('p'),{className:'form-err'}));
+        er.textContent=(j&&j.error)||('Something went wrong. Please try again or write to us at '+(C.contact.email||'')+'.')}
+    }).catch(()=>{btnS.disabled=false;btnS.style.opacity='';done(false,'Something went wrong. Please try again or write to us at '+esc(C.contact.email||'')+'.')})});
 }
 
 /* ---------- lightbox ---------- */
@@ -621,7 +652,7 @@ $('#lbStage').addEventListener('pointerup',e=>{if(sx==null)return;const d=e.clie
 /* ---------- film player shell ---------- */
 const fm=$('#fm');
 function openFilm(i,from){const f=filmList[i];if(!f)return;$('#fmImg').src=I(f.k);
-  const v=$('#fmVid'),url=videoURL(f.k),has=!!url;v.hidden=!has;$('#fmImg').hidden=has;$('#fmPlay').hidden=has;$('#fmNote').hidden=has;
+  const v=$('#fmVid'),url=vsrc(f),has=!!url;v.hidden=!has;$('#fmImg').hidden=has;$('#fmPlay').hidden=has;$('#fmNote').hidden=has;
   if(has){v.poster=I(f.k);v.src=url;v.onerror=()=>{v.hidden=true;$('#fmImg').hidden=false;$('#fmPlay').hidden=false;$('#fmNote').hidden=false};v.play().catch(()=>{})}$('#fmTitle').textContent=[f.title,f.meta||f.client].filter(Boolean).join(' · ');
   lastFocus=from;fm.hidden=false;lockScroll(true);requestAnimationFrame(()=>fm.classList.add('open'));$('#fmClose').focus()}
 function closeFM(){const v=$('#fmVid');v.pause();v.removeAttribute('src');v.load();fm.classList.remove('open');setTimeout(()=>{fm.hidden=true},RM?0:320);lockScroll(false);lastFocus&&lastFocus.focus()}
@@ -674,6 +705,11 @@ if(matchMedia('(pointer:fine)').matches&&!RM){
   document.addEventListener('pointerleave',()=>sq.classList.remove('on'));
   addEventListener('blur',()=>sq.classList.remove('on'));
 }
+
+/* shell texts (footer, mobile menu) come from the CMS too */
+$$('[data-c]').forEach(el=>{const path=el.dataset.c.split('.');let v=C;for(const k of path)v=v&&v[k];if(v==null||v==='')return;
+  if(el.dataset.attr==='href')el.setAttribute('href',v);else el.textContent=v});
+$$('[data-c-hide]').forEach(el=>{const path=el.dataset.cHide.split('.');let v=C;for(const k of path)v=v&&v[k];if(!v)el.remove()});
 
 go(true);
 })();

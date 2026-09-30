@@ -1,0 +1,1727 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><!--HEAD--></head><body><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+
+/* Layout: a 12-column editorial grid. Everything square: the pixel is the only shape.
+   Pixel colours are never picked by hand; they are sampled from the photograph underneath. */
+:root{
+  --paper:#F1F2EF; --paper-2:#E6E8E4; --ink:#0F1514; --muted:#5B6462; --line:#D3D7D2;
+  --lagoon:#0B7473; --night:#0A0F0E; --on-photo:#FFFFFF; --logo-f:brightness(0);
+  --display:"Bodoni Moda","Bodoni 72",Didot,"Times New Roman",serif;
+  --sans:"Geist","Helvetica Neue",Arial,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --gut:clamp(16px,4vw,56px); --max:1440px; --hdr:72px;
+  --t-label:.72rem; --t-body:1.0625rem; --t-lead:1.35rem; --t-h2:clamp(2rem,4.4vw,3.6rem);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0C1110; --paper-2:#141B1A; --ink:#EBEEEA; --muted:#98A29F; --line:#26302E; --lagoon:#4DB6B0; --logo-f:brightness(0) invert(1); color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0C1110; --paper-2:#141B1A; --ink:#EBEEEA; --muted:#98A29F; --line:#26302E; --lagoon:#4DB6B0; --logo-f:brightness(0) invert(1); color-scheme:dark}
+
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html{scroll-behavior:auto}
+html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}.lenis.lenis-stopped{overflow:hidden}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:var(--t-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--lagoon);outline-offset:3px}
+.wrap{max-width:var(--max);margin-inline:auto;padding-inline:var(--gut)}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(12px,2vw,28px)}
+
+/* ---------- labels, buttons ---------- */
+.label{font-family:var(--mono);font-size:var(--t-label);letter-spacing:.16em;text-transform:uppercase;display:inline-flex;align-items:center;gap:.7em;color:var(--ink)}
+.label::before{content:"";width:.62em;height:.62em;background:currentColor;flex:none}
+.meta{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.btn{--b:var(--ink);font-family:var(--mono);font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;
+  display:inline-flex;align-items:center;gap:.9em;padding:1.05em 1.5em;border:1px solid var(--b);color:var(--b);position:relative;isolation:isolate;overflow:hidden;background:none;cursor:pointer}
+.btn::after{content:"";position:absolute;inset:0;background:var(--b);transform:scaleX(0);transform-origin:left;transition:transform .42s steps(6,end);z-index:-1}
+.btn:hover::after,.btn:focus-visible::after{transform:scaleX(1)}
+.btn:hover,.btn:focus-visible{color:var(--paper)}
+.btn.light{--b:var(--on-photo)}
+.btn.light:hover,.btn.light:focus-visible{color:var(--night)}
+.btn i{width:6px;height:6px;background:currentColor;display:block}
+
+/* ---------- header ---------- */
+.hdr{position:fixed;inset:0 0 auto;z-index:50;padding-top:env(safe-area-inset-top,0px);background:var(--paper);color:var(--ink);border-bottom:1px solid var(--line);transition:transform .35s ease,background .3s,color .3s,border-color .3s}
+.hdr.over{background:transparent;color:var(--on-photo);border-color:transparent}
+.hdr.hide{transform:translateY(-101%)}
+.hdr .wrap{height:var(--hdr);display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.mark{display:grid;grid-template-columns:repeat(3,6px);grid-template-rows:repeat(3,6px);gap:0}
+.mark i{background:currentColor}
+.mark i:nth-child(1){grid-area:3/1}.mark i:nth-child(2){grid-area:2/2}.mark i:nth-child(3){grid-area:1/3}
+.wordmark{font-family:var(--display);font-weight:500;font-size:1.02rem;letter-spacing:.22em;text-transform:uppercase;white-space:nowrap}
+.nav{display:flex;align-items:center;gap:clamp(16px,2.2vw,34px)}
+.nav a{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;position:relative;padding-block:6px}
+.nav a.link::after{content:"";position:absolute;left:0;bottom:0;width:6px;height:6px;background:currentColor;transform:scale(0);transition:transform .2s steps(3,end)}
+.nav a.link:hover::after,.nav a.link.on::after{transform:scale(1)}
+.nav .enq{border:1px solid currentColor;padding:.7em 1.1em}
+.nav .enq:hover{background:currentColor}
+.nav .enq:hover span{filter:invert(1);mix-blend-mode:difference}
+.menu-btn{display:none;background:none;border:0;color:inherit;font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;cursor:pointer;padding:10px 0}
+
+.mnav{position:fixed;inset:0;z-index:60;background:var(--night);color:var(--on-photo);display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 14px) var(--gut) calc(env(safe-area-inset-bottom,0px) + 28px)}
+.mnav .top{display:flex;justify-content:space-between;align-items:center;height:58px}
+.mnav ul{list-style:none;margin:auto 0 0;padding:0;display:grid;gap:6px}
+.mnav li a{font-family:var(--display);font-size:clamp(2.4rem,11vw,4rem);line-height:1.1;text-decoration:none;letter-spacing:.01em}
+.mnav .foot{margin-top:36px;display:grid;gap:4px;color:#C9D0CE}
+
+/* ---------- hero ---------- */
+.hero{position:relative;height:100svh;min-height:560px;overflow:hidden;background:var(--night);color:var(--on-photo)}
+.hero picture img,.hero canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero picture img{object-position:50% 45%}
+.hero .scrim{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 52%,rgba(6,10,10,.42),rgba(6,10,10,0) 70%),linear-gradient(rgba(6,10,10,.34),rgba(6,10,10,0) 22%,rgba(6,10,10,0) 70%,rgba(6,10,10,.4))}
+.hero .copy{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;text-align:center;padding-inline:var(--gut);gap:clamp(14px,2vh,22px)}
+.display{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,9.4vw,9.6rem);line-height:.92;letter-spacing:.06em;text-transform:uppercase;margin:0;text-wrap:balance}
+.hero h1{font-family:var(--display);font-style:italic;font-weight:400;font-size:clamp(1.15rem,2vw,1.7rem);line-height:1.3;margin:6px 0 0;max-width:30ch;text-wrap:balance}
+.hero .sub{font-family:var(--mono);font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;margin:0;opacity:.9}
+.hero .btn{margin-top:14px}
+.cue{position:absolute;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));translate:-50% 0;width:1px;height:54px;background:rgba(255,255,255,.35)}
+.cue i{position:absolute;left:-3px;top:0;width:7px;height:7px;background:var(--on-photo);animation:drop 2.4s steps(9,end) infinite}
+@keyframes drop{to{transform:translateY(47px)}}
+.px-layer{position:absolute;inset:0;pointer-events:none}
+canvas.glc{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero.gl .scrim,.hero.gl .px-layer,.hero.gl #heroMos,.cta.gl .px-layer{display:none}
+.cta.gl .scrim{display:none}
+.hero.gl .copy{text-shadow:0 1px 24px rgba(0,0,0,.25)}
+.px{position:absolute;will-change:transform}
+.px.ghost{outline:1px solid rgba(255,255,255,.7);outline-offset:-1px}
+
+/* ---------- sections ---------- */
+section{position:relative}
+.sec{padding-block:clamp(88px,12vw,180px)}
+.intro{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:18px 40px;margin-bottom:clamp(40px,6vw,84px)}
+.intro p{margin:0;font-family:var(--display);font-size:clamp(1.5rem,2.8vw,2.4rem);line-height:1.18;max-width:22ch;text-wrap:balance}
+.intro .l{display:grid;gap:22px}
+
+/* mosaic canvases that sit over images while they resolve */
+.frame{position:relative;overflow:hidden;background:var(--paper-2)}
+.frame img{width:100%;height:100%;object-fit:cover;transition:transform 1.4s cubic-bezier(.2,.7,.1,1)}
+.frame canvas.mos{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;image-rendering:pixelated}
+
+/* ---------- selected work ---------- */
+.work{row-gap:clamp(56px,8vw,120px)}
+.card{text-decoration:none;display:grid;gap:16px;align-self:start}
+.card .frame{aspect-ratio:4/5}
+.card.land .frame{aspect-ratio:3/2}
+.card:hover .frame img{transform:scale(1.035)}
+.card .row{display:flex;justify-content:space-between;align-items:start;gap:16px}
+.card h3{font-family:var(--display);font-weight:400;font-size:clamp(1.3rem,2vw,1.75rem);line-height:1.15;margin:0 0 6px;text-wrap:balance}
+.swatch{display:flex;gap:3px;flex:none;padding-top:6px}
+.swatch i{width:9px;height:9px;transition:transform .25s steps(3,end)}
+.card:hover .swatch i{transform:translateY(-4px)}
+.card:hover .swatch i:nth-child(2n){transform:translateY(-8px)}
+.c1{grid-column:1/6}.c2{grid-column:7/13;align-self:end}
+.c3{grid-column:8/12;grid-row:2}.c4{grid-column:1/8;grid-row:2;align-self:center}
+.c5{grid-column:2/6;grid-row:3}.c6{grid-column:7/13;grid-row:3;margin-top:14vw}
+.more{display:flex;justify-content:center;margin-top:clamp(64px,8vw,110px)}
+
+/* ---------- photography ---------- */
+.photo{background:var(--paper-2)}
+.gal{row-gap:clamp(24px,4vw,56px)}
+.gal button{all:unset;cursor:zoom-in;display:block;position:relative}
+.gal button:focus-visible{outline:2px solid var(--lagoon);outline-offset:4px}
+.gal .frame{aspect-ratio:2/3}
+.gal button:hover img{transform:scale(1.03)}
+.gal figcaption{margin-top:10px}
+.gal figure{margin:0}
+.gal .g1{grid-column:1/6;grid-row:1}.gal .g2{grid-column:8/11;grid-row:1;margin-top:16vw}
+.gal .g3{grid-column:3/7;grid-row:2;margin-top:-4vw}.gal .g4{grid-column:8/13;grid-row:2;margin-top:8vw}
+.gal .g5{grid-column:1/4;grid-row:3;margin-top:10vw}.gal .g6{grid-column:5/10;grid-row:3}.gal .g7{grid-column:11/13;grid-row:3;margin-top:22vw}
+
+/* ---------- trusted by ---------- */
+.logos{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.logo{aspect-ratio:2/1;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:grid;place-items:center;position:relative;text-decoration:none;color:var(--ink)}
+.logo img{display:block;width:var(--w,56%);height:var(--h,42%);object-fit:contain;filter:var(--logo-f);opacity:.9;transition:opacity .2s}
+a.logo:hover img{opacity:.55}
+a.logo::after{content:"";position:absolute;right:10px;top:10px;width:6px;height:6px;background:currentColor;opacity:.4}
+.logo-note{margin-top:18px}
+
+/* ---------- film ---------- */
+.films{row-gap:clamp(24px,3vw,40px)}
+.film{all:unset;cursor:pointer;display:grid;gap:14px}
+.film .frame{aspect-ratio:16/9}
+.film:hover img{transform:scale(1.03)}
+.film:focus-visible{outline:2px solid var(--lagoon);outline-offset:4px}
+.play{position:absolute;left:50%;top:50%;translate:-50% -50%;width:64px;height:64px;border:1px solid rgba(255,255,255,.85);display:grid;place-items:center;color:var(--on-photo);transition:background .25s steps(4,end)}
+.play::before{content:"";border-left:12px solid currentColor;border-top:8px solid transparent;border-bottom:8px solid transparent;margin-left:4px}
+.film:hover .play{background:rgba(255,255,255,.14)}
+.film.big .play{width:88px;height:88px}
+.film h3{font-family:var(--display);font-weight:400;font-size:1.3rem;margin:0}
+.f1{grid-column:1/9;grid-row:1/3}.f2{grid-column:9/13;grid-row:1}.f3{grid-column:9/13;grid-row:2;align-self:end}
+
+/* ---------- studio ---------- */
+.studio .txt{grid-column:4/9;display:grid;gap:22px}
+.studio .txt p{margin:0;max-width:60ch}
+.studio .txt p.lead{font-family:var(--display);font-size:var(--t-lead);line-height:1.4}
+.studio .lab{grid-column:1/4}
+.studio .img{grid-column:10/13;align-self:start}
+.studio .img .frame{aspect-ratio:2/3}
+
+/* ---------- services ---------- */
+.svc{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.svc li{border-bottom:1px solid var(--line)}
+.svc a{display:grid;grid-template-columns:40px minmax(0,5fr) minmax(0,6fr) 40px;align-items:center;gap:20px;padding-block:clamp(22px,3vw,34px);text-decoration:none}
+.svc .dot{width:12px;height:12px;background:var(--ink);transition:transform .25s steps(3,end)}
+.svc h3{font-family:var(--display);font-weight:400;font-size:var(--t-h2);line-height:1;margin:0;text-transform:uppercase;letter-spacing:.02em;transition:transform .35s ease}
+.svc p{margin:0;color:var(--muted);max-width:46ch}
+.svc .arr{justify-self:end;font-family:var(--mono);transition:transform .25s steps(3,end)}
+.svc a:hover .dot{transform:scale(1.8)}
+.svc a:hover h3{transform:translateX(12px)}
+.svc a:hover .arr{transform:translateX(6px)}
+.float{position:fixed;left:0;top:0;width:min(22vw,300px);aspect-ratio:4/5;pointer-events:none;z-index:40;opacity:0;transition:opacity .2s;clip-path:inset(0 0 100% 0)}
+.float.on{opacity:1;clip-path:inset(0 0 0 0);transition:opacity .2s,clip-path .36s steps(6,end)}
+.float img{width:100%;height:100%;object-fit:cover}
+
+/* ---------- pre-footer CTA ---------- */
+.cta{position:relative;overflow:hidden;color:var(--on-photo);background:var(--night);min-height:clamp(480px,64vw,760px);display:grid;place-items:center;text-align:center}
+.cta img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cta .scrim{position:absolute;inset:0;background:rgba(5,12,12,.46)}
+.cta .copy{position:relative;display:grid;justify-items:center;gap:18px;padding:80px var(--gut)}
+.cta h2{font-family:var(--display);font-weight:400;font-size:clamp(2.4rem,6.4vw,5.6rem);line-height:.98;text-transform:uppercase;letter-spacing:.03em;margin:0;text-wrap:balance}
+.cta p{margin:0}
+.cta .lead{font-family:var(--display);font-style:italic;font-size:var(--t-lead)}
+
+/* ---------- footer ---------- */
+footer{padding-block:clamp(64px,8vw,110px) calc(28px + env(safe-area-inset-bottom,0px))}
+.fcols{row-gap:40px}
+.fcols > div{display:grid;gap:10px;align-content:start}
+.fcols .f-a{grid-column:1/5}.fcols .f-b{grid-column:6/8}.fcols .f-c{grid-column:8/11}.fcols .f-d{grid-column:11/13}
+.fcols a{text-decoration:none}
+.fcols a:hover{color:var(--lagoon)}
+.fcols p{margin:0;color:var(--muted);max-width:32ch}
+.fcols ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.legal{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;margin-top:clamp(56px,7vw,96px);padding-top:22px;border-top:1px solid var(--line)}
+.legal a,.legal button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:none}
+.legal a:hover,.legal button:hover{color:var(--lagoon)}
+.legal .l{display:flex;gap:22px}
+
+/* ---------- overlays ---------- */
+.lb{position:fixed;inset:0;z-index:80;background:rgba(6,9,9,.96);color:var(--on-photo);display:grid;grid-template-rows:auto 1fr auto;padding:calc(env(safe-area-inset-top,0px) + 14px) var(--gut) calc(env(safe-area-inset-bottom,0px) + 18px)}
+.lb .bar{display:flex;justify-content:space-between;align-items:center;height:52px}
+.lb .stage{position:relative;display:grid;place-items:center;min-height:0;touch-action:pan-y}
+.lb .stage img{max-height:100%;max-width:100%;object-fit:contain;height:100%}
+.lb .cap{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:52px;flex-wrap:wrap}
+.xbtn{all:unset;cursor:pointer;font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;padding:10px 0}
+.xbtn:focus-visible{outline:2px solid var(--on-photo);outline-offset:4px}
+.nav-arr{all:unset;cursor:pointer;position:absolute;top:50%;translate:0 -50%;width:52px;height:52px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.4);font-family:var(--mono)}
+.nav-arr:hover{background:rgba(255,255,255,.12)}
+.nav-arr.prev{left:0}.nav-arr.next{right:0}
+.fm .stage{place-items:center}
+.fm .poster{position:relative;width:min(100%,calc((100svh - 190px) * 16 / 9));aspect-ratio:16/9;background:#000}
+.fm .poster img{width:100%;height:100%;object-fit:contain}
+.fm .poster .play{pointer-events:none;width:88px;height:88px}
+.fm .note{position:absolute;left:0;right:0;bottom:0;padding:14px 18px;background:linear-gradient(transparent,rgba(0,0,0,.7));font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase}
+
+.cookie{position:fixed;left:var(--gut);right:var(--gut);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:70;max-width:760px;margin-inline:auto;background:var(--paper);color:var(--ink);border:1px solid var(--ink);display:flex;align-items:center;gap:18px 24px;padding:14px 16px 14px 20px;flex-wrap:wrap}
+.cookie p{margin:0;flex:1 1 320px;font-size:.88rem;line-height:1.45}
+.cookie p a{color:inherit}
+.cookie .b{display:flex;gap:8px}
+.cookie .btn{padding:.8em 1.2em;font-size:.7rem}
+
+
+/* ---------- routing shell ---------- */
+#app{min-height:60vh}
+.page{animation:none}
+.xfade{position:fixed;inset:0;z-index:90;pointer-events:none;width:100%;height:100%}
+.hdr .nav a.on::after{transform:scale(1)}
+
+/* ---------- page intro (pages without a hero) ---------- */
+.pintro{padding-block:calc(var(--hdr) + clamp(64px,9vw,140px)) clamp(40px,6vw,80px)}
+.pintro h1{font-family:var(--display);font-weight:400;font-size:clamp(3rem,9vw,8.5rem);line-height:.9;letter-spacing:.02em;text-transform:uppercase;margin:0 0 clamp(20px,3vw,36px)}
+.pintro p{margin:0;font-family:var(--display);font-size:clamp(1.25rem,2.2vw,1.9rem);line-height:1.3;max-width:34ch;text-wrap:balance}
+.pintro .count{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-top:24px;display:block}
+
+/* ---------- work index ---------- */
+.wgrid{row-gap:clamp(56px,7vw,110px)}
+.wgrid .card .meta.svc{color:var(--muted);margin-top:4px;opacity:.8}
+.w-a{grid-column:1/8}.w-b{grid-column:9/13;align-self:end}
+.w-c{grid-column:2/6}.w-d{grid-column:7/13;align-self:center}
+.w-e{grid-column:1/13}
+.w-e .frame{aspect-ratio:21/9 !important}
+
+/* ---------- project hero + info ---------- */
+.phero{position:relative;height:100svh;min-height:560px;overflow:hidden;background:var(--night);color:var(--on-photo)}
+.phero picture img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.phero .scrim{position:absolute;inset:0;background:linear-gradient(rgba(6,10,10,.35),rgba(6,10,10,0) 25%,rgba(6,10,10,0) 55%,rgba(6,10,10,.55))}
+.phero .copy{position:absolute;left:0;right:0;bottom:0;padding:0 var(--gut) clamp(32px,5vw,64px);max-width:var(--max);margin-inline:auto}
+.phero h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,7vw,6.6rem);line-height:.95;letter-spacing:.02em;text-transform:uppercase;margin:0 0 12px;max-width:14ch;text-wrap:balance}
+.phero .loc{font-family:var(--mono);font-size:.78rem;letter-spacing:.18em;text-transform:uppercase}
+.phero.gl .scrim{display:none}
+.metab{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;padding-block:clamp(40px,5vw,64px);border-bottom:1px solid var(--line)}
+.metab div{display:grid;gap:8px;align-content:start;min-width:0}
+.metab .v{font-family:var(--display);font-size:1.25rem;line-height:1.3}
+.metab .v.tbc{color:var(--muted);font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+
+/* ---------- content blocks ---------- */
+.blocks{display:grid;gap:clamp(40px,7vw,120px);padding-block:clamp(64px,9vw,140px)}
+.blk .frame img{height:auto}
+.blk-large{width:min(100%,62%);}
+.blk-large.right{margin-left:auto}
+.blk-pair{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,2vw,28px);align-items:start}
+.blk-pair > :nth-child(2){margin-top:clamp(40px,8vw,140px)}
+.blk-full,.blk-drone{margin-inline:calc(-1 * var(--gut))}
+.blk-full .frame,.blk-drone .frame{aspect-ratio:16/9}
+.blk-full .frame img,.blk-drone .frame img{height:100%}
+.blk-mixed{display:grid;grid-template-columns:5fr 7fr;gap:clamp(12px,2vw,28px);align-items:center}
+.blk-video{width:min(100%,1100px);margin-inline:auto}
+.blk .cap{margin-top:10px}
+.vid{all:unset;cursor:pointer;display:block;position:relative;width:100%}
+.vid:focus-visible{outline:2px solid var(--lagoon);outline-offset:4px}
+.vid .frame{aspect-ratio:16/9}
+.vid .frame img{height:100%}
+.vid:hover .play{background:rgba(255,255,255,.14)}
+.clogo{display:grid;justify-items:center;gap:14px;padding-block:clamp(40px,6vw,80px);border-top:1px solid var(--line)}
+.clogo img.m{display:block;width:180px;height:64px;object-fit:contain;filter:var(--logo-f)}
+.nextp{position:relative;display:block;height:clamp(360px,52vw,640px);overflow:hidden;color:var(--on-photo);text-decoration:none;background:var(--night)}
+.nextp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.4s cubic-bezier(.2,.7,.1,1)}
+.nextp:hover img{transform:scale(1.03)}
+.nextp .sc{position:absolute;inset:0;background:rgba(6,10,10,.34)}
+.nextp .copy{position:absolute;left:0;right:0;bottom:0;padding:0 var(--gut) clamp(32px,5vw,64px);display:grid;gap:12px;max-width:var(--max);margin-inline:auto}
+.nextp h2{font-family:var(--display);font-weight:400;font-size:clamp(2.2rem,6vw,5.4rem);line-height:.95;text-transform:uppercase;margin:0}
+.nextp canvas.mos{position:absolute;inset:0;width:100%;height:100%}
+
+/* ---------- photography ---------- */
+.filters{position:sticky;top:calc(var(--hdr) + env(safe-area-inset-top,0px));z-index:20;background:var(--paper);border-block:1px solid var(--line);transition:top .35s ease}
+body.hdr-hidden .filters{top:env(safe-area-inset-top,0px)}
+.filters .wrap{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-block:12px}
+.filters .wrap::-webkit-scrollbar{display:none}
+.chip{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;padding:.8em 1.1em;border:1px solid var(--line);background:none;color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;gap:.7em;align-items:center}
+.chip:hover{border-color:var(--ink)}
+.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip .n{opacity:.55}
+.pgrid{row-gap:clamp(28px,4vw,64px);padding-block:clamp(40px,6vw,90px) clamp(80px,10vw,160px)}
+.pgrid figure{margin:0}
+.pgrid button{all:unset;cursor:zoom-in;display:block;width:100%}
+.pgrid button:focus-visible{outline:2px solid var(--lagoon);outline-offset:4px}
+.pgrid .frame img{height:auto}
+.pgrid button:hover img{transform:scale(1.03)}
+.pgrid figcaption{margin-top:10px}
+
+/* ---------- film page ---------- */
+.fgroup{padding-block:clamp(40px,5vw,72px);border-top:1px solid var(--line)}
+.fgroup > .label{margin-bottom:clamp(24px,3vw,40px)}
+.fcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(24px,3vw,40px) clamp(12px,2vw,28px)}
+.fcards .film:first-child:nth-last-child(odd){grid-column:1/-1}
+.film .row{display:flex;justify-content:space-between;gap:16px;align-items:start}
+.tag{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--line);padding:.35em .6em;color:var(--muted)}
+
+/* ---------- services page ---------- */
+.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,6vw,110px);align-items:center;padding-block:clamp(48px,7vw,110px);border-top:1px solid var(--line);scroll-margin-top:var(--hdr)}
+.split.flip .media{order:2}
+.split .media .frame{aspect-ratio:4/5}
+.split .media .frame img{height:100%}
+.split h2{font-family:var(--display);font-weight:400;font-size:var(--t-h2);line-height:1;text-transform:uppercase;letter-spacing:.02em;margin:0 0 24px}
+.split p{margin:0 0 16px;max-width:52ch}
+.split .deliv{display:grid;gap:6px;margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}
+.band{padding-block:clamp(88px,11vw,160px);text-align:center;display:grid;justify-items:center;gap:28px;background:var(--paper-2)}
+.band p{margin:0;font-family:var(--display);font-size:clamp(1.4rem,2.6vw,2.2rem);line-height:1.3;max-width:30ch;text-wrap:balance}
+
+/* ---------- about ---------- */
+.about-open{padding-top:calc(var(--hdr) + clamp(48px,7vw,110px))}
+.about-open .grid{align-items:end;row-gap:40px}
+.about-open .t{grid-column:1/7;display:grid;gap:24px;padding-bottom:clamp(0px,4vw,60px)}
+.about-open h1{font-family:var(--display);font-weight:400;font-size:clamp(3rem,8vw,7.4rem);line-height:.92;text-transform:uppercase;letter-spacing:.02em;margin:0}
+.about-open p{margin:0;font-family:var(--display);font-size:var(--t-lead);line-height:1.45;max-width:36ch}
+.about-open .i{grid-column:8/13}
+.about-open .i .frame{aspect-ratio:3/4}
+.about-open .i .frame img{height:100%}
+.txtblock{padding-block:clamp(80px,10vw,150px)}
+.txtblock .grid > .l{grid-column:1/4}
+.txtblock .grid > .r{grid-column:4/11;display:grid;gap:22px}
+.txtblock h2{font-family:var(--display);font-weight:400;font-size:var(--t-h2);line-height:1;margin:0;text-transform:uppercase;letter-spacing:.02em}
+.txtblock p{margin:0;font-family:var(--display);font-size:var(--t-lead);line-height:1.45;max-width:44ch}
+.strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,2vw,28px);margin-top:clamp(40px,6vw,80px)}
+.strip figure{margin:0;display:grid;gap:12px}
+.strip .frame{aspect-ratio:3/4}
+.strip .frame img{height:100%}
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--line);margin-top:clamp(32px,5vw,60px)}
+.steps li{list-style:none;padding:28px 22px 8px 0;display:grid;gap:14px;align-content:start;position:relative}
+.steps li::before{content:"";position:absolute;top:-4px;left:0;width:7px;height:7px;background:var(--ink)}
+.steps .n{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;color:var(--muted)}
+.steps h3{font-family:var(--display);font-weight:400;font-size:1.6rem;text-transform:uppercase;letter-spacing:.03em;margin:0}
+.steps p{margin:0;color:var(--muted);font-size:.96rem}
+.steps ol{margin:0;padding:0}
+.world{position:relative;min-height:clamp(480px,60vw,760px);display:grid;place-items:center;text-align:center;color:var(--on-photo);background:var(--night);overflow:hidden}
+.world img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.world .sc{position:absolute;inset:0;background:rgba(5,12,12,.4)}
+.world .copy{position:relative;display:grid;gap:22px;justify-items:center;padding:80px var(--gut);max-width:900px}
+.world h2{font-family:var(--display);font-weight:400;font-size:clamp(2.4rem,6.4vw,5.6rem);line-height:.98;text-transform:uppercase;letter-spacing:.03em;margin:0}
+.world p{margin:0;font-family:var(--display);font-size:var(--t-lead);line-height:1.45;max-width:40ch}
+
+/* ---------- contact ---------- */
+.contact{padding-top:calc(var(--hdr) + clamp(48px,7vw,100px))}
+.contact .grid{align-items:start;row-gap:48px}
+.contact .l{grid-column:1/7;display:grid;gap:28px}
+.contact .r{grid-column:8/13;position:sticky;top:calc(var(--hdr) + 24px)}
+.contact .r .frame{aspect-ratio:4/5}
+.contact .r .frame img{height:100%}
+.contact h1{font-family:var(--display);font-weight:400;font-size:clamp(2.8rem,7vw,6.2rem);line-height:.92;text-transform:uppercase;letter-spacing:.02em;margin:0}
+.contact .intro-t{margin:0;font-family:var(--display);font-size:var(--t-lead);line-height:1.45;max-width:40ch}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:26px 22px;margin-top:12px}
+.field{display:grid;gap:8px;min-width:0}
+.field.w{grid-column:1/-1}
+.field label{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase}
+.field label .opt{color:var(--muted)}
+.field input,.field select,.field textarea{font:inherit;font-size:1rem;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:10px 0;width:100%;-webkit-appearance:none;appearance:none}
+.field textarea{min-height:130px;resize:vertical}
+.field select{background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 12px) 55%,calc(100% - 7px) 55%;background-size:5px 5px;background-repeat:no-repeat}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-bottom-color:var(--ink)}
+.field .err{font-size:.82rem;color:#B3261E;min-height:0}
+.field.bad input,.field.bad select,.field.bad textarea{border-bottom-color:#B3261E}
+.consent{grid-column:1/-1;display:flex;gap:12px;align-items:flex-start;font-size:.92rem;line-height:1.5}
+.consent input{width:18px;height:18px;margin-top:3px;accent-color:var(--ink);flex:none}
+.form .actions{grid-column:1/-1;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.form-msg{grid-column:1/-1;padding:18px 20px;border:1px solid var(--ink);display:flex;gap:14px;align-items:flex-start}
+.form-msg::before{content:"";width:10px;height:10px;background:var(--lagoon);flex:none;margin-top:7px}
+.direct{display:grid;gap:8px;margin-top:40px;padding-top:28px;border-top:1px solid var(--line)}
+.direct a{text-decoration:none}
+.direct a:hover{color:var(--lagoon)}
+
+/* ---------- legal, 404 ---------- */
+.legal-p{padding-block:calc(var(--hdr) + clamp(64px,9vw,140px)) clamp(80px,10vw,160px)}
+.legal-p h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,7vw,5.6rem);line-height:.95;text-transform:uppercase;margin:0 0 40px}
+.legal-p .body{max-width:68ch;display:grid;gap:18px}
+.legal-p h2{font-family:var(--display);font-weight:400;font-size:1.5rem;margin:24px 0 0}
+.legal-p p{margin:0;color:var(--muted)}
+.nf{position:relative;height:100svh;min-height:520px;display:grid;place-items:center;text-align:center;color:var(--on-photo);background:var(--night);overflow:hidden}
+.nf picture img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.nf .scrim{position:absolute;inset:0;background:rgba(5,10,10,.5)}
+.nf .copy{position:relative;display:grid;gap:22px;justify-items:center;padding-inline:var(--gut)}
+.nf h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,7vw,6rem);line-height:.95;text-transform:uppercase;margin:0;max-width:14ch}
+.nf .b{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.nf.gl .scrim{display:none}
+
+
+/* about: three disciplines, three sizes */
+.disc{padding-block:clamp(48px,6vw,90px) clamp(40px,5vw,72px)}
+.disc-g{row-gap:clamp(24px,3vw,40px)}
+.dcard{all:unset;box-sizing:border-box;display:grid;gap:14px;align-content:start;cursor:pointer;color:var(--ink);text-decoration:none;position:relative}
+.dcard:focus-visible{outline:2px solid var(--lagoon);outline-offset:4px}
+.dcard .frame img{height:100%}
+.dcard:hover .frame.in img{transform:scale(1.04)}
+.dcap{display:flex;justify-content:space-between;gap:16px;align-items:baseline}
+.d1{grid-column:1/8;grid-row:1/3}
+.d2{grid-column:8/13;grid-row:1}
+.d3{grid-column:9/13;grid-row:2;align-self:end}
+.d2 .play{top:calc(50% - 20px)}
+@media (max-width:760px){.d1,.d2,.d3{grid-column:1/-1;grid-row:auto}.d3{width:72%;justify-self:end}}
+/* listing cards that lead to a project: poster and label hover as one */
+.film.linked{text-decoration:none;color:var(--ink)}
+.film .vp{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;padding-bottom:3px;background:linear-gradient(currentColor,currentColor) left bottom/0 1px no-repeat;transition:background-size .45s var(--ease),color .3s}
+.film:hover .vp,.film:focus-visible .vp,.plink:hover .vp,.plink:focus-visible .vp{background-size:100% 1px}
+.film .go{position:absolute;right:14px;top:14px;width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.8);color:#fff;font-family:var(--mono);background:rgba(10,15,14,.18);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:transform .45s var(--ease),background .3s}
+.film.linked:hover .go{transform:translate(3px,-3px);background:rgba(255,255,255,.18)}
+.plink{display:block;text-decoration:none;color:inherit}
+.plink figcaption{display:flex;justify-content:space-between;gap:16px;margin-top:10px}
+.plink .vp{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);padding-bottom:3px;background:linear-gradient(currentColor,currentColor) left bottom/0 1px no-repeat;transition:background-size .45s var(--ease)}
+.plink:hover .frame.in img{transform:scale(1.04)}
+/* hero loop: used as the WebGL texture; only shown directly when WebGL is missing */
+.hero-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none;transition:opacity .8s ease}
+.hero-vid.on{opacity:1}
+.hero.gl .hero-vid{opacity:0 !important}
+.fm .poster video{width:100%;height:100%;display:block;background:#000;object-fit:contain}
+/* square pointer */
+html.sq-cursor,html.sq-cursor *{cursor:none}
+html.sq-cursor input,html.sq-cursor textarea{cursor:text}
+.sq{position:fixed;left:0;top:0;z-index:99;width:0;height:0;pointer-events:none;opacity:0;transition:opacity .2s ease;mix-blend-mode:difference}
+.sq.on{opacity:1}
+.sq i{position:absolute;left:0;top:0;width:10px;height:10px;translate:-50% -50%;background:#fff;border:1.5px solid #fff;box-sizing:border-box;
+  transition:width .35s var(--ease),height .35s var(--ease),rotate .45s var(--ease),background-color .25s ease}
+.sq[data-s="click"] i{width:24px;height:24px;rotate:45deg;background:transparent}
+.sq[data-s="field"] i{width:var(--fs,26px);height:var(--fs,26px);background:transparent}
+.sq[data-s="text"] i{width:2px;height:20px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-err{grid-column:1/-1;color:#B3261E;margin:0}
+.form-msg.bad::before{background:#B3261E}
+.pdesc{max-width:62ch;padding-top:clamp(32px,4vw,56px);font-family:var(--display);font-size:var(--t-lead);line-height:1.5}
+.pdesc p{margin:0 0 1em}
+.blk-text{max-width:56ch;margin-inline:auto;font-size:1.05rem}
+.blk-text p{margin:0 0 1em}
+/* merged closing folds */
+.world-cta{display:grid;justify-items:center;gap:18px;margin-top:clamp(28px,4vw,48px);padding-top:clamp(28px,4vw,48px);border-top:1px solid rgba(255,255,255,.35);width:min(100%,560px)}
+.world-cta .lead{font-family:var(--display);font-style:italic;font-size:var(--t-lead)}
+.band.pcta{gap:22px}
+.band.pcta h2{font-family:var(--display);font-weight:400;font-size:clamp(2rem,4.6vw,4rem);line-height:1;text-transform:uppercase;letter-spacing:.03em;margin:0;text-wrap:balance}
+/* ============ motion layer: blur, focus, micro-interactions ============ */
+:root{--ease:cubic-bezier(.2,.7,.1,1);--blur-in:14px}
+
+/* page change: out of focus, then back */
+#app{transition:opacity .42s var(--ease),filter .42s var(--ease),transform .42s var(--ease)}
+#app.leave{opacity:0;filter:blur(var(--blur-in));transform:translateY(-10px) scale(.992)}
+#app.enter{opacity:0;filter:blur(var(--blur-in));transform:translateY(14px);transition:none}
+#app.settled{filter:none;transform:none}
+.pgrid{transition:opacity .26s ease,filter .26s ease}
+.pgrid.leave,.pgrid.enter{opacity:0;filter:blur(10px)}
+.pgrid.enter{transition:none}
+
+/* images settle from a soft blur */
+.frame img{filter:blur(18px);transform:scale(1.07);opacity:.55;transition:filter 1.1s var(--ease),transform 1.4s var(--ease),opacity .9s ease}
+.frame.in img{filter:none;transform:none;opacity:1}
+.card:hover .frame.in img,.gal button:hover .frame.in img,.pgrid button:hover .frame.in img,.film:hover .frame.in img,.vid:hover .frame.in img,.hs-card:hover .frame.in img{transform:scale(1.04)}
+
+/* palette squares: four to seven, three sizes; they step in, and pulse when the palette chip is hovered */
+.frame i.sw{position:absolute;aspect-ratio:1;z-index:2;transform:scale(0);transform-origin:center;transition:transform .5s cubic-bezier(.3,1.5,.5,1) var(--d);pointer-events:none}
+.frame.sw-on i.sw{transform:scale(1)}
+.frame i.sw::after{content:"";position:absolute;inset:-3px;pointer-events:none;opacity:0;
+  box-shadow:0 0 0 1px rgba(255,255,255,.38),0 0 14px 3px rgba(255,255,255,.22)}   /* thin translucent edge, glow fading outward */
+.frame.pal-on i.sw::after{animation:swPulse 1.9s ease-in-out infinite}
+@keyframes swPulse{0%,100%{opacity:0;transform:scale(.94)}45%{opacity:1;transform:scale(1.04)}}
+.frame .pal{position:absolute;right:10px;bottom:10px;z-index:3;display:flex;align-items:center;gap:3px;padding:6px;background:rgba(10,15,14,.28);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:auto;cursor:default;opacity:0;transform:translateY(6px);transition:opacity .5s ease .45s,transform .5s var(--ease) .45s,padding .45s var(--ease),gap .45s var(--ease),background .3s}
+.frame.sw-on .pal{opacity:1;transform:none}
+.frame .pal i{display:block;width:8px;height:8px;transition:width .45s var(--ease),height .45s var(--ease)}
+.frame .pal:hover{padding:9px;gap:5px;background:rgba(10,15,14,.5)}
+.frame .pal:hover i{width:16px;height:16px}
+@media (hover:none){.frame .pal{right:8px;bottom:8px}}
+
+/* words rise out of a blur */
+.wsplit .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.wsplit .w > span{display:inline-block;transform:translateY(70%);filter:blur(8px);opacity:0;transition:transform .9s var(--ease),filter .9s var(--ease),opacity .7s ease}
+.wsplit.in .w > span{transform:none;filter:none;opacity:1}
+
+/* hero boots out of focus */
+.hero picture img,.hero canvas.glc,.phero picture img,.phero canvas.glc{transition:filter 1.8s var(--ease),transform 2.4s var(--ease)}
+.hero.boot picture img,.hero.boot canvas.glc,.phero.boot picture img,.phero.boot canvas.glc{filter:blur(28px);transform:scale(1.1);transition:none}
+.hero .copy,.phero .copy{will-change:filter,opacity,transform}
+
+
+.card .arrow{font-family:var(--mono);font-size:1rem;transition:transform .4s var(--ease);padding-top:4px}
+.card:hover .arrow{transform:translate(4px,-4px)}
+.card h3{transition:letter-spacing .5s var(--ease)}
+.card:hover h3{letter-spacing:.01em}
+
+/* magnetic controls */
+.btn,.chip,.nav .enq{transition:transform .35s var(--ease),color .3s,background .3s,border-color .3s}
+
+/* rolling link labels */
+.roll{display:inline-grid;overflow:hidden;vertical-align:top;line-height:1.25}
+.roll > span{grid-area:1/1;transition:transform .45s var(--ease)}
+.roll > span + span{transform:translateY(105%)}
+a:hover > .roll > span:first-child{transform:translateY(-105%)}
+a:hover > .roll > span + span{transform:none}
+
+/* overlays open through a blur */
+.lb{background:rgba(6,9,9,.0);backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0);transition:background .35s ease,backdrop-filter .35s ease,-webkit-backdrop-filter .35s ease}
+.lb.open{background:rgba(6,9,9,.86);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.lb .bar,.lb .cap,.lb .nav-arr{opacity:0;transition:opacity .3s ease .1s}
+.lb.open .bar,.lb.open .cap,.lb.open .nav-arr{opacity:1}
+#lbImg{transition:transform .55s var(--ease),filter .22s ease,opacity .22s ease}
+#lbImg.swap{filter:blur(16px);opacity:0}
+.fm .poster{transform:scale(.96);opacity:0;filter:blur(10px);transition:transform .5s var(--ease),opacity .4s ease,filter .5s ease}
+.fm.open .poster{transform:none;opacity:1;filter:none}
+.mnav{opacity:0;backdrop-filter:blur(0);transition:opacity .35s ease}
+.mnav.open{opacity:1}
+.mnav li{transform:translateY(24px);opacity:0;filter:blur(6px);transition:transform .6s var(--ease),opacity .5s ease,filter .6s ease}
+.mnav.open li{transform:none;opacity:1;filter:none}
+.mnav.open li:nth-child(2){transition-delay:.04s}.mnav.open li:nth-child(3){transition-delay:.08s}.mnav.open li:nth-child(4){transition-delay:.12s}.mnav.open li:nth-child(5){transition-delay:.16s}.mnav.open li:nth-child(6){transition-delay:.2s}
+
+
+
+/* horizontal rails pinned to vertical scroll */
+.hscroll{position:relative}
+.hs-sticky{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto;padding-block:calc(var(--hdr) + 28px) 32px;gap:24px}
+.hs-head{display:flex;align-items:end;gap:24px;flex-wrap:wrap;width:100%}
+.hs-head h2{min-width:0;font-family:var(--display);font-weight:400;font-size:var(--t-h2);line-height:1;text-transform:uppercase;letter-spacing:.02em;margin:0;flex:1}
+.hs-count{margin-left:auto}.hs-count b{font-weight:500;color:var(--ink)}
+.hs-view{min-height:0;min-width:0;display:flex;align-items:center}
+.hs-track{display:flex;gap:clamp(16px,2.4vw,36px);padding-inline:var(--gut);will-change:transform;height:100%;align-items:stretch}
+.hs-card{all:unset;box-sizing:border-box;position:relative;flex:0 0 calc((min(100vw,var(--max)) - 2*var(--gut) - clamp(16px,2.4vw,36px)) / 2);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:clamp(16px,2vw,32px);align-items:end;cursor:pointer;color:var(--ink);text-decoration:none;height:100%;max-height:72svh}
+.hs-card .frame{height:100%;aspect-ratio:auto !important}
+.hs-card .frame img{height:100%}
+.hs-card .play{left:calc((100% - clamp(16px,2vw,32px)) * .555 / 2 + 0px);top:45%}
+.hs-cap{display:grid;gap:14px;align-content:end;padding-bottom:6px}
+.hs-card.step .num{font-family:var(--display);font-size:clamp(4rem,9vw,8rem);line-height:.8;color:var(--muted)}
+.hs-card.step h3{font-family:var(--display);font-weight:400;font-size:clamp(1.8rem,3vw,2.8rem);text-transform:uppercase;letter-spacing:.02em;margin:0}
+.hs-card.step p{margin:0;color:var(--muted);max-width:30ch}
+.hs-bar{height:1px;background:var(--line);position:relative}
+.hs-bar i{position:absolute;inset:0;background:var(--ink);transform-origin:left;transform:scaleX(.02)}
+.hs-bar i::after{content:"";position:absolute;right:-4px;top:-4px;width:9px;height:9px;background:var(--ink)}
+@media (max-width:760px){
+  .hs-head h2{flex-basis:100%;order:-1;font-size:2.2rem}
+  .hs-card{flex-basis:78vw;grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;max-height:none}
+  .hs-card .play{left:50%}
+  .hs-card.step .num{font-size:3rem}
+}
+@media (prefers-reduced-motion:reduce){
+  .frame img{filter:none;transform:none;opacity:1}
+  .wsplit .w > span{transform:none;filter:none;opacity:1}
+}
+@media (max-width:1000px){
+  .steps{grid-template-columns:1fr}
+  .steps li{padding:22px 0;border-bottom:1px solid var(--line)}
+  .metab{grid-template-columns:1fr 1fr}
+}
+@media (max-width:760px){
+  .wgrid > *{grid-column:1/-1 !important;align-self:start !important}
+  .w-e .frame{aspect-ratio:4/5 !important}
+  .blk-large{width:100%}
+  .blk-pair{grid-template-columns:1fr}
+  .blk-pair > :nth-child(2){margin-top:0}
+  .blk-mixed{grid-template-columns:1fr}
+  .blk-full,.blk-drone{margin-inline:calc(-1 * var(--gut))}
+  .fcards{grid-template-columns:1fr}
+  .split{grid-template-columns:1fr}
+  .split.flip .media{order:0}
+  .about-open .t,.about-open .i,.txtblock .grid > .l,.txtblock .grid > .r,.contact .l,.contact .r{grid-column:1/-1}
+  .contact .r{position:static;order:-1;max-width:260px}
+  .strip{grid-template-columns:1fr}
+  .form{grid-template-columns:1fr}
+  .pgrid > *{grid-column:1/-1 !important;margin-top:0 !important}
+  .pgrid > .pair{grid-column:span 6 !important}
+}
+/* ---------- responsive ---------- */
+@media (max-width:1000px){
+  .nav .link{display:none}.nav .enq{display:none}.menu-btn{display:block}
+  .logos{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .svc a{grid-template-columns:28px minmax(0,1fr) 24px}
+  .svc p{grid-column:2/3}
+  .svc .arr{grid-row:1;grid-column:3}
+  .float{display:none}
+}
+@media (max-width:760px){
+  :root{--hdr:60px}
+  .wordmark{font-size:.86rem;letter-spacing:.18em}
+  .work > *,.gal > *,.films > *{grid-column:1/-1 !important;grid-row:auto !important;margin-top:0 !important;align-self:start !important}
+  .gal .g2,.gal .g3{grid-column:span 6 !important}
+  .gal .g6,.gal .g7{grid-column:span 6 !important}
+  .gal .g3{margin-top:18vw !important}.gal .g7{margin-top:18vw !important}
+  .studio .lab,.studio .txt,.studio .img{grid-column:1/-1}
+  .studio .img{max-width:420px;margin-top:40px}
+  .fcols .f-a{grid-column:1/-1}.fcols .f-b,.fcols .f-c,.fcols .f-d{grid-column:1/-1}
+  .nav-arr{display:none}
+  .intro p{font-size:1.5rem}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+
+</style>
+<header class="hdr over" id="hdr">
+  <div class="wrap">
+    <a class="brand" href="#" aria-label="Chasing Stories, home">
+      <span class="mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="wordmark">Chasing Stories</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="link" href="#work">Work</a>
+      <a class="link" href="#photography">Photography</a>
+      <a class="link" href="#film">Film</a>
+      <a class="link" href="#services">Services</a>
+      <a class="link" href="#about">About</a>
+      <a class="enq" href="#contact"><span>Enquire</span></a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mnav">MENU</button>
+    </nav>
+  </div>
+</header>
+
+<div class="mnav" id="mnav" hidden role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="top">
+    <span class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="wordmark">Chasing Stories</span></span>
+    <button class="xbtn" id="menuClose">CLOSE</button>
+  </div>
+  <ul>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#photography">Photography</a></li>
+    <li><a href="#film">Film</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Enquire</a></li>
+  </ul>
+  <div class="foot meta"><span data-c="contact.email">hello@chasingstories.org</span><a data-c-hide="contact.instagram" data-c="contact.instagram" data-attr="href" href="https://www.instagram.com/andra.oprea" target="_blank" rel="noopener">Instagram</a></div>
+</div>
+
+
+<main id="app"></main>
+<div class="float" id="float" aria-hidden="true"><img alt="" id="floatImg"></div>
+<footer>
+  <div class="wrap">
+    <div class="grid fcols">
+      <div class="f-a">
+        <span class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="wordmark">Chasing Stories</span></span>
+        <p data-c="footer.line">Creative production for luxury hospitality, travel and lifestyle brands.</p>
+      </div>
+      <div class="f-b"><span class="meta">Navigate</span>
+        <ul><li><a href="#work">Work</a></li><li><a href="#photography">Photography</a></li><li><a href="#film">Film</a></li><li><a href="#services">Services</a></li><li><a href="#about">About</a></li><li><a href="#contact">Contact</a></li></ul>
+      </div>
+      <div class="f-c"><span class="meta">Email</span><span style="user-select:all" data-c="contact.email">hello@chasingstories.org</span></div>
+      <div class="f-d"><span class="meta">Social</span><ul><li data-c-hide="contact.instagram"><a data-c="contact.instagram" data-attr="href" href="https://www.instagram.com/andra.oprea" target="_blank" rel="noopener">Instagram</a></li><li data-c-hide="contact.linkedin"><a data-c="contact.linkedin" data-attr="href" href="https://www.linkedin.com/in/andra-oprea-2a620b310/" target="_blank" rel="noopener">LinkedIn</a></li></ul></div>
+    </div>
+    <div class="legal meta">
+      <span>© <span id="yr">2026</span> Chasing Stories. All rights reserved.</span>
+      <span class="l"><a href="#privacy">Privacy &amp; Cookies</a><button id="cookieSettings">Cookie settings</button></span>
+    </div>
+  </div>
+</footer>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Photograph">
+  <div class="bar"><span class="meta" style="color:#C9D0CE" id="lbCount">01 / 07</span><button class="xbtn" id="lbClose">CLOSE ✕</button></div>
+  <div class="stage" id="lbStage">
+    <img id="lbImg" alt="">
+    <button class="nav-arr prev" id="lbPrev" aria-label="Previous photograph">←</button>
+    <button class="nav-arr next" id="lbNext" aria-label="Next photograph">→</button>
+  </div>
+  <div class="cap"><span class="meta" style="color:#C9D0CE" id="lbCap"></span><a class="btn light" href="#work" id="lbProject" hidden>View project <i></i></a></div>
+</div>
+
+<div class="lb fm" id="fm" hidden role="dialog" aria-modal="true" aria-label="Film">
+  <div class="bar"><span class="meta" style="color:#C9D0CE" id="fmTitle"></span><button class="xbtn" id="fmClose">CLOSE ✕</button></div>
+  <div class="stage"><div class="poster"><video id="fmVid" controls playsinline crossorigin="anonymous" preload="metadata" hidden></video><img id="fmImg" alt=""><span class="play" id="fmPlay"></span><div class="note" id="fmNote">Plays here in the site's own player, with sound. Streaming file to be encoded from the master.</div></div></div>
+  <div class="cap"></div>
+</div>
+
+<div class="cookie" id="cookie" hidden role="region" aria-label="Cookie consent">
+  <p>We use cookies to understand how visitors use our website. You can accept or decline analytics cookies. <a href="#privacy">Privacy &amp; Cookies</a></p>
+  <div class="b"><button class="btn" id="ckAccept">Accept</button><button class="btn" id="ckDecline">Decline</button></div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+/*BOOT*/
+</script>
+<script>
+/* Site content. On the live server the CMS (admin/) writes window.SITE_DATA into the page and every list
+   and text below is taken from there; the values here are the defaults the prototype ships with.
+   Image values are asset keys (see assets/manifest.json) or upload paths ("uploads/..."). */
+const SITE_DATA = (typeof window !== 'undefined' && window.SITE_DATA) || null;
+const S_ = (k, d) => (SITE_DATA && SITE_DATA[k] != null) ? SITE_DATA[k] : d;
+const deepMerge = (a, b) => { if (!b || typeof b !== 'object' || Array.isArray(b)) return b ?? a; const o = { ...a };
+  for (const k of Object.keys(b)) o[k] = (a && typeof a[k] === 'object' && !Array.isArray(a[k]) && a[k]) ? deepMerge(a[k], b[k]) : (b[k] ?? a[k]); return o };
+
+const PROJECTS = S_('projects', [
+  { slug:'palau', name:'Four Seasons Explorer', client:'Four Seasons', location:'Palau', year:'2026',
+    services:['Photography','Film','Drone','Lifestyle Production'], logo:'four-seasons.svg',
+    hero:'film-palau-1', heroM:'w-palau', coverV:'w-palau', coverL:'film-palau-1',
+    blocks:[
+      {t:'large', k:'palau-1'},
+      {t:'pair', k:['palau-2','palau-3']},
+      {t:'full', k:'palau-4'},
+      {t:'mixed', k:['palau-5','film-palau-2'], video:1},
+      {t:'pair', k:['palau-6','palau-7']},
+      {t:'video', k:'film-palau-3'},
+      {t:'pair', k:['palau-8','palau-9']},
+      {t:'large', k:'palau-10', side:'right'} ]},
+  { slug:'heritance', name:'Heritance Aarah', client:'Heritance Hotels & Resorts', location:'Raa Atoll, Maldives', year:'2026',
+    services:['Photography','Film','Drone'], logo:'heritance-aarah.svg',
+    hero:'film-heritance-1', heroM:'hv-heritance', coverV:'hv-heritance', coverL:'w-heritance',
+    blocks:[
+      {t:'drone', k:'heritance-1'},
+      {t:'pair', k:['heritance-2','heritance-3']},
+      {t:'video', k:'film-heritance-2'},
+      {t:'large', k:'heritance-4'},
+      {t:'pair', k:['heritance-5','heritance-6']},
+      {t:'mixed', k:['heritance-7','film-heritance-3'], video:1},
+      {t:'pair', k:['heritance-8','heritance-9']},
+      {t:'large', k:'heritance-10', side:'right'} ]},
+  { slug:'sixsenses', name:'Six Senses Kocataş Mansions', client:'Six Senses', location:'Istanbul, Türkiye', year:'',
+    services:['Photography','Film'], logo:'six-senses.png',
+    hero:'pl-sixsenses', heroM:'w-sixsenses', coverV:'w-sixsenses', coverL:'pl-sixsenses',
+    blocks:[
+      {t:'large', k:'sixsenses-1'},
+      {t:'pair', k:['sixsenses-2','sixsenses-3']},
+      {t:'video', k:'pl-sixsenses-2'},
+      {t:'pair', k:['sixsenses-4','sixsenses-5']},
+      {t:'large', k:'sixsenses-6', side:'right'},
+      {t:'pair', k:['sixsenses-7','sixsenses-8']},
+      {t:'pair', k:['sixsenses-9','sixsenses-10']} ]},
+  { slug:'hoiana', name:'Hoiana Resort & Golf', client:'Hoiana Resort & Golf', location:'Hội An, Vietnam', year:'',
+    services:['Photography','Film'], logo:'hoiana.png',
+    hero:'pl-hoiana', heroM:'hv-hoiana', coverV:'hv-hoiana', coverL:'w-hoiana',
+    blocks:[
+      {t:'large', k:'hoiana-1'},
+      {t:'pair', k:['hoiana-2','hoiana-3']},
+      {t:'video', k:'pl-hoiana-2'},
+      {t:'pair', k:['hoiana-4','hoiana-5']},
+      {t:'large', k:'hoiana-6', side:'right'},
+      {t:'pair', k:['hoiana-7','hoiana-8']},
+      {t:'pair', k:['hoiana-9','hoiana-10']} ]},
+  { slug:'bangkok', name:'Four Seasons Bangkok', client:'Four Seasons', location:'Bangkok, Thailand', year:'',
+    services:['Photography','Film'], logo:'four-seasons.svg',
+    hero:'film-bangkok-2', heroM:'w-bangkok', coverV:'w-bangkok', coverL:'film-bangkok-2',
+    blocks:[
+      {t:'large', k:'bangkok-1'},
+      {t:'pair', k:['bangkok-2','bangkok-3']},
+      {t:'video', k:'film-bangkok-1'},
+      {t:'pair', k:['bangkok-4','bangkok-5']},
+      {t:'large', k:'bangkok-6', side:'right'},
+      {t:'pair', k:['bangkok-7','bangkok-8']},
+      {t:'pair', k:['bangkok-9','bangkok-10']} ]},
+  { slug:'hideaway', name:'Hideaway Beach Resort & Spa', client:'Hideaway Beach Resort & Spa', location:'Haa Alifu Atoll, Maldives', year:'2026',
+    services:['Photography','Film','Drone'], logo:null,
+    hero:'w-hideaway', heroM:'hv-hideaway', coverV:'hv-hideaway', coverL:'w-hideaway',
+    blocks:[
+      {t:'large', k:'hideaway-1'},
+      {t:'pair', k:['hideaway-2','hideaway-3']},
+      {t:'drone', k:'hideaway-9'},
+      {t:'pair', k:['hideaway-4','hideaway-5']},
+      {t:'large', k:'hideaway-6', side:'right'},
+      {t:'pair', k:['hideaway-7','hideaway-8']},
+      {t:'large', k:'hideaway-10'} ]},
+  { slug:'millennium', name:'Millennium Hotels', client:'Millennium Hotels and Resorts', location:'Singapore', year:'',
+    services:['Photography','Film'], logo:'millenium.png',
+    hero:'pl-millennium', heroM:'hv-millennium', coverV:'hv-millennium', coverL:'pl-millennium',
+    blocks:[
+      {t:'large', k:'millennium-1'},
+      {t:'pair', k:['millennium-2','millennium-3']},
+      {t:'video', k:'pl-millennium-2'},
+      {t:'pair', k:['millennium-4','millennium-5']},
+      {t:'large', k:'millennium-6', side:'right'},
+      {t:'pair', k:['millennium-7','millennium-8']},
+      {t:'pair', k:['millennium-9','millennium-10']} ]},
+  { slug:'westin', name:'Westin', client:'The Westin', location:'', year:'',
+    services:['Photography','Film','Drone'], logo:'westin.svg',
+    hero:'film-westin-3', heroM:'westin-2', coverV:'westin-2', coverL:'film-westin-1',
+    blocks:[
+      {t:'drone', k:'film-westin-1'},
+      {t:'pair', k:['westin-1','westin-2']},
+      {t:'large', k:'westin-3'},
+      {t:'pair', k:['westin-4','westin-6']},
+      {t:'video', k:'film-westin-2'},
+      {t:'pair', k:['westin-7','westin-8']},
+      {t:'pair', k:['westin-9','westin-10']} ]},
+  { slug:'intercontinental', name:'InterContinental', client:'InterContinental Hotels & Resorts', location:'', year:'',
+    services:['Film'], logo:'intercontinental.png',
+    hero:'film-intercontinental-2', heroM:'hv-intercontinental', coverV:'hv-intercontinental', coverL:'film-intercontinental-1',
+    blocks:[
+      {t:'large', k:'hv-intercontinental'},
+      {t:'video', k:'film-intercontinental-1'},
+      {t:'video', k:'film-intercontinental-3'} ]},
+]);
+
+/* Photography: one list, multi-category, manually ordered. */
+const CATS = S_('cats', [
+  ['hospitality','Hospitality'],['lifestyle','Lifestyle'],['food-beverage','Food & Beverage'],
+  ['nature','Nature'],['interiors','Interiors'],['drone','Drone'],['product','Product']]);
+const P = (k,cats,project,loc) => ({k,cats,project,loc});
+const PHOTOS = S_('photos', [
+  P('palau-1',['drone','nature'],'palau','Palau'),
+  P('p-1',['hospitality'],null,''),
+  P('ph-food-3',['food-beverage'],null,''),
+  P('heritance-2',['lifestyle','nature'],'heritance','Raa Atoll, Maldives'),
+  P('ph-interiors-4',['interiors'],null,''),
+  P('sixsenses-2',['interiors','hospitality'],'sixsenses','Istanbul, Türkiye'),
+  P('heritance-1',['drone'],'heritance','Raa Atoll, Maldives'),
+  P('ph-hospitality-1',['hospitality'],null,''),
+  P('hoiana-4',['interiors','hospitality'],'hoiana','Hội An, Vietnam'),
+  P('ph-food-6',['food-beverage'],null,''),
+  P('palau-4',['nature'],'palau','Palau'),
+  P('ph-lifestyle-1',['lifestyle'],null,''),
+  P('ph-product-2',['product'],null,''),
+  P('hideaway-4',['lifestyle','hospitality'],'hideaway','Haa Alifu Atoll, Maldives'),
+  P('p-3',['drone','hospitality'],null,''),
+  P('ph-interiors-7',['interiors'],null,''),
+  P('millennium-1',['lifestyle'],'millennium','Singapore'),
+  P('ph-food-8',['food-beverage'],null,''),
+  P('heritance-10',['nature','drone'],'heritance','Raa Atoll, Maldives'),
+  P('ph-hospitality-3',['hospitality','interiors'],null,''),
+  P('bangkok-2',['lifestyle'],'bangkok','Bangkok, Thailand'),
+  P('ph-product-3',['product'],null,''),
+  P('westin-1',['drone','hospitality'],'westin',''),
+  P('ph-lifestyle-6',['lifestyle','hospitality'],null,''),
+  P('hoiana-10',['food-beverage'],'hoiana','Hội An, Vietnam'),
+  P('ph-nature-7',['nature'],null,''),
+  P('sixsenses-6',['nature','lifestyle'],'sixsenses','Istanbul, Türkiye'),
+  P('ph-interiors-5',['interiors'],null,''),
+  P('hideaway-9',['drone','nature'],'hideaway','Haa Alifu Atoll, Maldives'),
+  P('ph-food-5',['food-beverage'],null,''),
+  P('palau-6',['interiors','lifestyle'],'palau','Palau'),
+  P('ph-product-6',['product'],null,''),
+  P('ph-hospitality-5',['hospitality'],null,''),
+  P('ph-lifestyle-8',['lifestyle'],null,''),
+  P('millennium-8',['food-beverage'],'millennium','Singapore'),
+  P('ph-nature-2',['nature'],null,''),
+  P('westin-8',['drone','nature'],'westin',''),
+  P('ph-interiors-1',['interiors'],null,''),
+  P('ph-food-1',['food-beverage'],null,''),
+  P('ph-product-1',['product'],null,''),
+  P('ph-hospitality-8',['hospitality','drone'],null,''),
+  P('ph-lifestyle-3',['lifestyle'],null,''),
+  P('hideaway-6',['nature','drone'],'hideaway','Haa Alifu Atoll, Maldives'),
+  P('ph-interiors-3',['interiors'],null,''),
+  P('ph-product-4',['product'],null,''),
+]);
+
+/* Film: grouped by category; a group with fewer than two films folds into "More films". */
+const FILMS = S_('films', [
+  {k:'film-heritance-1', title:'Heritance Aarah', client:'Heritance Hotels & Resorts', loc:'Raa Atoll, Maldives', cat:'Hospitality', project:'heritance'},
+  {k:'film-bangkok-2', title:'Four Seasons Bangkok', client:'Four Seasons', loc:'Bangkok, Thailand', cat:'Hospitality', project:'bangkok'},
+  {k:'film-hideaway-1', title:'Hideaway Beach Resort & Spa', client:'Hideaway', loc:'Haa Alifu Atoll, Maldives', cat:'Hospitality', project:'hideaway'},
+  {k:'film-intercontinental-1', title:'InterContinental', client:'InterContinental', loc:'', cat:'Hospitality', project:'intercontinental'},
+  {k:'film-westin-1', title:'The Westin', client:'The Westin', loc:'', cat:'Hospitality', project:'westin'},
+  {k:'film-palau-1', title:'Four Seasons Explorer', client:'Four Seasons', loc:'Palau', cat:'Destination', project:'palau'},
+  {k:'film-italy-1', title:'Italy', client:'', loc:'Italy', cat:'Destination', project:null},
+  {k:'film-italy-4', title:'Italy, coast', client:'', loc:'Italy', cat:'Destination', project:null},
+  {k:'film-mazda-1', title:'Mazda', client:'Mazda Europe', loc:'', cat:'Brand & Commercial', project:null},
+  {k:'film-garmin-2', title:'Garmin × Mazda', client:'Mazda Europe', loc:'', cat:'Brand & Commercial', project:null},
+  {k:'film-dior-1', title:'Dior', client:'Dior', loc:'', cat:'Brand & Commercial', project:null},
+]);
+const HOME_FILMS = S_('homeFilms', [
+  {k:'f-01', title:'Film 01', meta:'Client and location to confirm'},
+  {k:'f-02', title:'InterContinental', meta:'Film 02', project:'intercontinental'},
+  {k:'f-03', title:'InterContinental', meta:'Film 03', project:'intercontinental'},
+]);
+
+const SERVICES = S_('services', [
+  {id:'photography', name:'Photography', short:'Hospitality, lifestyle, interiors, food and destinations.', img:'s-photography',
+   body:'High-end photography for hospitality, lifestyle, architecture, interiors, food and beverage, and destinations. Every shoot is planned around the light, the guest journey and the way the property wants to be seen.',
+   deliv:'Retouched image libraries, campaign and editorial imagery, website and OTA sets.'},
+  {id:'film', name:'Film', short:'Property films, brand films and short-form stories.', img:'s-film',
+   body:'Property films, brand films and short-form stories, from a single hero film to a full series for web and social. Graded to the brand and delivered in every ratio a campaign needs.',
+   deliv:'Hero films, cut-downs, vertical edits for social.'},
+  {id:'creative-direction', name:'Creative direction', short:'Concept, moodboards, shot planning and on-location direction.', img:'s-creative-direction',
+   body:'Concept development, visual direction, moodboards and shot planning, carried through on location. The direction is agreed before we arrive, so time on site goes into production.',
+   deliv:'Concept deck, moodboards, shot list, production schedule.'},
+  {id:'lifestyle-production', name:'Lifestyle production', short:'Talent, styling and production planning.', img:'s-lifestyle-production',
+   body:'Talent, styling, props and production planning for lifestyle scenes that feel natural and on brand.',
+   deliv:'Casting, styling, scene planning.'},
+  {id:'drone', name:'Drone', short:'Aerial photography and cinematography.', img:'s-drone',
+   body:'Aerial photography and cinematography that shows the setting, scale and surroundings of a property. Flights planned in line with local regulations.',
+   deliv:'Aerial stills, aerial footage.'},
+  {id:'content-libraries', name:'Content libraries', short:'One production, planned for every channel.', img:'s-content-libraries',
+   body:'One production, planned to cover every channel. Photography and film delivered as a cohesive library for websites, campaigns, PR, marketing and social media.',
+   deliv:''},
+]);
+
+const LOGOS = S_('logos', [
+ ['four-seasons.svg','Four Seasons','palau',58,50],['soneva.png','Soneva',null,40,64],['anantara.png','Anantara',null,44,58],
+ ['banyan-tree.svg','Banyan Tree',null,30,64],['six-senses.png','Six Senses','sixsenses',40,62],['heritance-aarah.svg','Heritance','heritance',50,54],
+ ['hoiana.png','Hoiana Resort & Golf','hoiana',56,38],['intercontinental.png','InterContinental','intercontinental',54,40],['westin.svg','Westin','westin',50,40],
+ ['millenium.png','Millennium Hotels','millennium',60,30],['rixos.svg','Rixos',null,52,40],['lux.svg','LUX* Resorts',null,40,44],
+ ['dior.svg','Dior',null,42,28],['mazda.svg','Mazda',null,50,40],['animawings.svg','Animawings',null,52,40]]);
+
+const HOME_WORK = S_('homeWork', ['palau','heritance','sixsenses','hoiana','bangkok','hideaway']);
+const HOME_PHOTOS = S_('homePhotos', [
+  ['p-1','Hospitality'],['p-2','Interiors'],['p-3','Drone'],['p-4','Lifestyle'],['p-5','Hospitality'],['p-7','Interiors'],['p-8','Food & Beverage']]);
+
+/* Every fixed text and image on the site. Editable in the CMS (Homepage, About, Contact, Pages). */
+const C = deepMerge({
+  brand: 'Chasing Stories',
+  available: 'Available worldwide.',
+  home: {
+    display: 'Chasing Stories',
+    h1: 'Visual storytelling for luxury hospitality, travel & lifestyle brands.',
+    sub: 'Photography, film & creative production.',
+    button: 'View our work',
+    heroAlt: 'A guest reading on an overwater deck in the Maldives, villas on the horizon',
+    workLabel: 'Selected work', workLine: 'Recent productions for hotels, resorts and destinations.',
+    photoLabel: 'Photography', photoLine: 'Hotels, resorts, food, people and places, composed with an editorial eye.',
+    trustedLabel: 'Trusted by', trustedLine: 'Hotels, resorts and brands we have worked with.',
+    filmLabel: 'Film', filmLine: 'Short films and brand films that carry the pace, light and sound of a place.',
+    studioLabel: 'The studio',
+    studioLead: 'We are a visual storytelling studio specializing in luxury hospitality, travel and lifestyle content.',
+    studioText: 'Through cinematic photography, refined videography and emotionally driven storytelling, we help hotels, resorts and premium brands translate experiences into compelling visual narratives.\n\nOur work blends creative direction with production expertise to capture the atmosphere, emotion and identity of a place, creating imagery that feels lived-in, elevated and deeply experiential.',
+    studioAlt: 'Guest in a stone-walled suite at dusk',
+    servicesLabel: 'What we do',
+  },
+  cta: { h2: 'Have a project in mind?', lead: "Let's create something meaningful.", projectH2: 'Planning a similar production?', button: 'Get in touch' },
+  pages: {
+    workTitle: 'Work', workIntro: 'Selected productions for hotels, resorts, destinations and brands.',
+    photoTitle: 'Photography', photoIntro: 'Photography is where our work began and where it remains strongest. Every image is composed for the brand it belongs to, in natural light wherever possible.',
+    filmTitle: 'Film', filmIntro: 'Our films follow the same principle as our photography: composed, unhurried and true to the place. Property films, brand films and short-form stories, shot for the big screen and cut for every channel.',
+    servicesTitle: 'Services', servicesIntro: 'From a single photography brief to a full production across photo, film and drone, we plan, direct and deliver the visual content a property needs.',
+    servicesBand: 'Every production is scoped individually. Tell us about your project and we will prepare a proposal.',
+  },
+  about: {
+    title: 'About Chasing Stories',
+    intro: 'Chasing Stories is a creative production studio for luxury hospitality, travel and lifestyle brands. We produce photography and film for hotels, resorts and destinations across Asia, the Indian Ocean and beyond.',
+    openAlt: 'Overwater villas and lagoon from above, Maldives',
+    approachTitle: 'Our approach',
+    approach: 'We treat every property as a place with its own character. Before we shoot, we study how guests move through it, when the light is at its best and what sets it apart. On location, we direct rather than document: every frame is planned, with room left for the moments that cannot be.',
+    productionTitle: 'Creative production',
+    production: 'Photography, film, drone and lifestyle production are handled by one team, under one creative direction. One brief, one visual language and a single library of assets that works across your website, campaigns, PR and social channels.',
+    disc: [
+      { label: 'Photography', meta: 'Six Senses Kocataş Mansions', img: 'ab-photo', project: 'sixsenses', film: '' },
+      { label: 'Film', meta: 'Four Seasons Explorer', img: 'film-palau-2', project: '', film: 'poster:film-palau-2' },
+      { label: 'Drone', meta: 'Hoiana Resort & Golf', img: 'ab-drone', project: 'hoiana', film: '' },
+    ],
+    stepsTitle: 'How we work',
+    steps: [
+      { t: 'Discover', d: 'We learn the property, the brand and the audience, and agree on what the content needs to achieve.', img: 'heritance-6' },
+      { t: 'Concept', d: 'Visual direction, moodboards, shot lists and schedules, approved before we arrive.', img: 'sixsenses-4' },
+      { t: 'Produce', d: 'Photography, film and drone on location, with talent and styling where the story needs it.', img: 'palau-3' },
+      { t: 'Curate', d: 'We edit with restraint. Only the strongest frames make the final selection.', img: 'hoiana-5' },
+      { t: 'Deliver', d: 'Retouched images and graded films, prepared in the formats each channel requires.', img: 'bangkok-6' },
+    ],
+    worldTitle: 'Available worldwide',
+    worldText: 'We travel for every production. Recent work has taken us to the Maldives, Thailand, Vietnam, Palau, Singapore, Hong Kong, Malaysia, Turkey and Tanzania.',
+    worldCta: "Have a project in mind? Let's create something meaningful.",
+  },
+  contact: {
+    title: "Let's create something",
+    intro: 'Tell us a little about your project, location and requirements. We reply to every enquiry within two working days.',
+    success: 'Your enquiry is with us and we will reply within two working days.',
+    email: 'hello@chasingstories.org',
+    instagram: 'https://www.instagram.com/andra.oprea',
+    linkedin: 'https://www.linkedin.com/in/andra-oprea-2a620b310/',
+    imgAlt: 'Evening light on a terrace',
+    types: ['Photography', 'Film', 'Photography + Film', 'Creative Direction', 'Full Production'],
+  },
+  footer: { line: 'Creative production for luxury hospitality, travel and lifestyle brands.' },
+  privacy: '',
+  notfound: { h1: 'This story has moved on.', p: 'The page you are looking for does not exist or has been moved.' },
+  img: { hero: 'hero', heroM: 'hero-m', prefooter: 'prefooter', studio: 'studio', aboutOpen: 'ab-open', world: 'ab-dest', contact: 'contact', notfound: 'film-palau-1' },
+  video: { hero: '', heroM: '' },
+}, S_('copy', null));
+
+/* Films: poster asset key -> Google Drive id of the web-sized [SMALL] mp4 (Drive refuses cross-site playback, so these are the SOURCE files to re-encode and host).
+   The page plays them through videoURL(). Generated from the Drive listing; see tools/ for the mapping rules. */
+const VIDEOS = {
+ "f-01": "123uep-xby_bQH6I-xo3feeBktSrn5nzk",
+ "f-02": "13t2VYMjZCJDHa9XOwqFXrXwDG-nw60U0",
+ "f-03": "11UiZiol3CWLv4GEJWSUvYeZE4bMUSZnC",
+ "film-palau-1": "1nyJAPKRNu-L8QreWxRwodax1RLBaviou",
+ "film-palau-2": "1poUOnx-b7QpVAnx0X5sFmjvQdjF0wOvm",
+ "film-palau-3": "1Ye1fQ73d6NFlhYT6JE9Ci-Ir_sFMEqJF",
+ "film-bangkok-1": "1Jh57gJzQAJb5buwqOZXA1fGfxYt8vpIc",
+ "film-bangkok-2": "1iDREAQNi9z-osc_UiBbZRez_TNLiMSkD",
+ "film-heritance-1": "1rQlsmVWglM-ekSUGQrVqW5FcopCa0T-x",
+ "film-heritance-2": "1n98OFofjKSYXT7lbVyft7fS0n5lvZZOv",
+ "film-heritance-3": "1QaRQUZ6bjPyU2DiMSja3mSv9i-Ki8Idb",
+ "film-hideaway-1": "16bdZyPQQQ4GRyH5eImviTnjxhsx-iFIW",
+ "film-intercontinental-1": "17jfO47x_G-IEmIHHcFocTgSeczASagjL",
+ "film-intercontinental-2": "1zMbCMWyiOwVqEKYnKVyCZNQWxkJmydsg",
+ "film-intercontinental-3": "1Baz_2Qe-n16FJ3LuXogpN-FFogjsceDS",
+ "film-westin-1": "1oGC9g0iQX-id_RpiAowx0iUPk9ia-RYA",
+ "film-westin-2": "11YxGuGSc3F3Ac_OCg9F3x_SsDNzLWEBG",
+ "film-westin-3": "1peGqPxFqJRNHaxqtFYYQ__SbeZNWdgYp",
+ "film-italy-1": "145jDsEmmPwS9iq0-2ErTQZXszV3cYqW5",
+ "film-italy-4": "1fFlwBFeD8pH7PBlkMdUxDgLGTxIMmtoZ",
+ "film-mazda-1": "1Ftg8lphXzVQnJQyjQq4m0dvTfwrbqfeM",
+ "film-garmin-2": "1ZNE7Tglvg8CDX8ZLMeEGMMbqjEoV6cX_",
+ "film-dior-1": "1D7o2wB2f_dvOcjPR_lNxtGFmLtnkEd6S",
+ "pl-hoiana": "1qUUDIYmsEUKxZq1Ob6wNJ-zxUuB-JolE",
+ "pl-hoiana-2": "16Kq0_4T2C3Z-wBiOZwG-syvvFx-WKVAs",
+ "pl-millennium": "12r0oh5uiRXg0KEmrSlJMDXU894T8P260",
+ "pl-millennium-2": "1VWQ8wNgE3BNNclINNp2MImQ7w_YJf40Y",
+ "pl-sixsenses": "1IXvxJ6VJErHds4wJYeUae_ZqLBfOiiTq",
+ "pl-sixsenses-2": "1QvCBoT7H512bXoTitIXzccv8MXFU8xHI",
+ "hero": "13P3Bn-ti-XY5RMdTh9mI4I1y0wEbnQCe",
+ "hero-m": "13P3Bn-ti-XY5RMdTh9mI4I1y0wEbnQCe"
+};
+// Where the web versions live. Empty until hosting is decided: the player then shows the poster.
+const VIDEO_BASE = '';
+const videoURL = k => (VIDEO_BASE && VIDEOS[k]) ? `${VIDEO_BASE}/${k}.mp4` : '';
+
+</script>
+<script>
+(()=>{
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (s,r=document)=>r.querySelector(s), $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const esc = s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const I = k=>ASSETS[k]||(k&&/[\/.]/.test(k)?k:'');          // asset key, or an upload path from the CMS
+const DIM = k=>(MANIFEST[k]||[4,5]);
+const LOGO = f=>ASSETS['logo/'+f]||(f&&/[\/.]/.test(f)?f:'');
+const vsrc = f=>{const v=f&&f.video||'';if(v.startsWith('poster:'))return videoURL(v.slice(7));return v||videoURL(f&&f.k)};
+const byslug = s=>PROJECTS.find(p=>p.slug===s);
+const nf = n=>String(n).padStart(2,'0');
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ============================================================
+   PIXEL SYSTEM
+   One shape (the square), colour always sampled from the image.
+   ============================================================ */
+function loaded(img){return img.complete&&img.naturalWidth?Promise.resolve(img):new Promise(r=>{img.addEventListener('load',()=>r(img),{once:true});img.addEventListener('error',()=>r(null),{once:true})})}
+function coverRect(iw,ih,cw,ch,pos=[.5,.5]){const s=Math.max(cw/iw,ch/ih),w=iw*s,h=ih*s;return[(cw-w)*pos[0],(ch-h)*pos[1],w,h]}
+const hex=(r,g,b)=>'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+function palette(img,n=6){
+  const c=document.createElement('canvas');c.width=12;c.height=12;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,12,12);
+  let d;try{d=x.getImageData(0,0,12,12).data}catch(e){return[]}
+  const cells=[];for(let i=0;i<d.length;i+=4)cells.push([d[i],d[i+1],d[i+2]]);
+  cells.sort((a,b)=>(a[0]*.3+a[1]*.59+a[2]*.11)-(b[0]*.3+b[1]*.59+b[2]*.11));
+  return Array.from({length:n},(_,k)=>hex(...cells[Math.round((k+.5)*cells.length/n-.5)]));
+}
+function hash(x,y){const t=Math.sin(x*127.1+y*311.7)*43758.5453;return t-Math.floor(t)}
+function vnoise(x,y){const i=Math.floor(x),j=Math.floor(y),f=x-i,g=y-j,u=f*f*(3-2*f),v=g*g*(3-2*g);
+  return (hash(i,j)*(1-u)+hash(i+1,j)*u)*(1-v)+(hash(i,j+1)*(1-u)+hash(i+1,j+1)*u)*v}
+
+/* Palette squares: four to seven per photograph, one per distinct colour, each placed where its colour lives,
+   never on a face or head (boxes from tools/detect_people.py + manual fixes), and clear of the palette chip.
+   Sizes: a quarter cell, one cell, four cells. The chip in the corner names the palette with a strategy word. */
+function distRGB(a,b){const dr=a[0]-b[0],dg=a[1]-b[1],db=a[2]-b[2];return Math.sqrt(dr*dr*.3+dg*dg*.59+db*db*.11)}
+function seedOf(str){let h=2166136261;for(const c of str){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return (h>>>0)/4294967295}
+function paletteWord(cols){
+  // brand-strategy vocabulary, chosen from lightness, saturation, warmth, contrast and dominant hue
+  const hsl=cols.map(([r,g,b])=>{r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;
+    let h=0;if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}
+    return {h,s:d?d/(1-Math.abs(2*l-1)):0,l,warm:r-b}});
+  const avg=k=>hsl.reduce((a,c)=>a+c[k],0)/hsl.length;
+  const L=avg('l'),S=avg('s'),W=avg('warm'),C=Math.max(...hsl.map(c=>c.l))-Math.min(...hsl.map(c=>c.l));
+  const sat=hsl.filter(c=>c.s>.25),green=sat.filter(c=>c.h>70&&c.h<165).length,blue=sat.filter(c=>c.h>=165&&c.h<250).length;
+  if(S<.12)return 'Timeless';
+  if(C>.68)return 'Bold';
+  if(green>=2&&green>=blue)return 'Rooted';
+  if(L>.6)return W>.02?'Radiant':'Serene';
+  if(L<.3)return W>.02?'Intimate':'Nocturnal';
+  if(blue>=2)return 'Tranquil';
+  return W>.04?'Welcoming':'Composed';
+}
+function spots(frame,img){
+  if(frame.dataset.done)return;frame.dataset.done=1;
+  const r=frame.getBoundingClientRect();if(r.width<2)return;
+  const key=frame.dataset.k||'',av=(AVOID&&AVOID[key])||{h:[],s:[]};
+  const W=r.width,H=r.height,land=W>H*1.1,cols=land?14:9,cell=W/cols,rows=Math.max(1,Math.floor(H/cell));
+  const g=2,c=document.createElement('canvas');c.width=cols*g;c.height=rows*g;
+  const x=c.getContext('2d',{willReadFrequently:true});const [dx,dy,dw,dh]=coverRect(img.naturalWidth,img.naturalHeight,cols*g,rows*g);x.drawImage(img,dx,dy,dw,dh);
+  let d;try{d=x.getImageData(0,0,cols*g,rows*g).data}catch(e){return}
+  // frame cells -> image coordinates, to test against the avoid boxes
+  const sc=Math.max(W/img.naturalWidth,H/img.naturalHeight),ox=(W-img.naturalWidth*sc)/2,oy=(H-img.naturalHeight*sc)/2;
+  const toImg=(fx,fy)=>[(fx-ox)/(img.naturalWidth*sc),(fy-oy)/(img.naturalHeight*sc)];
+  const hits=(boxes,cx,cy,s,pad)=>{const [u0,v0]=toImg(cx*cell,cy*cell),[u1,v1]=toImg((cx+s)*cell,(cy+s)*cell);
+    return boxes.some(b=>u1>b[0]-pad&&u0<b[2]+pad&&v1>b[1]-pad&&v0<b[3]+pad)};
+  const chip=[cols-(land?5.2:4.2),rows-(land?1.9:1.7)];                 // keep the corner chip clear
+  const cand=[];
+  for(let yy=0;yy<rows*g;yy++)for(let xx=0;xx<cols*g;xx++){const k=(yy*cols*g+xx)*4,rgb=[d[k],d[k+1],d[k+2]];
+    const mx=Math.max(...rgb),mn=Math.min(...rgb),l=rgb[0]*.3+rgb[1]*.59+rgb[2]*.11;
+    const px=xx/g,py=yy/g;if(px>=chip[0]&&py>=chip[1])continue;
+    if(hits(av.h,px,py,1,.02))continue;
+    cand.push({x:px,y:py,rgb,score:(mx?(mx-mn)/mx:0)*.7+Math.abs(l-128)/255*.3-(hits(av.s,px,py,1,0)?.35:0)})}
+  cand.sort((a,b)=>b.score-a.score);
+  const want=4+Math.floor(seedOf(key||img.src.slice(-40))*4);            // 4..7, stable per photograph
+  const chosen=cand.length?[cand[0]]:[];
+  for(const th of [26,16,8]){
+    while(chosen.length<want){let best=null,bd=-1;
+      for(const p of cand){const cd=Math.min(...chosen.map(q=>distRGB(p.rgb,q.rgb)));const sd=Math.min(...chosen.map(q=>Math.hypot(p.x-q.x,p.y-q.y)));
+        if(sd<1.5)continue;const v=cd+sd*2;if(cd>th&&v>bd){bd=v;best=p}}
+      if(!best)break;chosen.push(best)}
+    if(chosen.length>=want)break;
+  }
+  const sizes=[1,.5,2,1,.5,1,.5];
+  const placed=[];
+  chosen.forEach((p,i)=>{let s=sizes[i%sizes.length];let cx=Math.round(p.x/.5)*.5,cy=Math.round(p.y/.5)*.5;
+    cx=Math.min(Math.max(0,cx),cols-s);cy=Math.min(Math.max(0,cy),rows-s);
+    if(s===2&&(hits(av.h,cx,cy,2,.02)||(cx+2>chip[0]&&cy+2>chip[1])))s=1;          // a big square must not grow onto a head
+    if(hits(av.h,cx,cy,s,.01))return;
+    const e=document.createElement('i');e.className='sw';
+    e.style.cssText=`left:${cx/cols*100}%;top:${cy*cell/H*100}%;width:${s/cols*100}%;background:${hex(...p.rgb)};--d:${i*70}ms`;
+    frame.appendChild(e);placed.push(p.rgb)});
+  if(!placed.length)return;
+  // the palette chip, bottom right: grows on hover, names the palette, makes the squares on the photo pulse
+  const pal=document.createElement('span');pal.className='pal';
+  pal.innerHTML=placed.map(c=>`<i style="background:${hex(...c)}"></i>`).join('');
+  pal.addEventListener('pointerenter',()=>frame.classList.add('pal-on'));
+  pal.addEventListener('pointerleave',()=>frame.classList.remove('pal-on'));
+  frame.appendChild(pal);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>frame.classList.add('sw-on')));
+}
+
+/* WebGL pixel field for full-bleed media (hero, CTA, project hero, 404).
+   Takes an image today; a VideoTexture drops into the same shader later. */
+const FRAG=`
+precision highp float;
+uniform sampler2D uTex; uniform vec2 uRes; uniform vec2 uImg; uniform vec2 uFocus; uniform float uDpr;
+uniform float uCell; uniform float uStep; uniform float uDensity; uniform vec4 uBox; uniform float uForce;
+uniform float uDark; uniform float uEdge; uniform float uScroll; uniform vec3 uTrail[10];
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+vec3 tex(vec2 px){float s=max(uRes.x/uImg.x,uRes.y/uImg.y);vec2 sz=uImg*s;vec2 u=(px-(uRes-sz)*uFocus)/sz;return texture2D(uTex,vec2(u.x,1.-u.y)).rgb;}
+void main(){
+  vec2 px=vec2(gl_FragCoord.x,uRes.y*uDpr-gl_FragCoord.y)/uDpr;
+  vec2 id=floor(px/uCell);vec2 c0=id*uCell;vec2 cc=c0+uCell*.5;
+  vec3 photo=tex(px);
+  vec3 avg=vec3(0.);for(int i=0;i<3;i++)for(int j=0;j<3;j++)avg+=tex(c0+uCell*(vec2(float(i),float(j))+.5)/3.);avg/=9.;
+  vec2 cu=cc/uRes;
+  float inBox=step(uBox.x,cu.x)*step(cu.x,uBox.z)*step(uBox.y,cu.y)*step(cu.y,uBox.w);
+  float dens=mix(uDensity,uDensity*.3,inBox);
+  dens*=mix(.35,1.,step(64./uRes.y,cu.y));
+  float f=n(id*.21+vec2(uStep*.11,uScroll-uStep*.05))*.72+h(id)*.28;
+  float on=0.*step(1.-dens*1.25,f);
+  // each trail point lives 1 -> 0; cells dissolve in and out one by one, sparse and soft
+  float w=0.;
+  for(int k=0;k<10;k++){vec3 t=uTrail[k];if(t.z>0.){float d=length(cc-t.xy)/uCell;
+    float life=(1.-smoothstep(.82,1.,t.z))*smoothstep(0.,.55,t.z);   // quick fade in, long fade out
+    float reach=1.-smoothstep(.6,2.1,d);                                // edges must be ascending in GLSL
+    float lim=life*reach*.5*(1.-.75*inBox);
+    float cellv=(h(id*1.37+vec2(float(k)*3.1,7.7))<lim)?1.:0.;       // strict: no cell when lim is 0
+    w=max(w,cellv*life);}}
+  on=max(on,w);
+  on=max(on,uForce);
+  vec2 m=mod(px,uCell);
+  float edge=1.-step(1.,m.x)*step(1.,m.y)*step(m.x,uCell-1.)*step(m.y,uCell-1.);
+  float ghost=0.*edge;
+  vec2 pu=px/uRes;                                   // per pixel, so the shading is a smooth gradient, never a grid
+  float d=distance(pu,vec2(.5,.52));
+  photo*=1.-uDark*(1.-smoothstep(.05,.62,d));
+  photo*=1.-uEdge*(.32*(1.-smoothstep(0.,.2,pu.y))+.28*smoothstep(.8,1.,pu.y));
+  float r=h(id+13.1);
+  if(r<.45){vec2 q=vec2(h(id+2.7),h(id+5.9))*uRes;vec2 qc=floor(q/uCell)*uCell;vec3 a2=vec3(0.);
+    for(int i=0;i<2;i++)for(int j=0;j<2;j++)a2+=tex(qc+uCell*(vec2(float(i),float(j))+.5)/2.);avg=a2/4.;}
+  float l=dot(avg,vec3(.299,.587,.114));
+  avg=clamp(mix(vec3(l),avg,1.45),0.,1.);
+  avg*=mix(.82,1.12,h(id+21.4));
+  avg*=mix(1.,.8,inBox);
+  ghost*=step(80./uRes.y,cu.y);
+  vec3 col=mix(photo,avg,on*.9);
+  col=mix(col,vec3(1.),ghost*.8);
+  gl_FragColor=vec4(col,1.);
+}`;
+function pixelField(host,img,o){
+  if(!window.THREE)return null;
+  const probe=document.createElement('canvas');probe.width=probe.height=1;const px=probe.getContext('2d');px.drawImage(img,0,0,1,1);
+  try{px.getImageData(0,0,1,1)}catch(e){return null}
+  let renderer;try{renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'})}catch(e){return null}
+  if(!renderer.getContext())return null;
+  const cv=renderer.domElement;cv.className='glc';cv.setAttribute('aria-hidden','true');
+  host.insertBefore(cv,host.querySelector('.scrim')||host.querySelector('.copy'));
+  const src=document.createElement('canvas');const sc=Math.min(1,2048/Math.max(img.naturalWidth,img.naturalHeight));
+  src.width=Math.round(img.naturalWidth*sc);src.height=Math.round(img.naturalHeight*sc);const sx=src.getContext('2d');sx.drawImage(img,0,0,src.width,src.height);
+  try{sx.getImageData(0,0,1,1)}catch(e){return null}
+  const tex=new THREE.CanvasTexture(src);tex.minFilter=THREE.LinearFilter;tex.generateMipmaps=false;
+  const trail=Array.from({length:10},()=>new THREE.Vector3());
+  const U={uTex:{value:tex},uRes:{value:new THREE.Vector2()},uImg:{value:new THREE.Vector2(src.width,src.height)},uFocus:{value:new THREE.Vector2(...(o.focus||[.5,.5]))},
+    uDpr:{value:1},uCell:{value:40},uStep:{value:0},uDensity:{value:o.density},uBox:{value:new THREE.Vector4(...o.box)},uForce:{value:0},
+    uDark:{value:o.dark??.3},uEdge:{value:o.edge??1},uScroll:{value:0},uTrail:{value:trail}};
+  const mat=new THREE.ShaderMaterial({uniforms:U,vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:FRAG,depthTest:false});
+  const scene=new THREE.Scene(),cam=new THREE.Camera(),geo=new THREE.PlaneGeometry(2,2);scene.add(new THREE.Mesh(geo,mat));
+  let base=40,introOn=false,alive=true,raf=0,it=0;
+  const size=()=>{const r=host.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);renderer.setPixelRatio(dpr);renderer.setSize(r.width,r.height,false);
+    U.uRes.value.set(r.width,r.height);U.uDpr.value=dpr;base=r.width/(innerWidth<760?o.colsM||12:o.cols);host.dataset.cell=base.toFixed(1);if(!introOn)U.uCell.value=base};
+  size();addEventListener('resize',size);host.classList.add('gl');
+  if(introOn){U.uForce.value=1;const mul=[12,6,3,1.5];let i=0;U.uCell.value=base*mul[0];
+    it=setInterval(()=>{i++;if(i<mul.length)U.uCell.value=base*mul[i];else{clearInterval(it);U.uForce.value=0;U.uCell.value=base;introOn=false}},200)}
+  let tp=0,last=null;
+  const pm=e=>{if(e.pointerType!=='mouse')return;const r=host.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+    if(!last||Math.hypot(x-last[0],y-last[1])>base*1.1){trail[tp].set(x,y,1);tp=(tp+1)%trail.length;last=[x,y]}};
+  const pd=e=>{if(e.pointerType==='mouse')return;const r=host.getBoundingClientRect();for(let k=0;k<3;k++){trail[tp].set(e.clientX-r.left+(k-1)*base,e.clientY-r.top,1);tp=(tp+1)%trail.length}};
+  host.addEventListener('pointermove',pm);host.addEventListener('pointerdown',pd);
+  let vis=true;const io=new IntersectionObserver(es=>{vis=es[0].isIntersecting});io.observe(host);
+  const t0=performance.now();let prev=t0;
+  const loop=now=>{if(!alive)return;raf=requestAnimationFrame(loop);if(!vis)return;const dt=Math.min(.1,(now-prev)/1000);prev=now;
+    U.uStep.value=RM?0:Math.floor((now-t0)/850);trail.forEach(v=>{v.z=Math.max(0,v.z-dt*.55)});
+    const r=host.getBoundingClientRect();U.uScroll.value=Math.round(-r.top/Math.max(1,base))*.21;renderer.render(scene,cam)};
+  raf=requestAnimationFrame(loop);
+  const destroy=()=>{alive=false;cancelAnimationFrame(raf);clearInterval(it);io.disconnect();removeEventListener('resize',size);host.removeEventListener('pointermove',pm);host.removeEventListener('pointerdown',pd);
+    geo.dispose();mat.dispose();U.uTex.value.dispose();renderer.dispose();renderer.forceContextLoss&&renderer.forceContextLoss();cv.remove()};
+  destroy.useVideo=v=>{const vt=new THREE.VideoTexture(v);vt.minFilter=THREE.LinearFilter;vt.generateMipmaps=false;
+    const old=U.uTex.value;U.uTex.value=vt;U.uImg.value.set(v.videoWidth,v.videoHeight);old.dispose()};
+  return destroy;
+}
+
+/* ============================================================
+   TEMPLATES
+   ============================================================ */
+const btn=(href,label,cls='')=>`<a class="btn ${cls}" href="#${href}">${label} <i></i></a>`;
+const label=t=>`<span class="label">${t}</span>`;
+function frame(k,alt,{ratio,px,pal}={}){
+  const [w,h]=DIM(k);const ar=ratio||`${w}/${h}`;
+  return `<div class="frame" data-k="${k}"${pal||PAL_PAGE?' data-pal="1"':''}${px?` data-px="${px}"`:''} style="aspect-ratio:${ar}"><img src="${I(k)}" alt="${esc(alt)}" loading="lazy" width="${w}" height="${h}"></div>`;
+}
+function projCard(p,cls,land,withSvc){
+  const loc=[p.location,p.year].filter(Boolean).join(' · ')||'Location to confirm';
+  return `<a class="card ${land?'land ':''}${cls}" href="#work-${p.slug}">
+    ${frame(land?p.coverL:p.coverV,p.name,{ratio:land?'3/2':'4/5'})}
+    <div class="row"><div><h3>${esc(p.name)}</h3><div class="meta">${esc(loc)}</div>${withSvc?`<div class="meta svc">${esc((p.services||[]).join(', '))}</div>`:''}</div><span class="arrow" aria-hidden="true">↗</span></div></a>`;
+}
+const intro=(lab,line)=>`<div class="intro"><div class="l">${label(esc(lab))}${line?`<p>${esc(line)}</p>`:''}</div></div>`;
+const paras=t=>String(t||'').split(/\n\s*\n/).filter(Boolean).map(x=>`<p>${esc(x.trim())}</p>`).join('');
+function cta(project){
+  return `<section class="cta" id="enquire" data-field="prefooter">
+    <img class="bg" src="${I(C.img.prefooter)}" alt="" loading="lazy">
+    <div class="scrim"></div>
+    <div class="copy"><h2>${esc(project?C.cta.projectH2:C.cta.h2)}</h2>${project?'':`<p class="lead">${esc(C.cta.lead)}</p>`}
+      ${btn(project?'contact-'+project:'contact',esc(C.cta.button),'light')}<p class="meta" style="color:inherit;opacity:.85">${esc(C.available)}</p></div></section>`;
+}
+function logoGrid(){
+  return `<div class="logos">${LOGOS.map(([f,n,slug,w,h])=>{const s=`<img src="${LOGO(f)}" alt="" style="--w:${w}%;--h:${h}%" loading="lazy">`;
+    return slug&&byslug(slug)?`<a class="logo" href="#work-${slug}" title="${esc(n)}" aria-label="${esc(n)}, view project">${s}</a>`:`<div class="logo" role="img" title="${esc(n)}" aria-label="${esc(n)}">${s}</div>`}).join('')}</div>`;
+}
+function filmBtn(f,i,big){
+  const meta=esc(f.meta||[f.client!==f.title?f.client:'',f.loc].filter(Boolean).join(' · ')||f.cat);
+  if(f.project&&byslug(f.project))return `<a class="film linked${big?' big':''}" href="#work-${f.project}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="go" aria-hidden="true">↗</span></div>
+    <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${meta}</div></div><span class="vp">View project</span></div></a>`;
+  return `<button class="film${big?' big':''}" data-film="${i}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></div>
+    <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${meta}</div></div><span class="vp">Play film</span></div></button>`;
+}
+
+function hrail(lab,cards,title){
+  return `<section class="hscroll"><div class="hs-sticky"><div class="wrap hs-head">${label(esc(lab))}${title?`<h2>${esc(title)}</h2>`:''}<span class="hs-count meta"><b>01</b> / ${nf(cards.length)}</span></div>
+    <div class="hs-view"><div class="hs-track">${cards.join('')}</div></div>
+    <div class="wrap"><div class="hs-bar"><i></i></div></div></div></section>`;
+}
+let PAL_PAGE=false; // set while a page that shows palettes everywhere (home, services) is rendered
+const PAGES={};
+
+PAGES.home=()=>{
+  const W=HOME_WORK.map(byslug).filter(Boolean).slice(0,6);const cls=['c1','c2','c3','c4','c5','c6'];const H=C.home;
+  return {hero:true,filmList:HOME_FILMS,lightbox:HOME_PHOTOS.map(([k,c])=>({k,cap:c})),html:`
+  <section class="hero" id="hero" data-field="hero">
+    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(C.img.heroM)}"><img src="${I(C.img.hero)}" alt="${esc(H.heroAlt)}" fetchpriority="high"></picture>
+    <div class="scrim"></div>
+    <div class="copy"><p class="display" aria-hidden="true">${esc(H.display)}</p>
+      <h1>${esc(H.h1)}</h1>
+      <p class="sub">${esc(H.sub)}</p>${btn('work',esc(H.button),'light')}</div>
+    <span class="cue" aria-hidden="true"><i></i></span>
+  </section>
+  <section class="sec"><div class="wrap">${intro(H.workLabel,H.workLine)}
+    <div class="grid work">${W.map((p,i)=>projCard(p,cls[i],i%2===1)).join('')}</div>
+    <div class="more">${btn('work','View all work')}</div></div></section>
+  <section class="sec photo"><div class="wrap">${intro(H.photoLabel,H.photoLine)}
+    <div class="grid gal">${HOME_PHOTOS.slice(0,7).map(([k,c],i)=>`<figure class="g${i+1}"><button data-lb="${i}" aria-label="Open photograph ${i+1}">${frame(k,c,{ratio:'2/3'})}</button><figcaption class="meta">${esc(c)}</figcaption></figure>`).join('')}</div>
+    <div class="more">${btn('photography','View photography')}</div></div></section>
+  <section class="sec"><div class="wrap">${intro(H.trustedLabel,H.trustedLine)}${logoGrid()}</div></section>
+  <section class="sec photo"><div class="wrap">${intro(H.filmLabel,H.filmLine)}
+    <div class="grid films">${HOME_FILMS.slice(0,3).map((f,i)=>`<div class="f${i+1}">${filmBtn(f,i,i===0)}</div>`).join('')}</div>
+    <div class="more">${btn('film','View film')}</div></div></section>
+  <section class="sec studio"><div class="wrap grid">
+    <div class="lab">${label(esc(H.studioLabel))}</div>
+    <div class="txt"><p class="lead">${esc(H.studioLead)}</p>${paras(H.studioText)}
+      <p class="meta">${esc(C.available)}</p><div>${btn('about','About '+esc(C.brand))}</div></div>
+    <div class="img">${frame(C.img.studio,H.studioAlt,{ratio:'2/3'})}</div></div></section>
+  <section class="sec" style="padding-top:0"><div class="wrap"><div class="intro"><div class="l">${label(esc(H.servicesLabel))}</div></div>
+    <ul class="svc">${SERVICES.map(s=>`<li><a href="#services-${s.id}" data-img="${I(s.img)}"><span class="dot" data-k="${s.img}"></span><h3>${esc(s.name)}</h3><p>${esc(s.short)}</p><span class="arr" aria-hidden="true">→</span></a></li>`).join('')}</ul>
+    <div class="more">${btn('services','Explore services')}</div></div></section>
+  ${cta()}`};
+};
+
+PAGES.work=()=>{
+  const cls=['w-a','w-b','w-c','w-d','w-e'];const land=[true,false,false,true,true];
+  return {html:`
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.workTitle)}</h1><p>${esc(C.pages.workIntro)}</p><span class="count">${nf(PROJECTS.length)} projects</span></div></section>
+  <section style="padding-bottom:clamp(88px,12vw,180px)"><div class="wrap"><div class="grid wgrid">
+    ${PROJECTS.map((p,i)=>projCard(p,cls[i%5],land[i%5],true)).join('')}
+  </div></div></section>${cta()}`};
+};
+
+PAGES.project=slug=>{
+  const p=byslug(slug);if(!p)return PAGES.notfound();
+  const i=PROJECTS.indexOf(p),next=PROJECTS[(i+1)%PROJECTS.length];
+  const tbc=v=>v?`<span class="v">${esc(v)}</span>`:`<span class="v tbc">To confirm</span>`;
+  let vids=[];
+  const vid=(k,v)=>{vids.push({k,video:v||'',title:p.name,meta:p.client});return `<button class="vid" data-film="${vids.length-1}">${frame(k,'',{ratio:'16/9'})}<span class="play" aria-hidden="true"></span></button>`};
+  const blocks=p.blocks||[];
+  const palAt=new Set([0,Math.floor(blocks.length/2)]);
+  const b=blocks.map((bl,bi)=>{const pal=palAt.has(bi);const K=[].concat(bl.k);
+    switch(bl.t){
+      case 'large':return `<div class="blk blk-large ${bl.side||''}">${frame(K[0],p.name,{pal})}</div>`;
+      case 'pair':return `<div class="blk blk-pair">${K.slice(0,2).map((k,j)=>frame(k,p.name,{pal:pal&&j===0})).join('')}</div>`;
+      case 'full':return `<div class="blk blk-full">${frame(K[0],p.name,{ratio:'16/9',pal})}</div>`;
+      case 'drone':return `<div class="blk blk-drone">${frame(K[0],p.name+', aerial',{ratio:'16/9',pal})}</div>`;
+      case 'mixed':return `<div class="blk blk-mixed">${frame(K[0],p.name,{pal})}${bl.video?vid(K[1],bl.src):frame(K[1],p.name)}</div>`;
+      case 'video':return `<div class="blk blk-video">${vid(K[0],bl.src)}</div>`;
+      case 'text':return `<div class="blk blk-text">${paras(bl.text)}</div>`;
+    }return ''}).join('');
+  return {hero:true,filmList:vids,html:`
+  <section class="phero" data-field="phero">
+    <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(p.heroM||p.coverV)}"><img src="${I(p.hero||p.coverL)}" alt="${esc(p.name)}"></picture>
+    <div class="scrim"></div>
+    <div class="copy"><h1>${esc(p.name)}</h1><span class="loc">${esc(p.location||'Location to confirm')}</span></div>
+  </section>
+  <div class="wrap">
+    <div class="metab"><div>${label('Client')}${tbc(p.client)}</div><div>${label('Location')}${tbc(p.location)}</div><div>${label('Year')}${tbc(p.year)}</div><div>${label('Services')}${tbc((p.services||[]).join(', '))}</div></div>
+    ${p.desc?`<div class="pdesc">${paras(p.desc)}</div>`:''}
+    <div class="blocks">${b}</div>
+    ${p.logo?`<div class="clogo"><span class="meta">Client</span><img class="m" src="${LOGO(p.logo)}" alt="${esc(p.client)}"></div>`:''}
+  </div>
+  <section class="band pcta"><h2>${esc(C.cta.projectH2)}</h2>${btn('contact-'+p.slug,esc(C.cta.button))}<span class="meta">${esc(C.available)}</span></section>
+  <a class="nextp" href="#work-${next.slug}"><img src="${I(next.coverL)}" alt="" loading="lazy"><div class="sc"></div>
+    <div class="copy"><span class="label" style="color:inherit">Next project</span><h2>${esc(next.name)}</h2><span class="meta" style="color:inherit">${esc(next.location||'')}</span></div></a>`,next:next.coverL};
+};
+
+function layoutPhotos(list){
+  // editorial rhythm: verticals large and offset, landscapes across; never a uniform grid
+  const pat=[['1/7',0],['8/12','12vw'],['3/8','-2vw'],['9/13','6vw'],['1/5','8vw'],['6/12',0]];
+  const patL=['1/13','2/12'];
+  let v=0,l=0;
+  return list.map((ph,i)=>{const [w,h]=DIM(ph.k);const landscape=w>h*1.15;let col,mt=0;
+    if(landscape){col=patL[l++%2]}else{[col,mt]=pat[v++%pat.length]}
+    const pr=ph.project?byslug(ph.project):null;
+    const cap=photoCap(ph);
+    if(pr)return `<figure style="grid-column:${col};margin-top:${mt}"><a class="plink" href="#work-${pr.slug}" aria-label="${esc(pr.name)}, view project">${frame(ph.k,cap)}<figcaption class="meta"><span>${esc(cap)}</span><span class="vp">View project</span></figcaption></a></figure>`;
+    return `<figure style="grid-column:${col};margin-top:${mt}"><button data-lb="${i}" aria-label="Open photograph">${frame(ph.k,cap)}</button><figcaption class="meta">${esc(cap)}</figcaption></figure>`}).join('');
+}
+function photoCap(ph){const pr=ph.project?byslug(ph.project):null;const c=CATS.find(c=>c[0]===(ph.cats||[])[0]);return [ph.loc,pr?pr.name:''].filter(Boolean).join(' / ')||(c?c[1]:'')}
+PAGES.photography=cat=>{
+  const valid=CATS.find(c=>c[0]===cat);const list=valid?PHOTOS.filter(p=>(p.cats||[]).includes(cat)):PHOTOS;
+  const count=c=>PHOTOS.filter(p=>(p.cats||[]).includes(c)).length;
+  return {lightbox:list.map(ph=>({k:ph.k,cap:photoCap(ph),project:ph.project})),html:`
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.photoTitle)}</h1><p>${esc(C.pages.photoIntro)}</p></div></section>
+  <nav class="filters" aria-label="Photography categories"><div class="wrap">
+    <a class="chip${valid?'':' on'}" href="#photography">All <span class="n">${PHOTOS.length}</span></a>
+    ${CATS.map(([id,n])=>`<a class="chip${cat===id?' on':''}" href="#photography-${id}">${esc(n)} <span class="n">${count(id)}</span></a>`).join('')}
+  </div></nav>
+  <section><div class="wrap"><div class="grid pgrid">${layoutPhotos(list)}</div></div></section>${cta()}`};
+};
+
+PAGES.film=()=>{
+  const groups={};FILMS.forEach(f=>(groups[f.cat]=groups[f.cat]||[]).push(f));
+  const big=[],rest=[];Object.entries(groups).forEach(([c,l])=>l.length>=2?big.push([c,l]):rest.push(...l));
+  let idx=0;const all=[];
+  const cards=l=>l.map(f=>{all.push(f);return filmBtn(f,idx++)}).join('');
+  const html=big.map(([c,l])=>`<section class="fgroup">${label(esc(c))}<div class="fcards">${cards(l)}</div></section>`).join('')+
+    (rest.length?`<section class="fgroup">${label('More films')}<div class="fcards">${cards(rest)}</div></section>`:'');
+  return {filmList:all,html:`
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.filmTitle)}</h1><p>${esc(C.pages.filmIntro)}</p></div></section>
+  <div class="wrap" style="padding-bottom:clamp(88px,12vw,180px)">${html}</div>${cta()}`};
+};
+
+PAGES.services=anchor=>({anchor,html:`
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.servicesTitle)}</h1><p>${esc(C.pages.servicesIntro)}</p></div></section>
+  <div class="wrap">${SERVICES.map((s,i)=>`<section class="split${i%2?' flip':''}" id="svc-${s.id}">
+    <div class="media">${frame(s.img,s.name,{ratio:'4/5'})}</div>
+    <div class="t"><h2>${esc(s.name)}</h2>${paras(s.body)}${s.deliv?`<div class="deliv"><span class="meta">Typical deliverables</span><span>${esc(s.deliv)}</span></div>`:''}</div></section>`).join('')}</div>
+  <section class="band"><p>${esc(C.pages.servicesBand)}</p>${btn('contact','Start a project')}</section>`});
+
+PAGES.about=()=>{const A=C.about;const films=[];
+  const disc=(A.disc||[]).slice(0,3).map((d,i)=>{const cls='dcard d'+(i+1),ratio=['4/5','16/10','1/1'][i];
+    const inner=`${frame(d.img,d.label+(d.meta?', '+d.meta:''),{ratio})}${d.film?'<span class="play" aria-hidden="true"></span>':''}<div class="dcap"><span class="label">${esc(d.label)}</span><span class="meta">${esc(d.meta||'')}</span></div>`;
+    if(d.film){films.push({k:d.img,video:d.film,title:d.meta||d.label,meta:''});return `<button class="${cls} vid" data-film="${films.length-1}">${inner}</button>`}
+    return d.project&&byslug(d.project)?`<a class="${cls}" href="#work-${d.project}">${inner}</a>`:`<div class="${cls}">${inner}</div>`}).join('');
+  return {filmList:films,html:`
+  <section class="about-open"><div class="wrap grid">
+    <div class="t"><h1>${esc(A.title)}</h1>${paras(A.intro)}</div>
+    <div class="i">${frame(C.img.aboutOpen,A.openAlt,{ratio:'3/4'})}</div></div></section>
+  <section class="txtblock"><div class="wrap grid"><div class="l">${label(esc(A.approachTitle))}</div><div class="r"><h2>${esc(A.approachTitle)}</h2>${paras(A.approach)}</div></div></section>
+  <section class="txtblock" style="padding-top:0;padding-bottom:0"><div class="wrap"><div class="grid"><div class="l">${label(esc(A.productionTitle))}</div><div class="r"><h2>${esc(A.productionTitle)}</h2>${paras(A.production)}</div></div></div></section>
+  <section class="disc"><div class="wrap"><div class="grid disc-g">${disc}</div></div></section>
+  ${hrail(A.stepsTitle,(A.steps||[]).map((s,i)=>`<article class="hs-card step">${frame(s.img,s.t,{ratio:'4/5'})}<div class="hs-cap"><span class="num">${nf(i+1)}</span><h3>${esc(s.t)}</h3><p>${esc(s.d)}</p></div></article>`),A.stepsTitle)}
+  <section class="world" data-field="world"><img src="${I(C.img.world)}" alt="" loading="lazy"><div class="sc"></div>
+    <div class="copy"><h2>${esc(A.worldTitle)}</h2>${paras(A.worldText)}
+      <div class="world-cta"><span class="lead">${esc(A.worldCta)}</span>${btn('contact',esc(C.cta.button),'light')}</div></div></section>`};
+};
+
+PAGES.contact=project=>{
+  const p=project?byslug(project):null;const K=C.contact;
+  const types=K.types&&K.types.length?K.types:['Photography','Film','Photography + Film','Creative Direction','Full Production'];
+  const F=(id,lab,{type='text',req=true,ph='',w=false}={})=>`<div class="field${w?' w':''}"><label for="${id}">${lab}${req?'':' <span class="opt">(optional)</span>'}</label>
+    <input id="${id}" name="${id}" type="${type}" ${req?'required':''} placeholder="${esc(ph)}" autocomplete="${type==='email'?'email':id==='f-name'?'name':id==='f-company'?'organization':'off'}"><span class="err" aria-live="polite"></span></div>`;
+  return {html:`
+  <section class="contact"><div class="wrap grid">
+    <div class="l"><h1>${esc(K.title)}</h1>
+      <p class="intro-t">${esc(K.intro)}</p>
+      <form class="form" id="enq" novalidate>
+        ${F('f-name','Name')}${F('f-company','Company / Brand')}
+        ${F('f-email','Email',{type:'email'})}${F('f-web','Website / Instagram',{req:false,ph:'e.g. www.yourhotel.com or @yourhotel'})}
+        ${F('f-loc','Project location',{ph:'City, country'})}${F('f-dates','Preferred dates',{req:false,ph:'e.g. March 2027, flexible'})}
+        <div class="field w"><label for="f-type">Project type</label><select id="f-type" name="f-type" required><option value="">Select</option>${types.map(t=>`<option>${esc(t)}</option>`).join('')}</select><span class="err" aria-live="polite"></span></div>
+        <div class="field w"><label for="f-details">Project details</label><textarea id="f-details" name="f-details" required placeholder="Tell us about the property, the goal and what you have in mind."></textarea><span class="err" aria-live="polite"></span></div>
+        <input type="hidden" name="source" value="${esc(p?'project:'+p.slug:'contact')}">
+        <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website_url" tabindex="-1" autocomplete="off"></label></div>
+        <label class="consent"><input type="checkbox" id="f-consent" required><span>I agree to ${esc(C.brand)} processing my details to respond to this enquiry. <a href="#privacy">Privacy Policy</a></span></label>
+        <div class="field w" style="margin-top:-18px"><span class="err" id="consentErr" aria-live="polite"></span></div>
+        <div class="actions"><button class="btn" type="submit">Send enquiry <i></i></button>${p?`<span class="meta">About: ${esc(p.name)}</span>`:''}</div>
+      </form>
+      <div class="direct"><span class="label">Direct contact</span>
+        ${K.email?`<span>Email: <span style="user-select:all">${esc(K.email)}</span></span>`:''}
+        ${K.instagram?`<a href="${esc(K.instagram)}" target="_blank" rel="noopener">Instagram ↗</a>`:''}
+        ${K.linkedin?`<a href="${esc(K.linkedin)}" target="_blank" rel="noopener">LinkedIn ↗</a>`:''}
+        <span class="meta">${esc(C.available)}</span></div>
+    </div>
+    <div class="r">${frame(C.img.contact,K.imgAlt,{ratio:'4/5'})}</div>
+  </div></section><div style="height:clamp(80px,10vw,160px)"></div>`};
+};
+
+PAGES.privacy=()=>({html:`<section class="legal-p"><div class="wrap"><h1>Privacy &amp; Cookies</h1><div class="body">
+  ${C.privacy&&C.privacy.trim()?paras(C.privacy):`<p>The legal text is being prepared. It will cover the points below.</p>
+  ${['Who operates this website','What the enquiry form collects and why','How long data is kept','Your rights as a visitor','The analytics tool and its cookies','How to change your cookie choice','Contact for data requests']
+   .map(t=>`<h2>${t}</h2><p>To be supplied.</p>`).join('')}`}
+  <div style="margin-top:24px"><button class="btn" id="cookieOpen" type="button">Cookie settings <i></i></button></div></div></div></section>${cta()}`});
+
+PAGES.notfound=()=>({hero:true,status:404,html:`<section class="nf" data-field="nf"><picture><img src="${I(C.img.notfound)}" alt=""></picture><div class="scrim"></div>
+  <div class="copy"><span class="label" style="color:inherit">404</span><h1>${esc(C.notfound.h1)}</h1><p style="margin:0">${esc(C.notfound.p)}</p>
+  <div class="b">${btn('work','View our work','light')}${btn('','Back to home','light')}</div></div></section>`});
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+/* Two addressing modes, one set of route tokens ('work-palau', 'photography-drone', ...):
+   hash (#work-palau) for the prototype and the artifact, real paths (/work/palau) on the live server. */
+const PATH_MODE=!!(SITE_DATA&&SITE_DATA.routing==='path');
+function tokenToPath(t){t=(t||'').replace(/^#/,'');if(!t||t==='top')return '/';
+  for(const [a,b] of [['work-','/work/'],['photography-','/photography/'],['services-','/services/'],['contact-','/contact?project=']])if(t.startsWith(a))return b+encodeURIComponent(t.slice(a.length));
+  return '/'+t}
+function pathToToken(){const p=location.pathname.replace(/\/+$/,'')||'/',q=new URLSearchParams(location.search);if(p==='/')return '';
+  const seg=p.slice(1).split('/').map(decodeURIComponent);
+  if(seg[0]==='contact'&&seg.length===1&&q.get('project'))return 'contact-'+q.get('project');
+  if(seg.length===2&&['work','photography','services'].includes(seg[0]))return seg[0]+'-'+seg[1];
+  return seg.length===1?seg[0]:'__none'}
+const curToken=()=>PATH_MODE?pathToToken():location.hash.slice(1);
+const isRoute=t=>{t=(t||'').replace(/^#/,'');return t===''||t==='top'||parse(t)[0]!=='notfound'};
+function pathLinks(root){if(!PATH_MODE)return;$$('a[href^="#"]',root).forEach(a=>{const t=a.getAttribute('href').slice(1);if(isRoute(t))a.setAttribute('href',tokenToPath(t))})}
+function parse(h){
+  h=(h||'').replace(/^#/,'');
+  if(!h||h==='top')return ['home'];
+  if(h==='work')return ['work'];
+  if(h.startsWith('work-'))return ['project',h.slice(5)];
+  if(h==='photography')return ['photography'];
+  if(h.startsWith('photography-'))return ['photography',h.slice(12)];
+  if(h==='film')return ['film'];
+  if(h==='services')return ['services'];
+  if(h.startsWith('services-'))return ['services',h.slice(9)];
+  if(h==='about')return ['about'];
+  if(h==='contact')return ['contact'];
+  if(h.startsWith('contact-'))return ['contact',h.slice(8)];
+  if(h==='privacy')return ['privacy'];
+  return ['notfound'];
+}
+const app=$('#app');let cleanups=[],current=null,filmList=[],lbList=[];
+const navKey={home:null,work:'work',project:'work',photography:'photography',film:'film',services:'services',about:'about',contact:'contact'};
+const TITLES={home:C.brand,work:'Work',photography:'Photography',film:'Film',services:'Services',about:'About',contact:'Contact',privacy:'Privacy & Cookies',notfound:'Page not found'};
+
+async function go(first){
+  const [name,arg]=parse(curToken());
+  const key=name+(arg||'');
+  if(key===current)return;
+  const soft=current&&current.startsWith('photography')&&name==='photography';
+  const sameAnchor=current&&current.startsWith('services')&&name==='services';
+  current=key;
+  PAL_PAGE=(name==='home'||name==='services');
+  const view=(PAGES[name]||PAGES.notfound)(arg);
+  PAL_PAGE=false;
+  const animate=!first&&!RM&&!sameAnchor;
+  const keepY=soft?Math.min(scrollY,($('.filters')?.offsetTop||0)):0;
+  if(animate){
+    if(soft){const g=$('.pgrid');if(g){g.classList.add('leave');await wait(260)}}
+    else{app.classList.add('leave');await wait(420)}
+  }
+  cleanups.forEach(f=>{try{f()}catch(e){}});cleanups=[];
+  app.innerHTML=`<div class="page">${view.html}</div>`;
+  document.title=(name==='project'&&byslug(arg)?byslug(arg).name+' | ':TITLES[name]&&name!=='home'?TITLES[name]+' | ':'')+C.brand;
+  pathLinks(app);
+  filmList=view.filmList||[];lbList=view.lightbox||[];
+  const navHref=PATH_MODE?tokenToPath(navKey[name]||''):'#'+navKey[name];
+  $$('.nav a.link').forEach(a=>a.classList.toggle('on',!!navKey[name]&&a.getAttribute('href')===navHref));
+  if(view.anchor){const t=$('#svc-'+view.anchor);if(t)requestAnimationFrame(()=>scrollToY(t.getBoundingClientRect().top+scrollY-60,first))}
+  else if(!sameAnchor)scrollToY(soft?keepY:0,true);
+  if(animate){
+    if(soft){const g=$('.pgrid');g&&g.classList.add('enter');requestAnimationFrame(()=>requestAnimationFrame(()=>g&&g.classList.remove('enter')))}
+    else{app.classList.remove('leave');app.classList.add('enter');requestAnimationFrame(()=>requestAnimationFrame(()=>{app.classList.remove('enter');setTimeout(()=>app.classList.add('settled'),700)}));app.classList.remove('settled')}
+  }
+  hydrate(first);onScroll();
+}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+if(PATH_MODE){
+  // internal links change the address without a reload; everything else (assets, admin, other sites) behaves normally
+  document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||a.target==='_blank')return;
+    const u=new URL(a.href,location.href);if(u.origin!==location.origin||/^\/(admin|api|assets|uploads)\b/.test(u.pathname)||/\.[a-z0-9]{2,5}$/i.test(u.pathname))return;
+    e.preventDefault();if(u.pathname+u.search!==location.pathname+location.search){history.pushState(null,'',u.pathname+u.search);go(false)}});
+  addEventListener('popstate',()=>go(false));
+  if(location.hash&&isRoute(location.hash))history.replaceState(null,'',tokenToPath(location.hash));   // old #links keep working
+  pathLinks(document);
+}else addEventListener('hashchange',()=>go(false));
+
+/* smooth, weighted scrolling */
+let lenis=null;
+if(window.Lenis&&!RM){lenis=new Lenis({duration:1.15,easing:t=>1-Math.pow(1-t,3.2),smoothWheel:true});
+  const raf=t=>{lenis.raf(t);requestAnimationFrame(raf)};requestAnimationFrame(raf)}
+function scrollToY(y,instant){if(lenis)lenis.scrollTo(y,{immediate:!!instant,force:true});else scrollTo({top:y,behavior:instant?'instant':'smooth'})}
+function lockScroll(on){document.documentElement.style.overflow=on?'hidden':'';if(lenis)on?lenis.stop():lenis.start()}
+
+/* ============================================================
+   HYDRATE: wire the page that was just mounted
+   ============================================================ */
+function hydrate(first){
+  // images arrive out of focus and settle; then their palette squares step in
+  const frames=$$('.frame',app);
+  const settle=f=>{f.classList.add('in');const img=f.querySelector('img');if(f.closest('.nextp,.world')||!f.dataset.pal)return;
+    loaded(img).then(im=>{if(im&&f.isConnected)setTimeout(()=>spots(f,im),650)})};
+  if('IntersectionObserver' in window&&!RM){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);settle(e.target)}}),{rootMargin:'0px 0px -8% 0px'});
+    frames.forEach(f=>io.observe(f));cleanups.push(()=>io.disconnect())}else frames.forEach(settle);
+
+  // headings and lead lines rise out of a blur, word by word
+  const texts=$$('.display,.hero h1,.pintro h1,.pintro p,.intro p,.phero h1,.cta h2,.world h2,.about-open h1,.contact h1,.txtblock h2,.split h2,.nf h1,.band p,.band h2,.hs-head h2',app);
+  texts.forEach(splitWords);
+  const tio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){tio.unobserve(e.target);e.target.classList.add('in')}}),{rootMargin:'0px 0px -6% 0px'});
+  texts.forEach(t=>{if(t.closest('.hero,.phero,.pintro,.nf,.about-open,.contact'))requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('in')));else tio.observe(t)});
+  cleanups.push(()=>tio.disconnect());
+  setTimeout(()=>texts.forEach(t=>t.classList.add('in')),4000); // never leave copy hidden
+
+  // hero: first frame comes in out of focus; scrolling away blurs the copy again
+  const hero=$('.hero,.phero',app);
+  if(hero){if(!RM){hero.classList.add('boot');setTimeout(()=>hero.classList.remove('boot'),first?250:80)}
+    const copy=hero.querySelector('.copy');let tk=false;
+    const hs=()=>{tk=false;const y=Math.max(0,-hero.getBoundingClientRect().top),k=Math.min(1,y/(hero.offsetHeight*.6));
+      copy.style.filter=k>0?`blur(${(k*10).toFixed(1)}px)`:'';copy.style.opacity=(1-k*.9).toFixed(3);copy.style.transform=`translateY(${(-k*40).toFixed(1)}px)`};
+    const on=()=>{if(!tk){tk=true;requestAnimationFrame(hs)}};addEventListener('scroll',on,{passive:true});cleanups.push(()=>removeEventListener('scroll',on))}
+
+  // WebGL fields: pixels only where the cursor is
+  const FIELDS={hero:{cols:26,colsM:12,density:0,box:[.24,.22,.76,.78],focus:[.5,.45],dark:.34},
+    phero:{cols:24,colsM:10,density:0,box:[0,.62,.7,1],dark:.1},
+    prefooter:{cols:28,colsM:12,density:0,box:[0,0,0,0],dark:.22,edge:0},
+    world:{cols:28,colsM:12,density:0,box:[0,0,0,0],dark:.5,edge:0},
+    nf:{cols:24,colsM:10,density:0,box:[0,0,0,0],dark:.45}};
+  $$('[data-field]',app).forEach(host=>{const o=FIELDS[host.dataset.field];const img=host.querySelector('picture img, img');
+    const start=()=>loaded(img).then(im=>{if(!im||!host.isConnected)return;const d=pixelField(host,im,o);if(d)cleanups.push(d);
+      if(host.dataset.field==='hero')heroLoop(host,d)});
+    const ob=new IntersectionObserver(es=>{if(es[0].isIntersecting){ob.disconnect();start()}},{rootMargin:'300px'});ob.observe(host);cleanups.push(()=>ob.disconnect())});
+
+  // services list: marker takes a colour from its photograph; image trails the cursor, softly
+  const flt=$('#float'),fimg=$('#floatImg');let fx=0,fy=0,tx=0,ty=0,fr=0;
+  const follow=()=>{fx+=(tx-fx)*.14;fy+=(ty-fy)*.14;flt.style.transform=`translate(${fx.toFixed(1)}px,${fy.toFixed(1)}px) rotate(${((tx-fx)*.02).toFixed(2)}deg)`;fr=requestAnimationFrame(follow)};
+  $$('.svc a',app).forEach(a=>{const pre=new Image();pre.src=a.dataset.img;
+    loaded(pre).then(im=>{if(!im)return;const p=palette(im,6);a.querySelector('.dot').style.background=p[2]||''});
+    a.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;fimg.src=a.dataset.img;tx=fx=e.clientX+28;ty=fy=e.clientY-160;flt.classList.add('on');cancelAnimationFrame(fr);fr=requestAnimationFrame(follow)});
+    a.addEventListener('pointerleave',()=>{flt.classList.remove('on');setTimeout(()=>cancelAnimationFrame(fr),400)});
+    a.addEventListener('pointermove',e=>{tx=e.clientX+28;ty=e.clientY-160});
+    a.addEventListener('click',()=>flt.classList.remove('on'))});
+  cleanups.push(()=>{cancelAnimationFrame(fr);flt.classList.remove('on')});
+
+  // horizontal rails driven by vertical scroll
+  $$('.hscroll',app).forEach(sec=>{const d=hRail(sec);if(d)cleanups.push(d)});
+
+  // lightbox + film triggers
+  $$('[data-lb]',app).forEach(b=>b.addEventListener('click',()=>openLB(+b.dataset.lb,b)));
+  $$('[data-film]',app).forEach(b=>b.addEventListener('click',e=>{if(e.target.closest('[data-stop]'))return;openFilm(+b.dataset.film,b)}));
+
+  rollLinks($$('.nav a.link,.fcols a,.legal a,.direct a',document));
+
+  const form=$('#enq',app);if(form)wireForm(form);
+  const co=$('#cookieOpen',app);if(co)co.onclick=()=>{ck.hidden=false;$('#ckAccept').focus()};
+}
+
+/* hero loop: the [SMALL] master from Drive, muted and looping; drives the WebGL field when there is one */
+function heroLoop(host,field){
+  if(RM)return;const portrait=innerWidth<760&&innerHeight>innerWidth;const url=(portrait?C.video.heroM||C.video.hero:C.video.hero)||videoURL(portrait?'hero-m':'hero');if(!url)return;
+  const v=document.createElement('video');Object.assign(v,{muted:true,loop:true,playsInline:true,autoplay:true,preload:'auto'});
+  v.setAttribute('muted','');v.setAttribute('playsinline','');v.crossOrigin='anonymous';v.className='hero-vid';v.src=url;
+  host.querySelector('picture').appendChild(v);
+  v.addEventListener('playing',()=>{if(!host.isConnected)return;if(field&&field.useVideo){try{field.useVideo(v)}catch(e){v.classList.add('on')}}else v.classList.add('on')},{once:true});
+  v.addEventListener('error',()=>v.remove(),{once:true});
+  v.play().catch(()=>{});
+  cleanups.push(()=>{v.pause();v.removeAttribute('src');v.load();v.remove()});
+}
+
+/* words wrapped once, so each can rise out of a blur on its own delay */
+function splitWords(el){
+  if(el.dataset.split)return;el.dataset.split=1;let n=0;
+  const walk=node=>{[...node.childNodes].forEach(c=>{
+    if(c.nodeType===3){const parts=c.textContent.split(/(\s+)/);const frag=document.createDocumentFragment();
+      parts.forEach(p=>{if(!p)return;if(/^\s+$/.test(p)){frag.appendChild(document.createTextNode(p));return}
+        const w=document.createElement('span');w.className='w';const i=document.createElement('span');i.textContent=p;i.style.transitionDelay=(n++*45)+'ms';w.appendChild(i);frag.appendChild(w)});
+      c.replaceWith(frag)}
+    else if(c.nodeType===1&&c.tagName!=='BR')walk(c)})};
+  walk(el);el.classList.add('wsplit');
+}
+
+/* a horizontal rail pinned in place while the page scrolls vertically */
+function hRail(sec){
+  const track=sec.querySelector('.hs-track'),bar=sec.querySelector('.hs-bar i'),count=sec.querySelector('.hs-count b');
+  const items=track.children.length;let dist=0;
+  const size=()=>{dist=Math.max(0,track.scrollWidth-sec.querySelector('.hs-sticky').clientWidth);sec.style.height=(innerHeight+dist*1.1)+'px'};
+  let tk=false;
+  const upd=()=>{tk=false;const r=sec.getBoundingClientRect(),span=sec.offsetHeight-innerHeight;const p=span>0?Math.min(1,Math.max(0,-r.top/span)):0;
+    track.style.transform=`translate3d(${(-p*dist).toFixed(1)}px,0,0)`;if(bar)bar.style.transform=`scaleX(${Math.max(.02,p)})`;
+    if(count)count.textContent=nf(Math.min(items,1+Math.round(p*(items-1))))};
+  const on=()=>{if(!tk){tk=true;requestAnimationFrame(upd)}};
+  size();upd();addEventListener('scroll',on,{passive:true});addEventListener('resize',size);
+  const ro=new ResizeObserver(()=>{size();upd()});ro.observe(track);
+  return ()=>{removeEventListener('scroll',on);removeEventListener('resize',size);ro.disconnect()};
+}
+
+/* buttons lean toward the pointer */
+function magnetic(els){els.forEach(el=>{if(el.dataset.mag)return;el.dataset.mag=1;
+  el.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;const r=el.getBoundingClientRect();const x=(e.clientX-r.left-r.width/2)/r.width,y=(e.clientY-r.top-r.height/2)/r.height;
+    el.style.transform=`translate(${(x*10).toFixed(1)}px,${(y*8).toFixed(1)}px)`});
+  el.addEventListener('pointerleave',()=>{el.style.transform=''})})}
+
+/* link labels roll to a second copy on hover */
+function rollLinks(els){els.forEach(a=>{if(a.dataset.roll||a.children.length)return;a.dataset.roll=1;const t=a.textContent;
+  a.innerHTML=`<span class="roll"><span>${esc(t)}</span><span aria-hidden="true">${esc(t)}</span></span>`})}
+
+/* ---------- form ---------- */
+function wireForm(form){
+  const check=el=>{const f=el.closest('.field');if(!f)return true;const e=f.querySelector('.err');let msg='';
+    if(el.required&&!el.value.trim())msg='Please fill in this field.';
+    else if(el.type==='email'&&el.value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value))msg='Please enter a valid email address.';
+    f.classList.toggle('bad',!!msg);e.textContent=msg;return !msg};
+  $$('input,select,textarea',form).forEach(el=>el.addEventListener('blur',()=>{if(el.type!=='checkbox'&&el.type!=='hidden')check(el)}));
+  form.addEventListener('submit',e=>{e.preventDefault();let ok=true,first=null;
+    $$('input:not([type=hidden]):not([type=checkbox]),select,textarea',form).forEach(el=>{if(!check(el)){ok=false;first=first||el}});
+    const c=$('#f-consent',form);$('#consentErr').textContent=c.checked?'':'Please confirm you agree so we can reply.';if(!c.checked){ok=false;first=first||c}
+    if(!ok){first.focus();return}
+    const done=(ok,msg)=>{form.innerHTML=`<div class="form-msg${ok?'':' bad'}" role="status"><div>${msg}</div></div>`};
+    if(!(SITE_DATA&&SITE_DATA.api)){done(true,`<strong>Thank you.</strong> ${esc(C.contact.success)}<br><span class="meta">Prototype: nothing was sent. The live site posts this to the studio inbox.</span>`);return}
+    const btnS=form.querySelector('button[type=submit]');btnS.disabled=true;btnS.style.opacity=.5;
+    const fd=new FormData(form);fd.set('consent',$('#f-consent',form).checked?'1':'');fd.set('page',location.pathname+location.search);
+    fetch(SITE_DATA.api,{method:'POST',body:fd,headers:{'X-Requested-With':'fetch'}}).then(r=>r.json().catch(()=>({ok:false}))).then(j=>{
+      if(j&&j.ok)done(true,`<strong>Thank you.</strong> ${esc(C.contact.success)}`);
+      else{btnS.disabled=false;btnS.style.opacity='';const er=form.querySelector('.form-err')||form.insertAdjacentElement('beforeend',Object.assign(document.createElement('p'),{className:'form-err'}));
+        er.textContent=(j&&j.error)||('Something went wrong. Please try again or write to us at '+(C.contact.email||'')+'.')}
+    }).catch(()=>{btnS.disabled=false;btnS.style.opacity='';done(false,'Something went wrong. Please try again or write to us at '+esc(C.contact.email||'')+'.')})});
+}
+
+/* ---------- lightbox ---------- */
+const lb=$('#lb'),lbImg=$('#lbImg');let cur=0,lastFocus=null;
+function show(i,instant){cur=(i+lbList.length)%lbList.length;const it=lbList[cur];
+  const swap=()=>{lbImg.src=I(it.k);lbImg.alt=it.cap||'';$('#lbCap').textContent=it.cap||'';$('#lbCount').textContent=nf(cur+1)+' / '+nf(lbList.length);
+    const pl=$('#lbProject');pl.hidden=!it.project;if(it.project)pl.href='#work-'+it.project;lbImg.classList.remove('swap')};
+  if(instant||RM)swap();else{lbImg.classList.add('swap');setTimeout(swap,220)}}
+function openLB(i,from){if(!lbList.length)return;lastFocus=document.activeElement;show(i,true);lb.hidden=false;lockScroll(true);
+  const src=from&&from.querySelector('img');
+  if(src&&!RM){requestAnimationFrame(()=>{const a=src.getBoundingClientRect(),b=lbImg.getBoundingClientRect();if(!b.width)return;
+    const sc=a.width/b.width;lbImg.style.transition='none';lbImg.style.transform=`translate(${a.left+a.width/2-(b.left+b.width/2)}px,${a.top+a.height/2-(b.top+b.height/2)}px) scale(${sc})`;
+    requestAnimationFrame(()=>{lbImg.style.transition='';lbImg.style.transform=''})})}
+  requestAnimationFrame(()=>lb.classList.add('open'));$('#lbClose').focus()}
+function closeLB(){lb.classList.remove('open');setTimeout(()=>{lb.hidden=true},RM?0:320);lockScroll(false);lastFocus&&lastFocus.focus()}
+$('#lbPrev').onclick=()=>show(cur-1);$('#lbNext').onclick=()=>show(cur+1);$('#lbClose').onclick=closeLB;$('#lbProject').addEventListener('click',closeLB);
+let sx=null;$('#lbStage').addEventListener('pointerdown',e=>{sx=e.clientX});
+$('#lbStage').addEventListener('pointerup',e=>{if(sx==null)return;const d=e.clientX-sx;sx=null;if(Math.abs(d)>50)show(cur+(d<0?1:-1))});
+
+/* ---------- film player shell ---------- */
+const fm=$('#fm');
+function openFilm(i,from){const f=filmList[i];if(!f)return;$('#fmImg').src=I(f.k);
+  const v=$('#fmVid'),url=vsrc(f),has=!!url;v.hidden=!has;$('#fmImg').hidden=has;$('#fmPlay').hidden=has;$('#fmNote').hidden=has;
+  if(has){v.poster=I(f.k);v.src=url;v.onerror=()=>{v.hidden=true;$('#fmImg').hidden=false;$('#fmPlay').hidden=false;$('#fmNote').hidden=false};v.play().catch(()=>{})}$('#fmTitle').textContent=[f.title,f.meta||f.client].filter(Boolean).join(' · ');
+  lastFocus=from;fm.hidden=false;lockScroll(true);requestAnimationFrame(()=>fm.classList.add('open'));$('#fmClose').focus()}
+function closeFM(){const v=$('#fmVid');v.pause();v.removeAttribute('src');v.load();fm.classList.remove('open');setTimeout(()=>{fm.hidden=true},RM?0:320);lockScroll(false);lastFocus&&lastFocus.focus()}
+$('#fmClose').onclick=closeFM;
+
+addEventListener('keydown',e=>{
+  if(!lb.hidden){if(e.key==='Escape')closeLB();if(e.key==='ArrowRight')show(cur+1);if(e.key==='ArrowLeft')show(cur-1)}
+  else if(!fm.hidden&&e.key==='Escape')closeFM();
+  else if(!mnav.hidden&&e.key==='Escape')closeMenu();
+});
+
+/* ---------- header: transparent over a hero, hides on scroll down ---------- */
+const hdr=$('#hdr');let lastY=scrollY;
+function onScroll(){const y=scrollY;const hero=$('.hero,.phero,.nf',app);const h=hero?hero.offsetHeight-hdr.offsetHeight:0;
+  hdr.classList.toggle('over',!!hero&&y<h);
+  const hide=y>Math.max(h,120)&&y>lastY+4;if(hide)hdr.classList.add('hide');else if(y<lastY-4||y<h)hdr.classList.remove('hide');
+  document.body.classList.toggle('hdr-hidden',hdr.classList.contains('hide'));lastY=y}
+addEventListener('scroll',onScroll,{passive:true});
+
+/* ---------- mobile menu ---------- */
+const mnav=$('#mnav'),mb=$('#menuBtn');
+function openMenu(){mnav.hidden=false;mb.setAttribute('aria-expanded','true');lockScroll(true);requestAnimationFrame(()=>mnav.classList.add('open'));$('#menuClose').focus()}
+function closeMenu(){mnav.classList.remove('open');mb.setAttribute('aria-expanded','false');lockScroll(false);setTimeout(()=>{mnav.hidden=true},RM?0:360)}
+mb.onclick=openMenu;$('#menuClose').onclick=()=>{closeMenu();mb.focus()};$$('#mnav a').forEach(a=>a.addEventListener('click',closeMenu));
+
+/* ---------- cookie consent (remembered 6 months) ---------- */
+const ck=$('#cookie'),KEY='cs-consent';
+function getC(){try{const v=JSON.parse(localStorage.getItem(KEY));return v&&v.t>Date.now()-15552e6?v:null}catch(e){return null}}
+function setC(a){try{localStorage.setItem(KEY,JSON.stringify({a,t:Date.now()}))}catch(e){}ck.hidden=true}
+if(!getC())setTimeout(()=>{ck.hidden=false},RM?0:2600);
+$('#ckAccept').onclick=()=>setC(true);$('#ckDecline').onclick=()=>setC(false);$('#cookieSettings').onclick=()=>{ck.hidden=false;$('#ckAccept').focus()};
+
+/* ---------- square pointer ----------
+   A small square; over anything clickable it turns 45 degrees and grows; over a pixel field it takes
+   half the side of the cells the cursor paints. Position is written straight through (no easing) so it never lags. */
+if(matchMedia('(pointer:fine)').matches&&!RM){
+  document.documentElement.classList.add('sq-cursor');
+  const sq=document.createElement('div');sq.className='sq';sq.innerHTML='<i></i>';document.body.appendChild(sq);
+  const CLICK='a,button,[role="button"],label,select,summary,.chip,.pal';
+  let x=-99,y=-99,pend=false,state='';
+  const paint=()=>{pend=false;sq.style.transform=`translate3d(${x}px,${y}px,0)`};
+  addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;x=e.clientX;y=e.clientY;
+    const t=e.target;let st='',size='';
+    if(t.closest&&t.closest('input,textarea'))st='text';
+    else if(t.closest&&t.closest(CLICK))st='click';
+    else{const f=t.closest&&t.closest('[data-field].gl');if(f&&f.dataset.cell){st='field';size=(f.dataset.cell/2).toFixed(1)+'px'}}
+    if(st!==state){sq.dataset.s=st;state=st}
+    sq.style.setProperty('--fs',size||'');sq.classList.add('on');
+    if(!pend){pend=true;requestAnimationFrame(paint)}},{passive:true});
+  document.addEventListener('pointerleave',()=>sq.classList.remove('on'));
+  addEventListener('blur',()=>sq.classList.remove('on'));
+}
+
+/* shell texts (footer, mobile menu) come from the CMS too */
+$$('[data-c]').forEach(el=>{const path=el.dataset.c.split('.');let v=C;for(const k of path)v=v&&v[k];if(v==null||v==='')return;
+  if(el.dataset.attr==='href')el.setAttribute('href',v);else el.textContent=v});
+$$('[data-c-hide]').forEach(el=>{const path=el.dataset.cHide.split('.');let v=C;for(const k of path)v=v&&v[k];if(!v)el.remove()});
+
+go(true);
+})();
+
+</script>
+</body></html>
