@@ -36,7 +36,7 @@ admin_head('Mesaje', 'index');
   <?php foreach ($statuses as $k => $v): ?><a href="?s=<?= $k ?>" class="<?= $f === $k ? 'on' : '' ?>"><?= e($v) ?> <?= $counts[$k] ?? 0 ?></a><?php endforeach ?></div>
   <span class="sp"></span><a class="btn small ghost" href="?export=1">Export CSV</a>
 </div>
-<table class="list"><thead><tr><th>Data</th><th>De la</th><th class="hide-m">Proiect</th><th class="hide-m">Tip</th><th>Status</th></tr></thead><tbody>
+<table class="list"><thead><tr><th>Data</th><th>De la</th><th class="hide-m">Proiect</th><th class="hide-m">Servicii</th><th>Status</th></tr></thead><tbody>
 <?php foreach ($rows as $r): ?>
 <tr style="cursor:pointer" onclick="location='enquiry.php?id=<?= (int) $r['id'] ?>'">
   <td class="muted"><?= e(date('d.m.Y H:i', strtotime((string) $r['created_at']))) ?></td>

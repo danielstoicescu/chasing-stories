@@ -195,9 +195,9 @@ function pixelField(host,img,o){
    ============================================================ */
 const btn=(href,label,cls='')=>`<a class="btn ${cls}" href="#${href}">${label} <i></i></a>`;
 const label=t=>`<span class="label">${t}</span>`;
-function frame(k,alt,{ratio,px,pal}={}){
+function frame(k,alt,{ratio,px,pal,v}={}){
   const [w,h]=DIM(k);const ar=ratio||`${w}/${h}`;
-  return `<div class="frame" data-k="${k}"${pal||PAL_PAGE?' data-pal="1"':''}${px?` data-px="${px}"`:''} style="aspect-ratio:${ar}"><img src="${I(k)}" alt="${esc(alt)}" loading="lazy" width="${w}" height="${h}"></div>`;
+  return `<div class="frame" data-k="${k}"${v?` data-v="${esc(v)}"`:''}${pal||PAL_PAGE?' data-pal="1"':''}${px?` data-px="${px}"`:''} style="aspect-ratio:${ar}"><img src="${I(k)}" alt="${esc(alt)}" loading="lazy" width="${w}" height="${h}"></div>`;
 }
 function projCard(p,cls,land,withSvc){
   const loc=[p.location,p.year].filter(Boolean).join(' · ')||'Location to confirm';
@@ -220,9 +220,9 @@ function logoGrid(){
 }
 function filmBtn(f,i,big){
   const meta=esc(f.meta||[f.client!==f.title?f.client:'',f.loc].filter(Boolean).join(' · ')||f.cat);
-  if(f.project&&byslug(f.project))return `<a class="film linked${big?' big':''}" href="#work-${f.project}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="go" aria-hidden="true">↗</span></div>
+  if(f.project&&byslug(f.project))return `<a class="film linked${big?' big':''}" href="#work-${f.project}"><div class="frame" data-k="${f.k}" data-v="${esc(vsrc(f))}" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="go" aria-hidden="true">↗</span></div>
     <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${meta}</div></div><span class="vp">View project</span></div></a>`;
-  return `<button class="film${big?' big':''}" data-film="${i}"><div class="frame" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></div>
+  return `<button class="film${big?' big':''}" data-film="${i}"><div class="frame" data-k="${f.k}" data-v="${esc(vsrc(f))}" style="aspect-ratio:16/9"><img src="${I(f.k)}" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></div>
     <div class="row"><div><h3>${esc(f.title)}</h3><div class="meta">${meta}</div></div><span class="vp">Play film</span></div></button>`;
 }
 
@@ -280,7 +280,7 @@ PAGES.project=slug=>{
   const i=PROJECTS.indexOf(p),next=PROJECTS[(i+1)%PROJECTS.length];
   const tbc=v=>v?`<span class="v">${esc(v)}</span>`:`<span class="v tbc">To confirm</span>`;
   let vids=[];
-  const vid=(k,v)=>{vids.push({k,video:v||'',title:p.name,meta:p.client});return `<button class="vid" data-film="${vids.length-1}">${frame(k,'',{ratio:'16/9'})}<span class="play" aria-hidden="true"></span></button>`};
+  const vid=(k,v)=>{const f={k,video:v||'',title:p.name,meta:p.client};vids.push(f);return `<button class="vid" data-film="${vids.length-1}">${frame(k,'',{ratio:'16/9',v:vsrc(f)})}<span class="play" aria-hidden="true"></span></button>`};
   const blocks=p.blocks||[];
   const palAt=new Set([0,Math.floor(blocks.length/2)]);
   const b=blocks.map((bl,bi)=>{const pal=palAt.has(bi);const K=[].concat(bl.k);
@@ -294,7 +294,7 @@ PAGES.project=slug=>{
       case 'text':return `<div class="blk blk-text">${paras(bl.text)}</div>`;
     }return ''}).join('');
   return {hero:true,filmList:vids,html:`
-  <section class="phero" data-field="phero">
+  <section class="phero" data-field="phero" data-vk="${esc(p.hero||p.coverL)}" data-vkm="${esc(p.heroM||p.coverV)}">
     <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(p.heroM||p.coverV)}"><img src="${I(p.hero||p.coverL)}" alt="${esc(p.name)}"></picture>
     <div class="scrim"></div>
     <div class="copy"><h1>${esc(p.name)}</h1><span class="loc">${esc(p.location||'Location to confirm')}</span></div>
@@ -356,7 +356,7 @@ PAGES.services=anchor=>({anchor,html:`
 
 PAGES.about=()=>{const A=C.about;const films=[];
   const disc=(A.disc||[]).slice(0,3).map((d,i)=>{const cls='dcard d'+(i+1),ratio=['4/5','16/10','1/1'][i];
-    const inner=`${frame(d.img,d.label+(d.meta?', '+d.meta:''),{ratio})}${d.film?'<span class="play" aria-hidden="true"></span>':''}<div class="dcap"><span class="label">${esc(d.label)}</span><span class="meta">${esc(d.meta||'')}</span></div>`;
+    const inner=`${frame(d.img,d.label+(d.meta?', '+d.meta:''),{ratio,v:d.film?vsrc({k:d.img,video:d.film}):''})}${d.film?'<span class="play" aria-hidden="true"></span>':''}<div class="dcap"><span class="label">${esc(d.label)}</span><span class="meta">${esc(d.meta||'')}</span></div>`;
     if(d.film){films.push({k:d.img,video:d.film,title:d.meta||d.label,meta:''});return `<button class="${cls} vid" data-film="${films.length-1}">${inner}</button>`}
     return d.project&&byslug(d.project)?`<a class="${cls}" href="#work-${d.project}">${inner}</a>`:`<div class="${cls}">${inner}</div>`}).join('');
   return {filmList:films,html:`
@@ -374,24 +374,32 @@ PAGES.about=()=>{const A=C.about;const films=[];
 
 PAGES.contact=project=>{
   const p=project?byslug(project):null;const K=C.contact;
-  const types=K.types&&K.types.length?K.types:['Photography','Film','Photography + Film','Creative Direction','Full Production'];
-  const F=(id,lab,{type='text',req=true,ph='',w=false}={})=>`<div class="field${w?' w':''}"><label for="${id}">${lab}${req?'':' <span class="opt">(optional)</span>'}</label>
-    <input id="${id}" name="${id}" type="${type}" ${req?'required':''} placeholder="${esc(ph)}" autocomplete="${type==='email'?'email':id==='f-name'?'name':id==='f-company'?'organization':'off'}"><span class="err" aria-live="polite"></span></div>`;
+  const want=(p&&p.services||[]).map(x=>x.toLowerCase());
+  const F=(id,lab,{type='text',req=true,hint='',ac='off',area=false}={})=>`<div class="field fl${area?' w':''}">
+    ${area?`<textarea id="${id}" name="${id}" ${req?'required':''} placeholder=" " rows="4" maxlength="4000"></textarea>`:`<input id="${id}" name="${id}" type="${type}" ${req?'required':''} placeholder=" " autocomplete="${ac}">`}
+    <label for="${id}">${lab}${req?'':' <span class="opt">optional</span>'}</label>${hint?`<span class="hint">${esc(hint)}</span>`:''}<span class="err" aria-live="polite"></span></div>`;
+  const step=(n,t,sub,body)=>`<fieldset class="step" data-step="${n}"><legend><span class="lg"><span class="n">0${n}</span><span class="t">${t}</span>${sub?`<span class="s">${sub}</span>`:''}<i class="st-px" aria-hidden="true"></i></span></legend>${body}</fieldset>`;
   return {html:`
   <section class="contact"><div class="wrap grid">
     <div class="l"><h1>${esc(K.title)}</h1>
       <p class="intro-t">${esc(K.intro)}</p>
-      <form class="form" id="enq" novalidate>
-        ${F('f-name','Name')}${F('f-company','Company / Brand')}
-        ${F('f-email','Email',{type:'email'})}${F('f-web','Website / Instagram',{req:false,ph:'e.g. www.yourhotel.com or @yourhotel'})}
-        ${F('f-loc','Project location',{ph:'City, country'})}${F('f-dates','Preferred dates',{req:false,ph:'e.g. March 2027, flexible'})}
-        <div class="field w"><label for="f-type">Project type</label><select id="f-type" name="f-type" required><option value="">Select</option>${types.map(t=>`<option>${esc(t)}</option>`).join('')}</select><span class="err" aria-live="polite"></span></div>
-        <div class="field w"><label for="f-details">Project details</label><textarea id="f-details" name="f-details" required placeholder="Tell us about the property, the goal and what you have in mind."></textarea><span class="err" aria-live="polite"></span></div>
+      <form class="form enq" id="enq" novalidate>
+        ${step(1,'What do you need?','Select all that apply',`<div class="picks" role="group" aria-label="Services" aria-describedby="typeErr">${SERVICES.map(s=>`
+          <label class="pick"><input type="checkbox" name="f-type[]" value="${esc(s.name)}"${want.includes(s.name.toLowerCase())?' checked':''}>
+            <span class="pk-img"><img src="${I(s.img)}" alt="" loading="lazy"><span class="pk-pal" aria-hidden="true"></span></span>
+            <span class="pk-t"><b>${esc(s.name)}</b><small>${esc(s.short||'')}</small></span><span class="pk-box" aria-hidden="true"></span></label>`).join('')}
+          </div><span class="err" id="typeErr" aria-live="polite"></span>`)}
+        ${step(2,'Where and when','',`<div class="two">${F('f-loc','Project location',{hint:'City, country or the property itself'})}${F('f-dates','Preferred dates',{req:false,hint:'A month, a season, or flexible'})}</div>
+          <div class="chips" role="group" aria-label="Quick dates">${['Flexible','Within 3 months','Later this year','Next year'].map(c=>`<button type="button" class="chip" data-v="${c}">${c}</button>`).join('')}</div>`)}
+        ${step(3,'About you','',`<div class="two">${F('f-name','Name',{ac:'name'})}${F('f-company','Company / Brand',{ac:'organization'})}${F('f-email','Email',{type:'email',ac:'email'})}${F('f-web','Website / Instagram',{req:false,hint:'www.yourhotel.com or @yourhotel'})}</div>`)}
+        ${step(4,'The story','',`${F('f-details','Project details',{area:true,hint:'The property, the goal, the audience, anything you already have in mind.'})}<span class="count meta" aria-hidden="true"><b>0</b> / 4000</span>`)}
         <input type="hidden" name="source" value="${esc(p?'project:'+p.slug:'contact')}">
         <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website_url" tabindex="-1" autocomplete="off"></label></div>
-        <label class="consent"><input type="checkbox" id="f-consent" required><span>I agree to ${esc(C.brand)} processing my details to respond to this enquiry. <a href="#privacy">Privacy Policy</a></span></label>
-        <div class="field w" style="margin-top:-18px"><span class="err" id="consentErr" aria-live="polite"></span></div>
-        <div class="actions"><button class="btn" type="submit">Send enquiry <i></i></button>${p?`<span class="meta">About: ${esc(p.name)}</span>`:''}</div>
+        <div class="send">
+          <label class="consent"><input type="checkbox" id="f-consent" required><span>I agree to ${esc(C.brand)} processing my details to respond to this enquiry. <a href="#privacy">Privacy Policy</a></span></label>
+          <span class="err" id="consentErr" aria-live="polite"></span>
+          <div class="actions"><button class="btn" type="submit"><span class="bl">Send enquiry</span> <i></i></button>${p?`<span class="meta">About: ${esc(p.name)}</span>`:''}</div>
+        </div>
       </form>
       <div class="direct"><span class="label">Direct contact</span>
         ${K.email?`<span>Email: <span style="user-select:all">${esc(K.email)}</span></span>`:''}
@@ -399,7 +407,19 @@ PAGES.contact=project=>{
         ${K.linkedin?`<a href="${esc(K.linkedin)}" target="_blank" rel="noopener">LinkedIn ↗</a>`:''}
         <span class="meta">${esc(C.available)}</span></div>
     </div>
-    <div class="r">${frame(C.img.contact,K.imgAlt,{ratio:'4/5'})}</div>
+    <aside class="r brief" aria-label="Your brief">
+      <div class="bf-img">${frame(C.img.contact,K.imgAlt,{ratio:'1/1'})}<div class="bf-mosaic" aria-hidden="true"></div></div>
+      <div class="bf-card">
+        <div class="bf-head"><span class="label">Your brief</span><span class="bf-prog" aria-hidden="true">${'<i></i>'.repeat(6)}</span><span class="meta bf-count">0 / 6</span></div>
+        <dl>
+          <div><dt>For</dt><dd data-b="f-company" class="empty">Your brand</dd></div>
+          <div><dt>Services</dt><dd data-b="svc" class="empty">Choose one or more</dd></div>
+          <div><dt>Where</dt><dd data-b="f-loc" class="empty">Location</dd></div>
+          <div><dt>When</dt><dd data-b="f-dates" class="empty">Flexible</dd></div>
+        </dl>
+        ${p?`<p class="meta bf-about">Enquiry about ${esc(p.name)}</p>`:''}
+      </div>
+    </aside>
   </div></section><div style="height:clamp(80px,10vw,160px)"></div>`};
 };
 
@@ -534,7 +554,7 @@ function hydrate(first){
     nf:{cols:24,colsM:10,density:0,box:[0,0,0,0],dark:.45}};
   $$('[data-field]',app).forEach(host=>{const o=FIELDS[host.dataset.field];const img=host.querySelector('picture img, img');
     const start=()=>loaded(img).then(im=>{if(!im||!host.isConnected)return;const d=pixelField(host,im,o);if(d)cleanups.push(d);
-      if(host.dataset.field==='hero')heroLoop(host,d)});
+      if(host.dataset.field==='hero'||host.dataset.field==='phero')heroLoop(host,d)});
     const ob=new IntersectionObserver(es=>{if(es[0].isIntersecting){ob.disconnect();start()}},{rootMargin:'300px'});ob.observe(host);cleanups.push(()=>ob.disconnect())});
 
   // services list: marker takes a colour from its photograph; image trails the cursor, softly
@@ -551,6 +571,9 @@ function hydrate(first){
   // horizontal rails driven by vertical scroll
   $$('.hscroll',app).forEach(sec=>{const d=hRail(sec);if(d)cleanups.push(d)});
 
+  // films play where their thumbnails are: muted, looping, only while on screen
+  ambient();
+
   // lightbox + film triggers
   $$('[data-lb]',app).forEach(b=>b.addEventListener('click',()=>openLB(+b.dataset.lb,b)));
   $$('[data-film]',app).forEach(b=>b.addEventListener('click',e=>{if(e.target.closest('[data-stop]'))return;openFilm(+b.dataset.film,b)}));
@@ -563,14 +586,34 @@ function hydrate(first){
 
 /* hero loop: the [SMALL] master from Drive, muted and looping; drives the WebGL field when there is one */
 function heroLoop(host,field){
-  if(RM)return;const portrait=innerWidth<760&&innerHeight>innerWidth;const url=(portrait?C.video.heroM||C.video.hero:C.video.hero)||videoURL(portrait?'hero-m':'hero');if(!url)return;
+  if(RM)return;const portrait=innerWidth<760&&innerHeight>innerWidth;
+  const url=host.dataset.vk!=null?(portrait&&videoURL(host.dataset.vkm))||videoURL(host.dataset.vk):(portrait?C.video.heroM||C.video.hero:C.video.hero)||videoURL(portrait?'hero-m':'hero');if(!url)return;
   const v=document.createElement('video');Object.assign(v,{muted:true,loop:true,playsInline:true,autoplay:true,preload:'auto'});
   v.setAttribute('muted','');v.setAttribute('playsinline','');v.crossOrigin='anonymous';v.className='hero-vid';v.src=url;
   host.querySelector('picture').appendChild(v);
-  v.addEventListener('playing',()=>{if(!host.isConnected)return;if(field&&field.useVideo){try{field.useVideo(v)}catch(e){v.classList.add('on')}}else v.classList.add('on')},{once:true});
+  // a portrait film stretched over a landscape hero (or the reverse) looks soft: keep the photograph instead
+  v.addEventListener('loadedmetadata',()=>{const hr=host.offsetWidth/Math.max(1,host.offsetHeight),vr=v.videoWidth/Math.max(1,v.videoHeight);
+    if((hr>1)!==(vr>1)&&Math.max(hr/vr,vr/hr)>1.6){v.pause();v.removeAttribute('src');v.load();v.remove()}},{once:true});
+  v.addEventListener('playing',()=>{if(!host.isConnected||!v.isConnected)return;if(field&&field.useVideo){try{field.useVideo(v)}catch(e){v.classList.add('on')}}else v.classList.add('on')},{once:true});
   v.addEventListener('error',()=>v.remove(),{once:true});
   v.play().catch(()=>{});
   cleanups.push(()=>{v.pause();v.removeAttribute('src');v.load();v.remove()});
+}
+
+/* thumbnails that have a film become the film: it fades in over the poster when the frame is on screen, pauses when it leaves */
+function ambient(){
+  if(RM||!('IntersectionObserver' in window)||(navigator.connection&&navigator.connection.saveData))return;
+  const hosts=$$('.frame',app).filter(f=>!f.closest('[data-field]')&&(f.dataset.v||videoURL(f.dataset.k)));if(!hosts.length)return;
+  const io=new IntersectionObserver(es=>es.forEach(e=>{const f=e.target;let v=f.querySelector('video.amb');
+    if(e.isIntersecting){
+      if(!v){v=document.createElement('video');Object.assign(v,{muted:true,loop:true,playsInline:true,preload:'auto'});v.setAttribute('muted','');v.setAttribute('playsinline','');
+        v.className='amb';v.setAttribute('aria-hidden','true');v.src=f.dataset.v||videoURL(f.dataset.k);
+        v.addEventListener('playing',()=>v.classList.add('on'),{once:true});v.addEventListener('error',()=>v.remove(),{once:true});
+        const img=f.querySelector('img');img?img.after(v):f.prepend(v)}
+      v.play().catch(()=>{})}
+    else if(v)v.pause()}),{threshold:.3});
+  hosts.forEach(f=>io.observe(f));
+  cleanups.push(()=>{io.disconnect();hosts.forEach(f=>{const v=f.querySelector('video.amb');if(v){v.pause();v.removeAttribute('src');v.load();v.remove()}})});
 }
 
 /* words wrapped once, so each can rise out of a blur on its own delay */
@@ -612,24 +655,65 @@ function rollLinks(els){els.forEach(a=>{if(a.dataset.roll||a.children.length)ret
 
 /* ---------- form ---------- */
 function wireForm(form){
+  const picks=$$('.pick',form),boxes=picks.map(l=>l.querySelector('input')),brief=$('.brief',app),chips=$$('.chip',form);
+  const REQ=['f-loc','f-name','f-company','f-email','f-details'];
+  const EMPTY={'f-company':'Your brand','svc':'Choose one or more','f-loc':'Location','f-dates':'Flexible'};
+  const okEmail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   const check=el=>{const f=el.closest('.field');if(!f)return true;const e=f.querySelector('.err');let msg='';
     if(el.required&&!el.value.trim())msg='Please fill in this field.';
-    else if(el.type==='email'&&el.value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value))msg='Please enter a valid email address.';
+    else if(el.type==='email'&&el.value&&!okEmail(el.value.trim()))msg='Please enter a valid email address.';
     f.classList.toggle('bad',!!msg);e.textContent=msg;return !msg};
-  $$('input,select,textarea',form).forEach(el=>el.addEventListener('blur',()=>{if(el.type!=='checkbox'&&el.type!=='hidden')check(el)}));
+  const checkSvc=()=>{const ok=boxes.some(b=>b.checked);$('#typeErr',form).textContent=ok?'':'Choose at least one service.';$('.picks',form).classList.toggle('bad',!ok);return ok};
+  // each service tile carries the palette of its photograph
+  const pal={};picks.forEach(l=>{const im=l.querySelector('img'),v=l.querySelector('input').value;
+    loaded(im).then(x=>{if(!x)return;const c=palette(x,6);pal[v]=c;l.querySelector('.pk-pal').innerHTML=c.slice(0,4).map((k,i)=>`<i style="background:${k};--d:${i}"></i>`).join('');mosaic()})});
+  const chosen=()=>boxes.filter(b=>b.checked).map(b=>b.value);
+  function mosaic(){if(!brief)return;const m=$('.bf-mosaic',brief);const have=new Set($$('.bf-row',m).map(r=>r.dataset.v));const now=chosen();
+    $$('.bf-row',m).forEach(r=>{if(!now.includes(r.dataset.v)){r.classList.add('out');setTimeout(()=>r.remove(),380)}});
+    now.forEach(v=>{if(have.has(v)||!pal[v])return;const r=document.createElement('div');r.className='bf-row';r.dataset.v=v;
+      r.innerHTML=pal[v].slice(0,4).map((k,i)=>`<i style="background:${k};--d:${i}"></i>`).join('');m.appendChild(r)})}
+  const setDD=(key,val)=>{if(!brief)return;const d=$(`[data-b="${key}"]`,brief);if(!d)return;const txt=val||EMPTY[key];if(d.textContent===txt)return;
+    d.textContent=txt;d.classList.toggle('empty',!val);d.classList.remove('tick');void d.offsetWidth;d.classList.add('tick')};
+  function sync(){
+    const svc=chosen();setDD('svc',svc.join(' + '));picks.forEach(l=>l.classList.toggle('on',l.querySelector('input').checked));
+    ['f-company','f-loc','f-dates'].forEach(id=>setDD(id,$('#'+id,form).value.trim()));
+    const done=[svc.length>0,...REQ.map(id=>{const v=$('#'+id,form).value.trim();return id==='f-email'?okEmail(v):!!v})];
+    const n=done.filter(Boolean).length;
+    if(brief){$$('.bf-prog i',brief).forEach((i,k)=>i.classList.toggle('on',k<n));$('.bf-count',brief).textContent=n+' / 6'}
+    const stepOk={1:done[0],2:done[1],3:done[2]&&done[3]&&done[4],4:done[5]};
+    $$('.step',form).forEach(f=>f.classList.toggle('done',!!stepOk[f.dataset.step]));
+    const t=$('#f-details',form);$('.count b',form).textContent=t.value.length;
+    mosaic()}
+  boxes.forEach(b=>b.addEventListener('change',()=>{if($('.picks',form).classList.contains('bad'))checkSvc();sync()}));
+  chips.forEach(c=>c.addEventListener('click',()=>{const d=$('#f-dates',form),on=!c.classList.contains('on');chips.forEach(x=>x.classList.remove('on'));
+    if(on){c.classList.add('on');d.value=c.dataset.v}else d.value='';sync()}));
+  $('#f-dates',form).addEventListener('input',e=>chips.forEach(x=>x.classList.toggle('on',x.dataset.v===e.target.value)));
+  const ta=$('#f-details',form);const grow=()=>{ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight+2,560)+'px'};ta.addEventListener('input',grow);
+  $$('input,textarea',form).forEach(el=>{el.addEventListener('input',()=>{sync();if(el.closest('.field.bad'))check(el)});
+    el.addEventListener('blur',()=>{if(el.type!=='checkbox'&&el.type!=='hidden'&&el.name!=='website_url')check(el)})});
+  sync();
+
   form.addEventListener('submit',e=>{e.preventDefault();let ok=true,first=null;
-    $$('input:not([type=hidden]):not([type=checkbox]),select,textarea',form).forEach(el=>{if(!check(el)){ok=false;first=first||el}});
-    const c=$('#f-consent',form);$('#consentErr').textContent=c.checked?'':'Please confirm you agree so we can reply.';if(!c.checked){ok=false;first=first||c}
-    if(!ok){first.focus();return}
-    const done=(ok,msg)=>{form.innerHTML=`<div class="form-msg${ok?'':' bad'}" role="status"><div>${msg}</div></div>`};
-    if(!(SITE_DATA&&SITE_DATA.api)){done(true,`<strong>Thank you.</strong> ${esc(C.contact.success)}<br><span class="meta">Prototype: nothing was sent. The live site posts this to the studio inbox.</span>`);return}
-    const btnS=form.querySelector('button[type=submit]');btnS.disabled=true;btnS.style.opacity=.5;
-    const fd=new FormData(form);fd.set('consent',$('#f-consent',form).checked?'1':'');fd.set('page',location.pathname+location.search);
+    if(!checkSvc()){ok=false;first=boxes[0]}
+    $$('.field input,.field textarea',form).forEach(el=>{if(!check(el)){ok=false;first=first||el}});
+    const c=$('#f-consent',form);$('#consentErr',form).textContent=c.checked?'':'Please confirm you agree so we can reply.';if(!c.checked){ok=false;first=first||c}
+    if(!ok){first.focus({preventScroll:true});(first.closest('.step,.send')||first).scrollIntoView({behavior:RM?'auto':'smooth',block:'center'});return}
+    const svc=chosen(),name=$('#f-name',form).value.trim().split(/\s+/)[0],where=$('#f-loc',form).value.trim();
+    const cols=svc.flatMap(v=>(pal[v]||[]).slice(0,4));while(cols.length<12)cols.push(['var(--lagoon)','var(--ink)','var(--line)'][cols.length%3]);
+    const done=(ok,msg)=>{if(ok){form.innerHTML=`<div class="form-ok" role="status"><div class="ok-px" aria-hidden="true">${cols.slice(0,12).map((k,i)=>`<i style="background:${k};--d:${i}"></i>`).join('')}</div>
+        <h2>Thank you${name?', '+esc(name):''}.</h2><p>${msg}</p><p class="meta">${esc([svc.join(' + '),where].filter(Boolean).join(' · '))}</p></div>`;
+        if(brief){brief.classList.add('sent');$('.bf-head .label',brief).textContent='Brief sent'}
+        form.scrollIntoView({behavior:RM?'auto':'smooth',block:'center'})}
+      else form.insertAdjacentHTML('beforeend',`<div class="form-msg bad" role="status"><div>${msg}</div></div>`)};
+    if(!(SITE_DATA&&SITE_DATA.api)){done(true,`${esc(C.contact.success)}<br><span class="meta">Prototype: nothing was sent. The live site posts this to the studio inbox.</span>`);return}
+    const btnS=form.querySelector('button[type=submit]'),bl=btnS.querySelector('.bl');btnS.disabled=true;btnS.classList.add('sending');bl.textContent='Sending';
+    const reset=()=>{btnS.disabled=false;btnS.classList.remove('sending');bl.textContent='Send enquiry'};
+    const fd=new FormData(form);fd.set('consent',c.checked?'1':'');fd.set('page',location.pathname+location.search);
     fetch(SITE_DATA.api,{method:'POST',body:fd,headers:{'X-Requested-With':'fetch'}}).then(r=>r.json().catch(()=>({ok:false}))).then(j=>{
-      if(j&&j.ok)done(true,`<strong>Thank you.</strong> ${esc(C.contact.success)}`);
-      else{btnS.disabled=false;btnS.style.opacity='';const er=form.querySelector('.form-err')||form.insertAdjacentElement('beforeend',Object.assign(document.createElement('p'),{className:'form-err'}));
+      if(j&&j.ok)done(true,esc(C.contact.success));
+      else{reset();const er=form.querySelector('.form-err')||form.insertAdjacentElement('beforeend',Object.assign(document.createElement('p'),{className:'form-err'}));
         er.textContent=(j&&j.error)||('Something went wrong. Please try again or write to us at '+(C.contact.email||'')+'.')}
-    }).catch(()=>{btnS.disabled=false;btnS.style.opacity='';done(false,'Something went wrong. Please try again or write to us at '+esc(C.contact.email||'')+'.')})});
+    }).catch(()=>{reset();done(false,'Something went wrong. Please try again or write to us at '+esc(C.contact.email||'')+'.')})});
 }
 
 /* ---------- lightbox ---------- */
@@ -653,7 +737,8 @@ $('#lbStage').addEventListener('pointerup',e=>{if(sx==null)return;const d=e.clie
 const fm=$('#fm');
 function openFilm(i,from){const f=filmList[i];if(!f)return;$('#fmImg').src=I(f.k);
   const v=$('#fmVid'),url=vsrc(f),has=!!url;v.hidden=!has;$('#fmImg').hidden=has;$('#fmPlay').hidden=has;$('#fmNote').hidden=has;
-  if(has){v.poster=I(f.k);v.src=url;v.onerror=()=>{v.hidden=true;$('#fmImg').hidden=false;$('#fmPlay').hidden=false;$('#fmNote').hidden=false};v.play().catch(()=>{})}$('#fmTitle').textContent=[f.title,f.meta||f.client].filter(Boolean).join(' · ');
+  if(has){v.poster=I(f.k);v.src=url;const amb=from&&from.querySelector&&from.querySelector('video.amb');const t0=amb&&amb.currentTime>1?amb.currentTime:0;
+    if(t0)v.addEventListener('loadedmetadata',()=>{try{v.currentTime=t0}catch(e){}},{once:true});v.onerror=()=>{v.hidden=true;$('#fmImg').hidden=false;$('#fmPlay').hidden=false;$('#fmNote').hidden=false};v.play().catch(()=>{})}$('#fmTitle').textContent=[f.title,f.meta||f.client].filter(Boolean).join(' · ');
   lastFocus=from;fm.hidden=false;lockScroll(true);requestAnimationFrame(()=>fm.classList.add('open'));$('#fmClose').focus()}
 function closeFM(){const v=$('#fmVid');v.pause();v.removeAttribute('src');v.load();fm.classList.remove('open');setTimeout(()=>{fm.hidden=true},RM?0:320);lockScroll(false);lastFocus&&lastFocus.focus()}
 $('#fmClose').onclick=closeFM;

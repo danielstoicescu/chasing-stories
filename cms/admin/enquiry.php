@@ -30,7 +30,7 @@ $subject = rawurlencode('Re: your enquiry' . ($r['location'] ? ' (' . $r['locati
 <section class="card enq"><header><h2><?= e(date('d.m.Y H:i', strtotime((string) $r['created_at']))) ?></h2></header>
 <dl>
 <?php foreach (['Nume' => 'name', 'Companie / brand' => 'company', 'Email' => 'email', 'Website / Instagram' => 'website', 'Locația proiectului' => 'location',
-    'Date preferate' => 'dates', 'Tip proiect' => 'type', 'A venit din' => 'source', 'Pagina' => 'page'] as $label => $k):
+    'Date preferate' => 'dates', 'Servicii' => 'type', 'A venit din' => 'source', 'Pagina' => 'page'] as $label => $k):
     if ((string) $r[$k] === '') continue; ?>
   <dt><?= e($label) ?></dt><dd><?= $k === 'email' ? '<a href="mailto:' . e($r[$k]) . '?subject=' . $subject . '">' . e($r[$k]) . '</a>' : e($r[$k]) ?></dd>
 <?php endforeach ?>

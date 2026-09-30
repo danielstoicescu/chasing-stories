@@ -36,10 +36,10 @@ const q = await b.newPage(); q.on('pageerror', e => problems.push('site JS ' + e
 await q.goto(BASE + '/contact?project=palau'); await q.waitForTimeout(1500);
 await q.evaluate(() => document.getElementById('cookie').hidden = true);
 for (const [id, v] of [['f-name', 'Test Person'], ['f-company', 'Test Resort'], ['f-email', 'test@example.com'], ['f-loc', 'Bali, Indonesia'], ['f-details', 'Smoke test enquiry from the automated check.']]) await q.fill('#' + id, v);
-await q.selectOption('#f-type', { index: 1 }); await q.check('#f-consent'); await q.click('#enq button[type=submit]');
-await q.waitForSelector('.form-msg', { timeout: 10000 }); console.log('form result:', (await q.textContent('.form-msg')).trim().slice(0, 80));
+await q.click('.pick >> nth=0'); await q.click('.pick >> nth=4'); await q.check('#f-consent'); await q.click('#enq button[type=submit]');
+await q.waitForSelector('.form-ok, .form-msg, .form-err', { timeout: 10000 }); await q.screenshot({ path: path.join(OUT, 'form-ok.png') }); console.log('form result:', (await q.textContent('.form-ok, .form-msg, .form-err')).trim().slice(0, 80));
 await p.goto(BASE + '/admin/index.php'); const inbox = await p.content();
-console.log('enquiry in inbox:', inbox.includes('Test Resort'));
+console.log('enquiry in inbox:', inbox.includes('Test Resort'), (inbox.match(/Test Resort[\s\S]{0,400}?hide-m">([^<]*)<\/td>\s*<td/)||[])[1]);
 await p.screenshot({ path: path.join(OUT, 'adm-inbox.png') });
 console.log(problems.length ? 'PROBLEMS:\n' + problems.join('\n') : 'no PHP/JS errors');
 await b.close();

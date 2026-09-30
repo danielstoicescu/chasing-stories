@@ -12,3 +12,5 @@ cms/cache/*
 cms/uploads/*
 !cms/uploads/.htaccess
 tools/php/
+assets/video/
+cms/assets/video

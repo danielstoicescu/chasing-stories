@@ -224,7 +224,7 @@ function mail_enquiry_team(array $r): array
 {
     $rows = [
         'Name' => $r['name'], 'Company / Brand' => $r['company'], 'Email' => $r['email'], 'Website / Instagram' => $r['website'],
-        'Project location' => $r['location'], 'Preferred dates' => $r['dates'], 'Project type' => $r['type'], 'Came from' => $r['source'],
+        'Project location' => $r['location'], 'Preferred dates' => $r['dates'], 'Services' => $r['type'], 'Came from' => $r['source'],
     ];
     $t = '<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:18px">';
     foreach ($rows as $k => $v) {

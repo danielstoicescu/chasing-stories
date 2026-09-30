@@ -33,6 +33,7 @@ const VIDEOS = {
  "hero": "13P3Bn-ti-XY5RMdTh9mI4I1y0wEbnQCe",
  "hero-m": "13P3Bn-ti-XY5RMdTh9mI4I1y0wEbnQCe"
 };
-// Where the web versions live. Empty until hosting is decided: the player then shows the poster.
-const VIDEO_BASE = '';
+// Web versions (720p H.264, tools/encode_videos.sh) live on the client's server. On the server itself they are same-origin;
+// every other build (prototype, test deploy) streams them from there (CORS is open for .mp4 in .htaccess).
+const VIDEO_BASE = (window.SITE_DATA && window.SITE_DATA.routing === 'path') ? '/assets/video' : 'https://www.chasingstories.org/assets/video';
 const videoURL = k => (VIDEO_BASE && VIDEOS[k]) ? `${VIDEO_BASE}/${k}.mp4` : '';

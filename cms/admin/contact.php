@@ -12,8 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('contact.php');
     }
     save_copy_from_post($keys);
-    $types = array_values(array_filter(array_map('trim', explode("\n", (string) ($_POST['types'] ?? '')))));
-    $pairs = ['copy.contact.types' => $types];
+    $pairs = [];
     $to = array_filter(array_map('trim', explode(',', (string) ($_POST['mail_to'] ?? ''))));
     $bad = array_filter($to, fn($x) => !filter_var($x, FILTER_VALIDATE_EMAIL));
     if ($bad) {
@@ -54,7 +53,7 @@ admin_head('Contact și email', 'contact');
 <?= cimg('img.contact', 'Imagine laterală (4:5)') ?>
 <?= cf('contact.intro', 'Intro', 'Include timpul de răspuns.', 'area', ['rows' => 3]) ?>
 <?= cf('contact.success', 'Mesaj după trimitere', '', 'area', ['rows' => 2]) ?>
-<?= f_area('types', 'Opțiunile de la „Project type”', implode("\n", setting_json('copy.contact.types', [])), 'Câte una pe rând.', 5) ?>
+<p class="muted" style="margin:0">Opțiunile de la „What do you need?” (selecție multiplă) sunt serviciile din <a href="services.php">Cele șase servicii</a>, cu pozele lor.</p>
 <?= cf('contact.imgAlt', 'Descrierea imaginii (alt)') ?>
 <?= card_close() ?>
 

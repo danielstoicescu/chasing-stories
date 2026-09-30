@@ -14,7 +14,10 @@ $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if ($origin !== '' && parse_url($origin, PHP_URL_HOST) !== parse_url(site_base(), PHP_URL_HOST)) {
     json_out(403, ['ok' => false, 'error' => 'Not allowed.']);
 }
-$in = fn(string $k, int $max = 190) => mb_substr(trim((string) ($_POST[$k] ?? '')), 0, $max);
+$in = fn(string $k, int $max = 190) => is_array($_POST[$k] ?? null) ? '' : mb_substr(trim((string) ($_POST[$k] ?? '')), 0, $max);
+// services are a multi-select (f-type[]); older clients send one string
+$types = $_POST['f-type'] ?? '';
+$types = is_array($types) ? implode(', ', array_filter(array_map(fn($x) => trim((string) $x), $types), 'strlen')) : trim((string) $types);
 
 // the hidden field real people never see; bots fill it. Pretend success.
 if ($in('website_url') !== '') {
@@ -26,11 +29,11 @@ if (!rate_ok('enquiry', 5, 600)) {
 
 $r = [
     'name' => $in('f-name'), 'company' => $in('f-company'), 'email' => $in('f-email'), 'website' => $in('f-web', 255),
-    'location' => $in('f-loc'), 'dates' => $in('f-dates'), 'type' => $in('f-type', 120), 'details' => $in('f-details', 8000),
+    'location' => $in('f-loc'), 'dates' => $in('f-dates'), 'type' => mb_substr($types, 0, 120), 'details' => $in('f-details', 8000),
     'source' => $in('source'), 'page' => $in('page', 255),
 ];
 $missing = [];
-foreach (['name' => 'Name', 'company' => 'Company / Brand', 'email' => 'Email', 'location' => 'Project location', 'type' => 'Project type', 'details' => 'Project details'] as $k => $label) {
+foreach (['name' => 'Name', 'company' => 'Company / Brand', 'email' => 'Email', 'location' => 'Project location', 'type' => 'Services', 'details' => 'Project details'] as $k => $label) {
     if ($r[$k] === '') {
         $missing[] = $label;
     }
