@@ -13,7 +13,7 @@
     const list = items.filter(it => (want === 'video' ? it.kind === 'video' : want === 'logo' ? it.kind !== 'video' : it.kind === 'image'))
       .filter(it => !q || (it.name + ' ' + it.ref).toLowerCase().includes(q));
     grid.innerHTML = list.map(it => `<button type="button" class="pk-item ${it.kind === 'logo' ? 'logo' : ''} ${it.kind === 'video' ? 'vid' : ''}" data-ref="${it.ref}" data-url="${it.url}" title="${it.name}">
-      ${it.kind === 'video' ? '' : `<img src="${it.thumb || it.url}" alt="" loading="lazy">`}<span>${it.name}</span></button>`).join('') || '<p class="muted">Nimic aici încă. Încarcă un fișier.</p>';
+      ${it.kind === 'video' ? '' : `<img src="${it.thumb || it.url}" alt="" loading="lazy" decoding="async">`}<span>${it.name}</span></button>`).join('') || '<p class="muted">Nimic aici încă. Încarcă un fișier.</p>';
   }
   async function open(field) { target = field; pk.hidden = false; search.value = ''; grid.innerHTML = '<p class="muted">Se încarcă…</p>'; await load(); render(); search.focus() }
   function choose(ref, url) {
