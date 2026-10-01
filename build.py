@@ -4,7 +4,7 @@
   python3 build.py --dev    -> dist/dev.html    (same page, images loaded from ../assets for quick iteration)
   python3 build.py --web    -> public/          (what the server serves: index.html + assets/ as files)
 """
-import base64, json, os, re, sys
+import subprocess, base64, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 dev = '--dev' in sys.argv
@@ -67,6 +67,7 @@ if cms:
             shutil.copy(src_f, os.path.join(A, f))
     for f in logos:
         shutil.copy(os.path.join(ROOT, 'assets', 'logo', f), os.path.join(A, 'logo', f))
+    subprocess.run([sys.executable, os.path.join(ROOT, 'tools', 'make_thumbs.py')], check=False)
     open(os.path.join(A, 'favicon.svg'), 'w').write('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 3"><rect width="3" height="3" fill="#0F1514"/><rect x="0" y="2" width="1" height="1" fill="#fff"/><rect x="1" y="1" width="1" height="1" fill="#fff"/><rect x="2" y="0" width="1" height="1" fill="#fff"/></svg>')
     # 3. starting content for the installer
     subprocess.run(['node', os.path.join(ROOT, 'tools', 'make_seed.mjs')], check=True)

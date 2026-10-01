@@ -20,7 +20,8 @@ foreach (db()->query('SELECT * FROM ' . t('media') . ' ORDER BY id DESC') as $m)
     $items[] = ['ref' => $m['path'], 'url' => $m['path'], 'thumb' => $m['path'], 'name' => $m['original'] ?: basename($m['path']), 'kind' => $m['kind']];
 }
 foreach (array_keys(asset_manifest()) as $k) {
-    $items[] = ['ref' => $k, 'url' => '/assets/' . $k . '.webp', 'thumb' => '/assets/' . $k . '.webp', 'name' => $k, 'kind' => 'image'];
+    $thumb = is_file(CS_ROOT . '/assets/thumb/' . $k . '.webp') ? '/assets/thumb/' . $k . '.webp' : '/assets/' . $k . '.webp';
+    $items[] = ['ref' => $k, 'url' => '/assets/' . $k . '.webp', 'thumb' => $thumb, 'name' => $k, 'kind' => 'image'];
 }
 foreach (glob(CS_ROOT . '/assets/logo/*') ?: [] as $f) {
     $b = basename($f);
