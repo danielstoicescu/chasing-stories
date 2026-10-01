@@ -4,9 +4,11 @@
   const CSRF = document.body.dataset.csrf;
 
   /* ---------------- media picker ---------------- */
-  const pk = $('#picker'), grid = $('#pkGrid'), search = $('#pkSearch');
-  let items = null, target = null;
-  const load = async () => { if (items) return items; const r = await fetch('media_api.php?list=1', { credentials: 'same-origin' }); items = (await r.json()).items || []; return items };
+  const pk = $('#picker'), grid = $('#pkGrid'), search = $('#pkSearch'), status = $('#pkStatus');
+  let items = null, target = null, MAXB = 0;
+  const load = async () => { if (items) return items; const r = await fetch('media_api.php?list=1', { credentials: 'same-origin' }); const j = await r.json(); items = j.items || []; MAXB = j.max || 0; return items };
+  const mb = b => (b / 1048576).toFixed(b < 10485760 ? 1 : 0) + ' MB';
+  const say = (msg, bad) => { if (!status) return; status.hidden = !msg; status.className = 'pk-status' + (bad ? ' bad' : ''); status.innerHTML = msg || '' };
   const kindOf = el => el.dataset.kind || 'image';
   function render() {
     const want = target ? kindOf(target) : 'image', q = (search.value || '').toLowerCase();
@@ -15,7 +17,7 @@
     grid.innerHTML = list.map(it => `<button type="button" class="pk-item ${it.kind === 'logo' ? 'logo' : ''} ${it.kind === 'video' ? 'vid' : ''}" data-ref="${it.ref}" data-url="${it.url}" title="${it.name}">
       ${it.kind === 'video' ? '' : `<img src="${it.thumb || it.url}" alt="" loading="lazy" decoding="async">`}<span>${it.name}</span></button>`).join('') || '<p class="muted">Nimic aici încă. Încarcă un fișier.</p>';
   }
-  async function open(field) { target = field; pk.hidden = false; search.value = ''; grid.innerHTML = '<p class="muted">Se încarcă…</p>'; await load(); render(); search.focus() }
+  async function open(field) { target = field; pk.hidden = false; search.value = ''; say(''); grid.innerHTML = '<p class="muted">Se încarcă…</p>'; await load(); render(); search.focus() }
   function choose(ref, url) {
     if (!target) return; const inp = $('[data-ref]', target), img = $('.imgbox img', target), none = $('.none', target);
     inp.value = ref; if (img) { img.src = url; img.hidden = !url; } if (none) none.hidden = !!url;
@@ -32,18 +34,52 @@
     pk.addEventListener('click', e => { if (e.target === pk) close() });
     addEventListener('keydown', e => { if (e.key === 'Escape' && !pk.hidden) close() });
     search.addEventListener('input', render);
-    const upload = async files => {
-      const kind = target ? kindOf(target) : 'image'; let last = null;
-      for (const f of files) {
-        const fd = new FormData(); fd.append('file', f); fd.append('kind', kind); fd.append('csrf', CSRF);
-        grid.insertAdjacentHTML('afterbegin', `<p class="muted up">Se încarcă ${f.name}…</p>`);
-        const r = await fetch('media_api.php', { method: 'POST', body: fd, credentials: 'same-origin' });
-        const j = await r.json().catch(() => ({ error: 'Răspuns invalid de la server.' }));
-        $$('.up', grid).forEach(x => x.remove());
-        if (j.error) { alertBox(j.error); continue }
-        items.unshift(j.item); last = j.item;
+    // photos straight from a camera or phone are huge: scale them to 2400px in the browser before sending
+    const MAXPX = 2400;
+    const prep = async (f, kind) => {
+      const isVid = /^video\//.test(f.type) || /\.(mp4|mov|m4v|webm)$/i.test(f.name);
+      if (isVid) {
+        if (MAXB && f.size > MAXB) throw `<b>${f.name}</b> are ${mb(f.size)}; serverul primește până la ${mb(MAXB)}. Exportă filmul mai mic (MP4, H.264, 1080p) și încearcă din nou.`;
+        return f;
       }
-      render(); if (last && files.length === 1) choose(last.ref, last.url);
+      if (f.type === 'image/svg+xml' || /\.svg$/i.test(f.name)) return f;
+      let bmp;
+      try { bmp = await createImageBitmap(f, { imageOrientation: 'from-image' }) }
+      catch (e) { throw /hei[cf]/i.test(f.type + f.name) ? `<b>${f.name}</b> e în format HEIC (iPhone), pe care browserul nu îl poate citi. Exportă poza ca JPEG și încearc-o din nou.` : `<b>${f.name}</b> nu pare o imagine validă (JPG, PNG sau WebP).` }
+      const k = Math.min(1, MAXPX / Math.max(bmp.width, bmp.height));
+      if (k === 1 && f.size < 6e6 && /jpeg|png|webp/.test(f.type)) { bmp.close && bmp.close(); return f }
+      const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+      const x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(bmp, 0, 0, c.width, c.height); bmp.close && bmp.close();
+      const png = kind === 'logo' && f.type === 'image/png', type = png ? 'image/png' : 'image/jpeg';
+      const blob = await new Promise(r => c.toBlob(r, type, .9));
+      return new File([blob], f.name.replace(/\.[^.]+$/, '') + (png ? '.png' : '.jpg'), { type });
+    };
+    const send = (file, kind, i, n) => new Promise(res => {
+      const fd = new FormData(); fd.append('file', file); fd.append('kind', kind); fd.append('csrf', CSRF);
+      const x = new XMLHttpRequest(); x.open('POST', 'media_api.php'); x.withCredentials = true;
+      x.upload.onprogress = e => { if (e.lengthComputable) say(`Se încarcă ${n > 1 ? (i + 1) + '/' + n + ' · ' : ''}<b>${file.name}</b> · ${Math.round(e.loaded / e.total * 100)}%`) };
+      x.onload = () => { let j; try { j = JSON.parse(x.responseText) } catch (e) { j = { error: x.status === 413 ? 'Fișierul e mai mare decât permite serverul.' : 'Răspuns neașteptat de la server (' + x.status + '). Reîncarcă pagina și încearcă din nou.' } } res(j) };
+      x.onerror = () => res({ error: 'Conexiunea s-a întrerupt. Încearcă din nou.' });
+      x.send(fd);
+    });
+    const upload = async files => {
+      const kind = target ? kindOf(target) : 'image'; let last = null; const errs = [];
+      if (!items) await load();
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        try {
+          say(`Pregătesc <b>${f.name}</b>…`);
+          const file = await prep(f, kind);
+          if (MAXB && file.size > MAXB) throw `<b>${f.name}</b> are ${mb(file.size)}; serverul primește până la ${mb(MAXB)}.`;
+          const j = await send(file, kind, i, files.length);
+          if (j.error) throw `<b>${f.name}</b>: ${j.error}`;
+          items.unshift(j.item); last = j.item;
+        } catch (e) { errs.push(typeof e === 'string' ? e : `<b>${f.name}</b>: ${e.message || e}`) }
+      }
+      search.value = ''; render();
+      if (errs.length) say(errs.join('<br>'), true);
+      else say(last ? (files.length > 1 ? `${files.length} fișiere încărcate. Alege unul din listă.` : 'Încărcat.') : '');
+      if (last && files.length === 1 && !errs.length) choose(last.ref, last.url);
     };
     $('#pkUpload').addEventListener('change', e => { upload([...e.target.files]); e.target.value = '' });
     grid.addEventListener('dragover', e => { e.preventDefault(); grid.classList.add('drag') });

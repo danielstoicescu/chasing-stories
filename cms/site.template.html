@@ -992,6 +992,7 @@ const LOGOS = S_('logos', [
  ['dior.svg','Dior',null,42,28],['mazda.svg','Mazda',null,50,40],['animawings.svg','Animawings',null,52,40]]);
 
 const HOME_WORK = S_('homeWork', ['palau','heritance','sixsenses','hoiana','bangkok','hideaway']);
+const HOME_WORK_IMG = S_('homeWorkImg', []);   // optional homepage image per selected project (same order); empty = project cover
 const HOME_PHOTOS = S_('homePhotos', [
   ['p-1','Hospitality'],['p-2','Interiors'],['p-3','Drone'],['p-4','Lifestyle'],['p-5','Hospitality'],['p-7','Interiors'],['p-8','Food & Beverage']]);
 
@@ -1308,10 +1309,10 @@ function frame(k,alt,{ratio,px,pal,v}={}){
   const [w,h]=DIM(k);const ar=ratio||`${w}/${h}`;
   return `<div class="frame" data-k="${k}"${v?` data-v="${esc(v)}"`:''}${pal||PAL_PAGE?' data-pal="1"':''}${px?` data-px="${px}"`:''} style="aspect-ratio:${ar}"><img src="${I(k)}" alt="${esc(alt)}" loading="lazy" width="${w}" height="${h}"></div>`;
 }
-function projCard(p,cls,land,withSvc){
+function projCard(p,cls,land,withSvc,img){
   const loc=[p.location,p.year].filter(Boolean).join(' · ')||'Location to confirm';
   return `<a class="card ${land?'land ':''}${cls}" href="#work-${p.slug}">
-    ${frame(land?p.coverL:p.coverV,p.name,{ratio:land?'3/2':'4/5'})}
+    ${frame(img||(land?p.coverL:p.coverV),p.name,{ratio:land?'3/2':'4/5'})}
     <div class="row"><div><h3>${esc(p.name)}</h3><div class="meta">${esc(loc)}</div>${withSvc?`<div class="meta svc">${esc((p.services||[]).join(', '))}</div>`:''}</div><span class="arrow" aria-hidden="true">↗</span></div></a>`;
 }
 const intro=(lab,line)=>`<div class="intro"><div class="l">${label(esc(lab))}${line?`<p>${esc(line)}</p>`:''}</div></div>`;
@@ -1344,7 +1345,7 @@ let PAL_PAGE=false; // set while a page that shows palettes everywhere (home, se
 const PAGES={};
 
 PAGES.home=()=>{
-  const W=HOME_WORK.map(byslug).filter(Boolean).slice(0,6);const cls=['c1','c2','c3','c4','c5','c6'];const H=C.home;
+  const W=HOME_WORK.map((sl,i)=>{const p=byslug(sl);return p&&{p,img:HOME_WORK_IMG[i]||''}}).filter(Boolean).slice(0,6);const cls=['c1','c2','c3','c4','c5','c6'];const H=C.home;
   return {hero:true,filmList:HOME_FILMS,lightbox:HOME_PHOTOS.map(([k,c])=>({k,cap:c})),html:`
   <section class="hero" id="hero" data-field="hero">
     <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(C.img.heroM)}"><img src="${I(C.img.hero)}" alt="${esc(H.heroAlt)}" fetchpriority="high"></picture>
@@ -1355,7 +1356,7 @@ PAGES.home=()=>{
     <span class="cue" aria-hidden="true"><i></i></span>
   </section>
   <section class="sec"><div class="wrap">${intro(H.workLabel,H.workLine)}
-    <div class="grid work">${W.map((p,i)=>projCard(p,cls[i],i%2===1)).join('')}</div>
+    <div class="grid work">${W.map(({p,img},i)=>projCard(p,cls[i],i%2===1,false,img)).join('')}</div>
     <div class="more">${btn('work','View all work')}</div></div></section>
   <section class="sec photo"><div class="wrap">${intro(H.photoLabel,H.photoLine)}
     <div class="grid gal">${HOME_PHOTOS.slice(0,7).map(([k,c],i)=>`<figure class="g${i+1}"><button data-lb="${i}" aria-label="Open photograph ${i+1}">${frame(k,c,{ratio:'2/3'})}</button><figcaption class="meta">${esc(c)}</figcaption></figure>`).join('')}</div>

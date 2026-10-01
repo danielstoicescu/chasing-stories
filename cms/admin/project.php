@@ -119,7 +119,7 @@ admin_head($id ? $p['name'] : 'Proiect nou', 'work');
     ['f' => 'k1', 'label' => 'Poză / poster', 'type' => 'image', 'show' => 'large pair full drone mixed video'],
     ['f' => 'k2', 'label' => 'A doua poză / posterul filmului', 'type' => 'image', 'show' => 'pair mixed'],
     ['f' => 'video', 'label' => 'A doua e film', 'type' => 'check', 'show' => 'mixed'],
-    ['f' => 'src', 'label' => 'Link film (MP4)', 'show' => 'video mixed', 'span' => 2, 'placeholder' => 'https://… sau /uploads/video/…'],
+    ['f' => 'src', 'label' => 'Film (MP4)', 'type' => 'video', 'show' => 'video mixed', 'span' => 2],
     ['f' => 'text', 'label' => 'Text', 'type' => 'area', 'show' => 'text', 'span' => 4],
 ], $blocks, 'Bloc', ['large' => 'Poză mare', 'pair' => 'Pereche', 'full' => 'Lată', 'drone' => 'Dronă', 'mixed' => 'Mixt', 'video' => 'Film', 'text' => 'Text']) ?>
 </section>

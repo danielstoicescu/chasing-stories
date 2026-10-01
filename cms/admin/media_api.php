@@ -27,4 +27,8 @@ foreach (glob(CS_ROOT . '/assets/logo/*') ?: [] as $f) {
     $b = basename($f);
     $items[] = ['ref' => $b, 'url' => '/assets/logo/' . $b, 'thumb' => '/assets/logo/' . $b, 'name' => $b, 'kind' => 'logo'];
 }
-json_out(200, ['items' => $items]);
+foreach (glob(CS_ROOT . '/assets/video/*.mp4') ?: [] as $f) {
+    $b = basename($f);
+    $items[] = ['ref' => '/assets/video/' . $b, 'url' => '/assets/video/' . $b, 'thumb' => '', 'name' => $b, 'kind' => 'video'];
+}
+json_out(200, ['items' => $items, 'max' => upload_limit()]);

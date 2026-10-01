@@ -8,11 +8,16 @@ $copyKeys = ['home.display', 'home.h1', 'home.sub', 'home.button', 'home.heroAlt
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     save_copy_from_post($copyKeys);
-    $work = array_values(array_unique(array_filter(array_map(fn($r) => (string) ($r['slug'] ?? ''), rep_post('home_work')))));
+    $work = []; $workImg = [];
+    foreach (rep_post('home_work') as $r) {
+        $sl = (string) ($r['slug'] ?? '');
+        if ($sl === '' || in_array($sl, $work, true)) continue;
+        $work[] = $sl; $workImg[] = (string) ($r['img'] ?? '');
+    }
     $photos = array_values(array_map(fn($r) => [(string) $r['img'], (string) $r['label']], array_filter(rep_post('home_photos'), fn($r) => !empty($r['img']))));
     $films = array_values(array_map(fn($r) => ['k' => (string) $r['k'], 'title' => (string) $r['title'], 'meta' => (string) $r['meta'],
         'project' => (string) $r['project'] ?: null, 'video' => (string) $r['video']], array_filter(rep_post('home_films'), fn($r) => !empty($r['k']))));
-    setting_save(['home.work' => $work, 'home.photos' => $photos, 'home.films' => $films]);
+    setting_save(['home.work' => $work, 'home.workImg' => $workImg, 'home.photos' => $photos, 'home.films' => $films]);
     flash('Homepage salvat. Modificările sunt deja pe site.');
     redirect('home.php');
 }
@@ -36,8 +41,10 @@ admin_head('Homepage', 'home');
 
 <?= card_open('Selected work', 'Proiectele de pe homepage, în ordinea afișării. Recomandat: 6.') ?>
 <?= cf('home.workLabel', 'Eticheta secțiunii') ?><?= cf('home.workLine', 'Rândul de intro') ?>
-<?= rep_widget('home_work', [['f' => 'slug', 'label' => 'Proiect', 'type' => 'select', 'options' => $projects, 'span' => 4]],
-    array_map(fn($s) => ['slug' => $s], setting_json('home.work', [])), 'Proiect', ['' => 'Adaugă proiect']) ?>
+<?php $wi = setting_json('home.workImg', []); ?>
+<?= rep_widget('home_work', [['f' => 'slug', 'label' => 'Proiect', 'type' => 'select', 'options' => $projects, 'span' => 2],
+    ['f' => 'img', 'label' => 'Imagine pe homepage (gol = coperta proiectului)', 'type' => 'image', 'span' => 2]],
+    array_map(fn($s, $i) => ['slug' => $s, 'img' => $wi[$i] ?? ''], setting_json('home.work', []), array_keys(setting_json('home.work', []))), 'Proiect', ['' => 'Adaugă proiect']) ?>
 <?= card_close() ?>
 
 <?= card_open('Photography pe homepage', 'Șapte poze, cele mai bune cadre, predominant verticale. Se deschid mari la click.') ?>

@@ -80,6 +80,7 @@ function collection_page(array $cfg): void
             echo match ($type) {
                 'image'  => f_image($name, $label, $v, is_string($extra) ? $extra : ''),
                 'logo'   => f_image($name, $label, $v, is_string($extra) ? $extra : '', 'logo'),
+                'video'  => f_video($name, $label, $v, is_string($extra) ? $extra : ''),
                 'area'   => f_area($name, $label, $v, is_string($extra) ? $extra : ''),
                 'select' => f_select($name, $label, $v, $extra),
                 'check'  => f_check($name, $label, (bool) $v),

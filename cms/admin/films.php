@@ -6,7 +6,7 @@ collection_page([
     'editHint' => 'Filmele se grupează pe categorii; o categorie cu un singur film intră la „More films”. Dacă filmul aparține unui proiect, click-ul duce în proiect.',
     'fields' => [
         'poster' => ['Poster (16:9)', 'image', 'Un cadru ales, nu primul cadru automat.'],
-        'video' => ['Link film (MP4)', 'text', 'Din Media (/uploads/video/…) sau de pe serviciul video. Pornește în player-ul site-ului.'],
+        'video' => ['Film (MP4)', 'video', 'Încarcă de pe laptop (MP4, H.264, ideal sub 50 MB) sau alege din bibliotecă. Gol = filmul livrat cu site-ul pentru acest poster, dacă există.'],
         'title' => ['Titlu', 'text'],
         'client' => ['Client', 'text'],
         'loc' => ['Locație', 'text'],

@@ -323,6 +323,17 @@ function media_record(string $path, int $w, int $h, string $kind, string $origin
     return ['ref' => $path, 'url' => $path, 'w' => $w, 'h' => $h, 'kind' => $kind];
 }
 
+/** Largest upload the server accepts, in bytes (the smaller of upload_max_filesize and post_max_size). */
+function upload_limit(): int
+{
+    $b = function (string $v): int {
+        $v = trim($v); $n = (int) $v; $u = strtolower(substr($v, -1));
+        return $u === 'g' ? $n << 30 : ($u === 'm' ? $n << 20 : ($u === 'k' ? $n << 10 : $n));
+    };
+    $a = $b((string) ini_get('upload_max_filesize')); $p = $b((string) ini_get('post_max_size'));
+    return $p > 0 ? min($a, $p) : $a;
+}
+
 function upload_error_text(int $code): string
 {
     return match ($code) {

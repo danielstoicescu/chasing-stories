@@ -19,6 +19,9 @@ RewriteRule ^(includes|cache)(/|$) - [F,L]
 <FilesMatch "\.(sql|md|json|sqlite|log|example\.php)$">
   Require all denied
 </FilesMatch>
+<Files ".user.ini">
+  Require all denied
+</Files>
 <Files "manifest.json">
   Require all granted
 </Files>

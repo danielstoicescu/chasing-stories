@@ -208,6 +208,7 @@ const LOGOS = S_('logos', [
  ['dior.svg','Dior',null,42,28],['mazda.svg','Mazda',null,50,40],['animawings.svg','Animawings',null,52,40]]);
 
 const HOME_WORK = S_('homeWork', ['palau','heritance','sixsenses','hoiana','bangkok','hideaway']);
+const HOME_WORK_IMG = S_('homeWorkImg', []);   // optional homepage image per selected project (same order); empty = project cover
 const HOME_PHOTOS = S_('homePhotos', [
   ['p-1','Hospitality'],['p-2','Interiors'],['p-3','Drone'],['p-4','Lifestyle'],['p-5','Hospitality'],['p-7','Interiors'],['p-8','Food & Beverage']]);
 

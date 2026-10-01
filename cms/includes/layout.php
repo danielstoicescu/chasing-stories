@@ -67,8 +67,9 @@ function admin_foot(): void
   <div class="pk-box" role="dialog" aria-modal="true" aria-label="Alege o imagine">
     <div class="pk-top"><strong>Biblioteca media</strong>
       <input type="search" id="pkSearch" placeholder="Caută după nume">
-      <label class="btn small">Încarcă <input type="file" id="pkUpload" accept="image/jpeg,image/png,image/webp,image/svg+xml,video/mp4" multiple hidden></label>
+      <label class="btn small">Încarcă <input type="file" id="pkUpload" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,image/svg+xml,video/mp4,video/quicktime,.heic,.mov" multiple hidden></label>
       <button type="button" class="btn small ghost" id="pkClose">Închide</button></div>
+    <div class="pk-status" id="pkStatus" hidden></div>
     <div class="pk-grid" id="pkGrid"></div>
   </div>
 </div>
@@ -117,6 +118,15 @@ function f_image(string $name, string $label, string $ref, string $help = '', st
         . '<div class="imgbox"><img src="' . e($url) . '" alt=""' . ($url ? '' : ' hidden') . '><span class="none"' . ($url ? ' hidden' : '') . '>Nicio imagine</span></div>'
         . '<input type="hidden" name="' . e($name) . '" value="' . e($ref) . '" data-ref>'
         . '<div class="imgact"><button type="button" class="btn small" data-pick>Alege</button><button type="button" class="btn small ghost" data-clear>Scoate</button></div>'
+        . ($help ? '<span class="help">' . e($help) . '</span>' : '') . '</div>';
+}
+
+/** Film field: pick or upload an MP4 from the library, or paste a link. */
+function f_video(string $name, string $label, string $ref, string $help = ''): string
+{
+    return '<div class="fld img vidf" data-kind="video"><span class="lb">' . e($label) . '</span>'
+        . '<input type="text" name="' . e($name) . '" value="' . e($ref) . '" data-ref placeholder="Alege sau încarcă un MP4, ori lipește un link">'
+        . '<div class="imgact"><button type="button" class="btn small" data-pick>Alege / încarcă film</button><button type="button" class="btn small ghost" data-clear>Scoate</button></div>'
         . ($help ? '<span class="help">' . e($help) . '</span>' : '') . '</div>';
 }
 
@@ -195,6 +205,10 @@ function rep_field(array $s, $value): string
             return $h . '</select></label>';
         case 'check':
             return '<label class="fld check"' . $show . '><input type="checkbox" data-f="' . e($s['f']) . '"' . ($v ? ' checked' : '') . '><span>' . e($s['label']) . '</span></label>';
+        case 'video':
+            return '<div class="fld img vidf ' . trim(str_replace('fld', '', $cls)) . '" data-kind="video"' . $show . '>' . $lb
+                . '<input type="text" data-f="' . e($s['f']) . '" value="' . e($v) . '" data-ref placeholder="Alege sau încarcă un MP4, ori lipește un link">'
+                . '<div class="imgact"><button type="button" class="btn small" data-pick>Alege / încarcă film</button><button type="button" class="btn small ghost" data-clear>Scoate</button></div></div>';
         case 'image':
         case 'logo':
             $url = $s['type'] === 'logo' ? logo_url($v) : ref_url($v);

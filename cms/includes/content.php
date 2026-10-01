@@ -86,6 +86,7 @@ function site_data(): array
         'services'   => $services,
         'logos'      => $logos,
         'homeWork'   => setting_json('home.work', []),
+        'homeWorkImg' => setting_json('home.workImg', []),
         'homePhotos' => setting_json('home.photos', []),
         'copy'       => copy_tree(),
     ];
