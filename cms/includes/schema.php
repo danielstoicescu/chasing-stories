@@ -10,7 +10,7 @@ function schema_statements(): array
                         display_name VARCHAR(120) NOT NULL DEFAULT \'\', role VARCHAR(20) NOT NULL DEFAULT \'editor\', last_login DATETIME NULL, created_at DATETIME NULL',
         'projects'  => 'id INTEGER PRIMARY KEY AUTO_INCREMENT, slug VARCHAR(120) NOT NULL UNIQUE, name VARCHAR(190) NOT NULL, client VARCHAR(190) NOT NULL DEFAULT \'\',
                         location VARCHAR(190) NOT NULL DEFAULT \'\', year VARCHAR(20) NOT NULL DEFAULT \'\', services TEXT, description TEXT,
-                        hero VARCHAR(255) NOT NULL DEFAULT \'\', hero_m VARCHAR(255) NOT NULL DEFAULT \'\', cover_v VARCHAR(255) NOT NULL DEFAULT \'\', cover_l VARCHAR(255) NOT NULL DEFAULT \'\',
+                        hero VARCHAR(255) NOT NULL DEFAULT \'\', hero_m VARCHAR(255) NOT NULL DEFAULT \'\', hero_video VARCHAR(255) NOT NULL DEFAULT \'\', hero_video_m VARCHAR(255) NOT NULL DEFAULT \'\', cover_v VARCHAR(255) NOT NULL DEFAULT \'\', cover_l VARCHAR(255) NOT NULL DEFAULT \'\',
                         logo VARCHAR(255) NOT NULL DEFAULT \'\', blocks MEDIUMTEXT, meta_description VARCHAR(255) NOT NULL DEFAULT \'\',
                         published INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0, updated_at DATETIME NULL',
         'clients'   => 'id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(190) NOT NULL, logo VARCHAR(255) NOT NULL DEFAULT \'\', project_slug VARCHAR(120) NOT NULL DEFAULT \'\',
@@ -43,3 +43,20 @@ function schema_statements(): array
     $out[] = 'CREATE INDEX ' . (DB_DRIVER === 'sqlite' ? 'IF NOT EXISTS ' : '') . t('rate_ix') . ' ON ' . t('rate') . ' (ip, action, ts)';
     return $out;
 }
+
+/** Columns added after the first install; runs once per version from the panel. */
+function schema_upgrade(): void
+{
+    if ((int) setting('schema.v', '1') >= 2) {
+        return;
+    }
+    foreach (["hero_video VARCHAR(255) NOT NULL DEFAULT ''", "hero_video_m VARCHAR(255) NOT NULL DEFAULT ''"] as $col) {
+        try {
+            db()->exec('ALTER TABLE ' . t('projects') . ' ADD COLUMN ' . $col);
+        } catch (Throwable $e) {
+            // already there (fresh install)
+        }
+    }
+    setting_save(['schema.v' => '2']);
+}
+

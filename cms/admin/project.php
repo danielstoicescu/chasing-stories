@@ -3,7 +3,7 @@ require __DIR__ . '/_boot.php';
 require __DIR__ . '/_sort.php';
 
 $id = (int) ($_GET['id'] ?? 0);
-$p = ['id' => 0, 'slug' => '', 'name' => '', 'client' => '', 'location' => '', 'year' => '', 'services' => '[]', 'description' => '', 'hero' => '', 'hero_m' => '',
+$p = ['id' => 0, 'slug' => '', 'name' => '', 'client' => '', 'location' => '', 'year' => '', 'services' => '[]', 'description' => '', 'hero' => '', 'hero_m' => '', 'hero_video' => '', 'hero_video_m' => '',
     'cover_v' => '', 'cover_l' => '', 'logo' => '', 'blocks' => '[]', 'meta_description' => '', 'published' => 1];
 if ($id) {
     $st = db()->prepare('SELECT * FROM ' . t('projects') . ' WHERE id = ?');
@@ -51,17 +51,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $vals = [$slug, $name, trim((string) $_POST['client']), trim((string) $_POST['location']), trim((string) $_POST['year']),
         json_encode($services, JSON_UNESCAPED_UNICODE), trim((string) $_POST['description']),
-        (string) $_POST['hero'], (string) $_POST['hero_m'], (string) $_POST['cover_v'], (string) $_POST['cover_l'], (string) $_POST['logo'],
+        (string) $_POST['hero'], (string) $_POST['hero_m'], trim((string) ($_POST['hero_video'] ?? '')), trim((string) ($_POST['hero_video_m'] ?? '')), (string) $_POST['cover_v'], (string) $_POST['cover_l'], (string) $_POST['logo'],
         json_encode($blocks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), mb_substr(trim((string) $_POST['meta_description']), 0, 255),
         (int) ($_POST['published'] ?? 0), date('Y-m-d H:i:s')];
     if ($name === '') {
         flash('Proiectul are nevoie de un nume.', 'bad');
     } elseif ($id) {
-        db()->prepare('UPDATE ' . t('projects') . ' SET slug=?, name=?, client=?, location=?, year=?, services=?, description=?, hero=?, hero_m=?, cover_v=?, cover_l=?, logo=?, blocks=?, meta_description=?, published=?, updated_at=? WHERE id=?')
+        db()->prepare('UPDATE ' . t('projects') . ' SET slug=?, name=?, client=?, location=?, year=?, services=?, description=?, hero=?, hero_m=?, hero_video=?, hero_video_m=?, cover_v=?, cover_l=?, logo=?, blocks=?, meta_description=?, published=?, updated_at=? WHERE id=?')
             ->execute([...$vals, $id]);
         flash('Proiect salvat.');
     } else {
-        db()->prepare('INSERT INTO ' . t('projects') . ' (slug, name, client, location, year, services, description, hero, hero_m, cover_v, cover_l, logo, blocks, meta_description, published, updated_at, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+        db()->prepare('INSERT INTO ' . t('projects') . ' (slug, name, client, location, year, services, description, hero, hero_m, hero_video, hero_video_m, cover_v, cover_l, logo, blocks, meta_description, published, updated_at, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
             ->execute([...$vals, next_sort('projects')]);
         $id = (int) db()->lastInsertId();
         flash('Proiect creat.');
@@ -107,6 +107,9 @@ admin_head($id ? $p['name'] : 'Proiect nou', 'work');
 <?= card_open('Imagini principale', 'Hero-ul e afișat pe tot ecranul; copertele apar pe Home, Work și în banda „Next project”.') ?>
 <?= f_image('hero', 'Hero desktop (16:9)', (string) $p['hero']) ?>
 <?= f_image('hero_m', 'Hero mobil (4:5)', (string) $p['hero_m']) ?>
+<?php $shipped = fn(string $k) => $k !== '' && is_file(CS_ROOT . '/assets/video/' . $k . '.mp4') ? ' Gol = filmul livrat cu site-ul (' . $k . '.mp4).' : ' Gol = doar poza.'; ?>
+<?= f_video('hero_video', 'Film hero desktop (orizontal)', (string) ($p['hero_video'] ?? ''), 'Pornește peste poza hero, fără sunet, în buclă.' . $shipped((string) $p['hero'])) ?>
+<?= f_video('hero_video_m', 'Film hero mobil (vertical)', (string) ($p['hero_video_m'] ?? ''), 'Pe telefon. Gol = filmul de desktop.') ?>
 <?= f_image('cover_v', 'Copertă verticală (4:5)', (string) $p['cover_v']) ?>
 <?= f_image('cover_l', 'Copertă orizontală (3:2)', (string) $p['cover_l']) ?>
 <?= f_select('logo', 'Logo client (afișat după conținut)', (string) $p['logo'], $logos, 'Logo-urile se adaugă din Clienți.') ?>

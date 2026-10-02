@@ -294,7 +294,7 @@ PAGES.project=slug=>{
       case 'text':return `<div class="blk blk-text">${paras(bl.text)}</div>`;
     }return ''}).join('');
   return {hero:true,filmList:vids,html:`
-  <section class="phero" data-field="phero" data-vk="${esc(p.hero||p.coverL)}" data-vkm="${esc(p.heroM||p.coverV)}">
+  <section class="phero" data-field="phero" data-vk="${esc(p.hero||p.coverL)}" data-vkm="${esc(p.heroM||p.coverV)}" data-v="${esc(p.heroVideo||'')}" data-vm="${esc(p.heroVideoM||'')}">
     <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(p.heroM||p.coverV)}"><img src="${I(p.hero||p.coverL)}" alt="${esc(p.name)}"></picture>
     <div class="scrim"></div>
     <div class="copy"><h1>${esc(p.name)}</h1><span class="loc">${esc(p.location||'Location to confirm')}</span></div>
@@ -587,7 +587,10 @@ function hydrate(first){
 /* hero loop: the [SMALL] master from Drive, muted and looping; drives the WebGL field when there is one */
 function heroLoop(host,field){
   if(RM)return;const portrait=innerWidth<760&&innerHeight>innerWidth;
-  const url=host.dataset.vk!=null?(portrait&&videoURL(host.dataset.vkm))||videoURL(host.dataset.vk):(portrait?C.video.heroM||C.video.hero:C.video.hero)||videoURL(portrait?'hero-m':'hero');if(!url)return;
+  // a film chosen in the panel wins; otherwise the film shipped for the hero poster; phones prefer the vertical one
+  const D=host.dataset,home=D.vk==null;
+  const url=portrait?(home?C.video.heroM||videoURL('hero-m')||C.video.hero:D.vm||D.v||videoURL(D.vkm)||videoURL(D.vk))
+                    :(home?C.video.hero||videoURL('hero-wide'):D.v||videoURL(D.vk));if(!url)return;
   const v=document.createElement('video');Object.assign(v,{muted:true,loop:true,playsInline:true,autoplay:true,preload:'auto'});
   v.setAttribute('muted','');v.setAttribute('playsinline','');v.crossOrigin='anonymous';v.className='hero-vid';v.src=url;
   host.querySelector('picture').appendChild(v);

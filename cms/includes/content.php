@@ -54,7 +54,7 @@ function site_data(): array
         'slug' => $p['slug'], 'name' => $p['name'], 'client' => $p['client'], 'location' => $p['location'], 'year' => $p['year'],
         'services' => json_decode((string) $p['services'], true) ?: csv_list($p['services']),
         'desc' => (string) $p['description'], 'logo' => $p['logo'],
-        'hero' => $p['hero'], 'heroM' => $p['hero_m'], 'coverV' => $p['cover_v'], 'coverL' => $p['cover_l'],
+        'hero' => $p['hero'], 'heroM' => $p['hero_m'], 'heroVideo' => $p['hero_video'] ?? '', 'heroVideoM' => $p['hero_video_m'] ?? '', 'coverV' => $p['cover_v'], 'coverL' => $p['cover_l'],
         'blocks' => json_decode((string) $p['blocks'], true) ?: [],
     ], $q('SELECT * FROM ' . t('projects') . ' WHERE published = 1 ORDER BY sort_order, id'));
 

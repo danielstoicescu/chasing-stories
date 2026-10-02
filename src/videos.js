@@ -30,7 +30,7 @@ const VIDEOS = {
  "pl-millennium-2": "1VWQ8wNgE3BNNclINNp2MImQ7w_YJf40Y",
  "pl-sixsenses": "1IXvxJ6VJErHds4wJYeUae_ZqLBfOiiTq",
  "pl-sixsenses-2": "1QvCBoT7H512bXoTitIXzccv8MXFU8xHI",
- "hero": "13P3Bn-ti-XY5RMdTh9mI4I1y0wEbnQCe",
+ "hero-wide": "1iu-3VVd_oKZ-cvIS8tZCARrE4ZQBbC_h",
  "hero-m": "13P3Bn-ti-XY5RMdTh9mI4I1y0wEbnQCe"
 };
 // Web versions (720p H.264, tools/encode_videos.sh) live on the client's server. On the server itself they are same-origin;

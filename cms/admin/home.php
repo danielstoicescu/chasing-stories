@@ -34,8 +34,8 @@ admin_head('Homepage', 'home');
 <?= cf('home.sub', 'Subtitlu', '', 'text', ['wide' => true]) ?>
 <?= cimg('img.hero', 'Imagine desktop (16:9)', 'Afișată până pornește video-ul și pe dispozitive cu mișcare redusă.') ?>
 <?= cimg('img.heroM', 'Imagine mobil (4:5)') ?>
-<?= cf('video.hero', 'Video desktop (link MP4)', 'Link către fișierul MP4 (din Media sau de pe serviciul video). Gol = doar imaginea.', 'text', ['placeholder' => 'https://… sau /uploads/video/…']) ?>
-<?= cf('video.heroM', 'Video mobil (link MP4)', 'Versiunea verticală. Gol = se folosește cel de desktop.') ?>
+<?= f_video('c_video__hero', 'Film hero desktop (orizontal)', c('video.hero'), 'Pornește peste poza hero, fără sunet. Gol = filmul livrat cu site-ul.') ?>
+<?= f_video('c_video__heroM', 'Film hero mobil (vertical)', c('video.heroM'), 'Pe telefon. Gol = filmul vertical livrat cu site-ul.') ?>
 <?= cf('home.heroAlt', 'Descrierea imaginii (alt)', 'Pentru cititoare de ecran și Google.', 'text', ['wide' => true]) ?>
 <?= card_close() ?>
 

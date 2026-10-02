@@ -5,6 +5,8 @@ require __DIR__ . '/../includes/layout.php';
 if (!db_ready()) {
     exit('Baza de date nu e instalată încă. Deschide /_install/install.php.');
 }
+require_once __DIR__ . '/../includes/schema.php';
+schema_upgrade();
 if (!defined('CS_PUBLIC_ADMIN')) {
     auth_check();
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
