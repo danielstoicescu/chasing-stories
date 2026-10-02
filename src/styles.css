@@ -421,6 +421,8 @@ body.hdr-hidden .filters{top:env(safe-area-inset-top,0px)}
 .hero-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none;transition:opacity .8s ease}
 .hero-vid.on{opacity:1}
 .hero.gl .hero-vid{opacity:0 !important}
+.vid-direct .hero-vid.on{opacity:1 !important}
+.vid-direct canvas.glc{opacity:0 !important}
 .fm .poster video{width:100%;height:100%;display:block;background:#000;object-fit:contain}
 /* square pointer */
 html.sq-cursor,html.sq-cursor *{cursor:none}

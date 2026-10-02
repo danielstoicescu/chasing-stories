@@ -594,12 +594,21 @@ function heroLoop(host,field){
   const v=document.createElement('video');Object.assign(v,{muted:true,loop:true,playsInline:true,autoplay:true,preload:'auto'});
   v.setAttribute('muted','');v.setAttribute('playsinline','');v.crossOrigin='anonymous';v.className='hero-vid';v.src=url;
   host.querySelector('picture').appendChild(v);
-  // a portrait film stretched over a landscape hero (or the reverse) looks soft: keep the photograph instead
-  v.addEventListener('loadedmetadata',()=>{const hr=host.offsetWidth/Math.max(1,host.offsetHeight),vr=v.videoWidth/Math.max(1,v.videoHeight);
+  // phones show the film itself (iOS will not keep decoding an invisible video that only feeds WebGL); desktops run it through the pixel field
+  const direct=portrait||matchMedia('(hover: none)').matches;
+  const chosen=!home&&!!(portrait?D.vm||D.v:D.v);
+  // a shipped portrait film stretched over a landscape hero (or the reverse) looks soft: keep the photograph; a film chosen in the panel always plays
+  v.addEventListener('loadedmetadata',()=>{if(chosen||(home&&(portrait?C.video.heroM||C.video.hero:C.video.hero)))return;const hr=host.offsetWidth/Math.max(1,host.offsetHeight),vr=v.videoWidth/Math.max(1,v.videoHeight);
     if((hr>1)!==(vr>1)&&Math.max(hr/vr,vr/hr)>1.6){v.pause();v.removeAttribute('src');v.load();v.remove()}},{once:true});
-  v.addEventListener('playing',()=>{if(!host.isConnected||!v.isConnected)return;if(field&&field.useVideo){try{field.useVideo(v)}catch(e){v.classList.add('on')}}else v.classList.add('on')},{once:true});
+  v.addEventListener('playing',()=>{if(!host.isConnected||!v.isConnected)return;
+    if(!direct&&field&&field.useVideo){try{field.useVideo(v);return}catch(e){}}
+    v.classList.add('on');host.classList.add('vid-direct')},{once:true});
   v.addEventListener('error',()=>v.remove(),{once:true});
+  // Low Power Mode and some data savers refuse autoplay: try again on the first touch
+  const retry=()=>{if(v.isConnected&&v.paused)v.play().catch(()=>{})};
+  addEventListener('touchstart',retry,{once:true,passive:true});document.addEventListener('visibilitychange',retry);
   v.play().catch(()=>{});
+  cleanups.push(()=>{removeEventListener('touchstart',retry);document.removeEventListener('visibilitychange',retry)});
   cleanups.push(()=>{v.pause();v.removeAttribute('src');v.load();v.remove()});
 }
 
