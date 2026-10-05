@@ -489,10 +489,10 @@ html.sq-cursor input,html.sq-cursor textarea{cursor:text}
 .enq .count b{font-weight:400;color:var(--ink)}
 
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font:inherit;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:transparent;border:1px solid var(--line);padding:8px 12px;cursor:pointer;
+.enq .chip{font:inherit;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:transparent;border:1px solid var(--line);padding:8px 12px;cursor:pointer;
   transition:background .3s,color .3s,border-color .3s}
-.chip:hover{border-color:var(--ink)}
-.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.enq .chip:hover{border-color:var(--ink)}
+.enq .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 
 .enq .send{display:grid;gap:16px;padding-top:24px;border-top:1px solid var(--line)}
 .enq .send .consent{margin:0}
@@ -697,6 +697,17 @@ a:hover > .roll > span + span{transform:none}
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none !important;transition:none !important}
 }
+
+/* homepage project cards: extra photographs step through on hover (on their own on touch screens) */
+.frame img.alt{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;filter:blur(8px);transition:opacity .9s ease,filter .9s ease,transform 1.4s cubic-bezier(.2,.7,.1,1)}
+.frame img.alt.on{opacity:1;filter:none}
+.card:hover .frame img.alt.on{transform:scale(1.035)}
+.card .frame .steps{position:absolute;left:12px;bottom:12px;display:flex;gap:4px;z-index:2;opacity:0;transition:opacity .4s}
+.card .frame .steps i{width:7px;height:7px;background:rgba(255,255,255,.45);transition:background .3s,transform .4s cubic-bezier(.3,1.4,.5,1)}
+.card .frame .steps i.on{background:#fff;transform:rotate(45deg)}
+.card:hover .frame .steps,.card .frame.cycling .steps{opacity:1}
+.filters.wf{position:static;border:0;background:none}
+.filters.wf .wrap{padding-block:0 28px}
 
 </style>
 <header class="hdr over" id="hdr">
@@ -1312,9 +1323,10 @@ function frame(k,alt,{ratio,px,pal,v}={}){
   return `<div class="frame" data-k="${k}"${v?` data-v="${esc(v)}"`:''}${pal||PAL_PAGE?' data-pal="1"':''}${px?` data-px="${px}"`:''} style="aspect-ratio:${ar}"><img src="${I(k)}" alt="${esc(alt)}" loading="lazy" width="${w}" height="${h}"></div>`;
 }
 function projCard(p,cls,land,withSvc,img){
+  const imgs=[].concat(img||[]);imgs[0]=imgs[0]||(land?p.coverL:p.coverV);for(let j=imgs.length-1;j>0;j--)if(!imgs[j])imgs.splice(j,1);
   const loc=[p.location,p.year].filter(Boolean).join(' · ')||'Location to confirm';
   return `<a class="card ${land?'land ':''}${cls}" href="#work-${p.slug}">
-    ${frame(img||(land?p.coverL:p.coverV),p.name,{ratio:land?'3/2':'4/5'})}
+    ${frame(imgs[0],p.name,{ratio:land?'3/2':'4/5'}).replace(/<\/div>$/,imgs.length>1?imgs.slice(1).map(k=>`<img class="alt" src="${I(k)}" alt="" loading="lazy">`).join('')+`<span class="steps" aria-hidden="true">${imgs.map((_,j)=>`<i${j?'':' class="on"'}></i>`).join('')}</span></div>`:'</div>')}
     <div class="row"><div><h3>${esc(p.name)}</h3><div class="meta">${esc(loc)}</div>${withSvc?`<div class="meta svc">${esc((p.services||[]).join(', '))}</div>`:''}</div><span class="arrow" aria-hidden="true">↗</span></div></a>`;
 }
 const intro=(lab,line)=>`<div class="intro"><div class="l">${label(esc(lab))}${line?`<p>${esc(line)}</p>`:''}</div></div>`;
@@ -1347,7 +1359,7 @@ let PAL_PAGE=false; // set while a page that shows palettes everywhere (home, se
 const PAGES={};
 
 PAGES.home=()=>{
-  const W=HOME_WORK.map((sl,i)=>{const p=byslug(sl);return p&&{p,img:HOME_WORK_IMG[i]||''}}).filter(Boolean).slice(0,6);const cls=['c1','c2','c3','c4','c5','c6'];const H=C.home;
+  const W=HOME_WORK.map((sl,i)=>{const p=byslug(sl);return p&&{p,img:HOME_WORK_IMG[i]||[]}}).filter(Boolean).slice(0,6);const cls=['c1','c2','c3','c4','c5','c6'];const H=C.home;
   return {hero:true,filmList:HOME_FILMS,lightbox:HOME_PHOTOS.map(([k,c])=>({k,cap:c})),html:`
   <section class="hero" id="hero" data-field="hero">
     <picture><source media="(max-width:760px) and (orientation:portrait)" srcset="${I(C.img.heroM)}"><img src="${I(C.img.hero)}" alt="${esc(H.heroAlt)}" fetchpriority="high"></picture>
@@ -1378,12 +1390,18 @@ PAGES.home=()=>{
   ${cta()}`};
 };
 
-PAGES.work=()=>{
+const catSlug=c=>String(c||'Hospitality').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+PAGES.work=cat=>{
   const cls=['w-a','w-b','w-c','w-d','w-e'];const land=[true,false,false,true,true];
+  const cats=[...new Set(PROJECTS.map(p=>p.cat||'Hospitality'))];
+  const valid=cats.find(c=>catSlug(c)===cat);const list=valid?PROJECTS.filter(p=>(p.cat||'Hospitality')===valid):PROJECTS;
+  const nav=cats.length>1?`<nav class="filters wf" aria-label="Project categories"><div class="wrap">
+    <a class="chip${valid?'':' on'}" href="#work">All <span class="n">${PROJECTS.length}</span></a>
+    ${cats.map(c=>`<a class="chip${valid===c?' on':''}" href="#workcat-${catSlug(c)}">${esc(c)} <span class="n">${PROJECTS.filter(p=>(p.cat||'Hospitality')===c).length}</span></a>`).join('')}</div></nav>`:'';
   return {html:`
-  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.workTitle)}</h1><p>${esc(C.pages.workIntro)}</p><span class="count">${nf(PROJECTS.length)} projects</span></div></section>
-  <section style="padding-bottom:clamp(88px,12vw,180px)"><div class="wrap"><div class="grid wgrid">
-    ${PROJECTS.map((p,i)=>projCard(p,cls[i%5],land[i%5],true)).join('')}
+  <section class="pintro"><div class="wrap"><h1>${esc(C.pages.workTitle)}</h1><p>${esc(C.pages.workIntro)}</p><span class="count">${nf(list.length)} projects</span></div></section>
+  ${nav}<section style="padding-bottom:clamp(88px,12vw,180px)"><div class="wrap"><div class="grid wgrid">
+    ${list.map((p,i)=>projCard(p,cls[i%5],land[i%5],true)).join('')}
   </div></div></section>${cta()}`};
 };
 
@@ -1552,11 +1570,12 @@ PAGES.notfound=()=>({hero:true,status:404,html:`<section class="nf" data-field="
    hash (#work-palau) for the prototype and the artifact, real paths (/work/palau) on the live server. */
 const PATH_MODE=!!(SITE_DATA&&SITE_DATA.routing==='path');
 function tokenToPath(t){t=(t||'').replace(/^#/,'');if(!t||t==='top')return '/';
-  for(const [a,b] of [['work-','/work/'],['photography-','/photography/'],['services-','/services/'],['contact-','/contact?project=']])if(t.startsWith(a))return b+encodeURIComponent(t.slice(a.length));
+  for(const [a,b] of [['workcat-','/work?cat='],['work-','/work/'],['photography-','/photography/'],['services-','/services/'],['contact-','/contact?project=']])if(t.startsWith(a))return b+encodeURIComponent(t.slice(a.length));
   return '/'+t}
 function pathToToken(){const p=location.pathname.replace(/\/+$/,'')||'/',q=new URLSearchParams(location.search);if(p==='/')return '';
   const seg=p.slice(1).split('/').map(decodeURIComponent);
   if(seg[0]==='contact'&&seg.length===1&&q.get('project'))return 'contact-'+q.get('project');
+  if(seg[0]==='work'&&seg.length===1&&q.get('cat'))return 'workcat-'+q.get('cat');
   if(seg.length===2&&['work','photography','services'].includes(seg[0]))return seg[0]+'-'+seg[1];
   return seg.length===1?seg[0]:'__none'}
 const curToken=()=>PATH_MODE?pathToToken():location.hash.slice(1);
@@ -1567,6 +1586,7 @@ function parse(h){
   if(!h||h==='top')return ['home'];
   if(h==='work')return ['work'];
   if(h.startsWith('work-'))return ['project',h.slice(5)];
+  if(h.startsWith('workcat-'))return ['work',h.slice(8)];
   if(h==='photography')return ['photography'];
   if(h.startsWith('photography-'))return ['photography',h.slice(12)];
   if(h==='film')return ['film'];
@@ -1586,7 +1606,7 @@ async function go(first){
   const [name,arg]=parse(curToken());
   const key=name+(arg||'');
   if(key===current)return;
-  const soft=current&&current.startsWith('photography')&&name==='photography';
+  const soft=current&&((current.startsWith('photography')&&name==='photography')||(current.startsWith('work')&&name==='work'));
   const sameAnchor=current&&current.startsWith('services')&&name==='services';
   current=key;
   PAL_PAGE=(name==='home'||name==='services');
@@ -1682,6 +1702,16 @@ function hydrate(first){
 
   // horizontal rails driven by vertical scroll
   $$('.hscroll',app).forEach(sec=>{const d=hRail(sec);if(d)cleanups.push(d)});
+
+  // project cards with several homepage photographs step through them on hover, or on their own on touch screens
+  $$('.card .frame',app).filter(f=>f.querySelector('img.alt')).forEach(f=>{const alts=$$('img.alt',f),dots=$$('.steps i',f),n=alts.length+1;let i=0,t=null;
+    const show=k=>{i=k%n;alts.forEach((a,j)=>a.classList.toggle('on',j===i-1));dots.forEach((d,j)=>d.classList.toggle('on',j===i))};
+    const start=ms=>{if(t||RM)return;f.classList.add('cycling');show(i+1);t=setInterval(()=>show(i+1),ms)};
+    const stop=back=>{clearInterval(t);t=null;f.classList.remove('cycling');if(back)show(0)};
+    const card=f.closest('.card');
+    if(matchMedia('(hover: hover)').matches){card.addEventListener('pointerenter',()=>start(1100));card.addEventListener('pointerleave',()=>stop(true))}
+    else{const io=new IntersectionObserver(es=>{es[0].isIntersecting?start(2600):stop(false)},{threshold:.6});io.observe(f);cleanups.push(()=>io.disconnect())}
+    cleanups.push(()=>stop(false))});
 
   // films play where their thumbnails are: muted, looping, only while on screen
   ambient();

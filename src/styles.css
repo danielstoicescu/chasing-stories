@@ -485,10 +485,10 @@ html.sq-cursor input,html.sq-cursor textarea{cursor:text}
 .enq .count b{font-weight:400;color:var(--ink)}
 
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font:inherit;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:transparent;border:1px solid var(--line);padding:8px 12px;cursor:pointer;
+.enq .chip{font:inherit;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:transparent;border:1px solid var(--line);padding:8px 12px;cursor:pointer;
   transition:background .3s,color .3s,border-color .3s}
-.chip:hover{border-color:var(--ink)}
-.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.enq .chip:hover{border-color:var(--ink)}
+.enq .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 
 .enq .send{display:grid;gap:16px;padding-top:24px;border-top:1px solid var(--line)}
 .enq .send .consent{margin:0}
@@ -693,3 +693,14 @@ a:hover > .roll > span + span{transform:none}
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none !important;transition:none !important}
 }
+
+/* homepage project cards: extra photographs step through on hover (on their own on touch screens) */
+.frame img.alt{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;filter:blur(8px);transition:opacity .9s ease,filter .9s ease,transform 1.4s cubic-bezier(.2,.7,.1,1)}
+.frame img.alt.on{opacity:1;filter:none}
+.card:hover .frame img.alt.on{transform:scale(1.035)}
+.card .frame .steps{position:absolute;left:12px;bottom:12px;display:flex;gap:4px;z-index:2;opacity:0;transition:opacity .4s}
+.card .frame .steps i{width:7px;height:7px;background:rgba(255,255,255,.45);transition:background .3s,transform .4s cubic-bezier(.3,1.4,.5,1)}
+.card .frame .steps i.on{background:#fff;transform:rotate(45deg)}
+.card:hover .frame .steps,.card .frame.cycling .steps{opacity:1}
+.filters.wf{position:static;border:0;background:none}
+.filters.wf .wrap{padding-block:0 28px}

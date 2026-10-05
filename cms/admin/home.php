@@ -12,7 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach (rep_post('home_work') as $r) {
         $sl = (string) ($r['slug'] ?? '');
         if ($sl === '' || in_array($sl, $work, true)) continue;
-        $work[] = $sl; $workImg[] = (string) ($r['img'] ?? '');
+        // first slot may stay empty (= project cover); extras keep their order
+        $extra = array_values(array_filter([(string) ($r['img2'] ?? ''), (string) ($r['img3'] ?? ''), (string) ($r['img4'] ?? '')], 'strlen'));
+        $first = (string) ($r['img'] ?? '');
+        $work[] = $sl; $workImg[] = ($first === '' && !$extra) ? [] : array_merge([$first], $extra);
     }
     $photos = array_values(array_map(fn($r) => [(string) $r['img'], (string) $r['label']], array_filter(rep_post('home_photos'), fn($r) => !empty($r['img']))));
     $films = array_values(array_map(fn($r) => ['k' => (string) $r['k'], 'title' => (string) $r['title'], 'meta' => (string) $r['meta'],
@@ -42,9 +45,12 @@ admin_head('Homepage', 'home');
 <?= card_open('Selected work', 'Proiectele de pe homepage, în ordinea afișării. Recomandat: 6.') ?>
 <?= cf('home.workLabel', 'Eticheta secțiunii') ?><?= cf('home.workLine', 'Rândul de intro') ?>
 <?php $wi = setting_json('home.workImg', []); ?>
-<?= rep_widget('home_work', [['f' => 'slug', 'label' => 'Proiect', 'type' => 'select', 'options' => $projects, 'span' => 2],
-    ['f' => 'img', 'label' => 'Imagine pe homepage (gol = coperta proiectului)', 'type' => 'image', 'span' => 2]],
-    array_map(fn($s, $i) => ['slug' => $s, 'img' => $wi[$i] ?? ''], setting_json('home.work', []), array_keys(setting_json('home.work', []))), 'Proiect', ['' => 'Adaugă proiect']) ?>
+<p class="help span-all" style="grid-column:1/-1;margin:0">Fiecare proiect poate avea până la 4 poze pe homepage: prima e cea afișată, celelalte se derulează când treci cu mouse-ul peste card (pe telefon, singure). Fără poze = coperta proiectului.</p>
+<?= rep_widget('home_work', [['f' => 'slug', 'label' => 'Proiect', 'type' => 'select', 'options' => $projects, 'span' => 4],
+    ['f' => 'img', 'label' => 'Poza 1 (principală)', 'type' => 'image'], ['f' => 'img2', 'label' => 'Poza 2', 'type' => 'image'],
+    ['f' => 'img3', 'label' => 'Poza 3', 'type' => 'image'], ['f' => 'img4', 'label' => 'Poza 4', 'type' => 'image']],
+    array_map(function ($s, $i) use ($wi) { $im = array_values((array) ($wi[$i] ?? [])); return ['slug' => $s, 'img' => $im[0] ?? '', 'img2' => $im[1] ?? '', 'img3' => $im[2] ?? '', 'img4' => $im[3] ?? '']; },
+        setting_json('home.work', []), array_keys(setting_json('home.work', []))), 'Proiect', ['' => 'Adaugă proiect']) ?>
 <?= card_close() ?>
 
 <?= card_open('Photography pe homepage', 'Șapte poze, cele mai bune cadre, predominant verticale. Se deschid mari la click.') ?>

@@ -3,7 +3,7 @@ require __DIR__ . '/_boot.php';
 require __DIR__ . '/_sort.php';
 
 $id = (int) ($_GET['id'] ?? 0);
-$p = ['id' => 0, 'slug' => '', 'name' => '', 'client' => '', 'location' => '', 'year' => '', 'services' => '[]', 'description' => '', 'hero' => '', 'hero_m' => '', 'hero_video' => '', 'hero_video_m' => '',
+$p = ['id' => 0, 'slug' => '', 'name' => '', 'client' => '', 'location' => '', 'year' => '', 'services' => '[]', 'description' => '', 'hero' => '', 'hero_m' => '', 'hero_video' => '', 'hero_video_m' => '', 'category' => '',
     'cover_v' => '', 'cover_l' => '', 'logo' => '', 'blocks' => '[]', 'meta_description' => '', 'published' => 1];
 if ($id) {
     $st = db()->prepare('SELECT * FROM ' . t('projects') . ' WHERE id = ?');
@@ -51,17 +51,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $vals = [$slug, $name, trim((string) $_POST['client']), trim((string) $_POST['location']), trim((string) $_POST['year']),
         json_encode($services, JSON_UNESCAPED_UNICODE), trim((string) $_POST['description']),
-        (string) $_POST['hero'], (string) $_POST['hero_m'], trim((string) ($_POST['hero_video'] ?? '')), trim((string) ($_POST['hero_video_m'] ?? '')), (string) $_POST['cover_v'], (string) $_POST['cover_l'], (string) $_POST['logo'],
+        (string) $_POST['hero'], (string) $_POST['hero_m'], trim((string) ($_POST['hero_video'] ?? '')), trim((string) ($_POST['hero_video_m'] ?? '')), mb_substr(trim((string) ($_POST['category'] ?? '')), 0, 60), (string) $_POST['cover_v'], (string) $_POST['cover_l'], (string) $_POST['logo'],
         json_encode($blocks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), mb_substr(trim((string) $_POST['meta_description']), 0, 255),
         (int) ($_POST['published'] ?? 0), date('Y-m-d H:i:s')];
     if ($name === '') {
         flash('Proiectul are nevoie de un nume.', 'bad');
     } elseif ($id) {
-        db()->prepare('UPDATE ' . t('projects') . ' SET slug=?, name=?, client=?, location=?, year=?, services=?, description=?, hero=?, hero_m=?, hero_video=?, hero_video_m=?, cover_v=?, cover_l=?, logo=?, blocks=?, meta_description=?, published=?, updated_at=? WHERE id=?')
+        db()->prepare('UPDATE ' . t('projects') . ' SET slug=?, name=?, client=?, location=?, year=?, services=?, description=?, hero=?, hero_m=?, hero_video=?, hero_video_m=?, category=?, cover_v=?, cover_l=?, logo=?, blocks=?, meta_description=?, published=?, updated_at=? WHERE id=?')
             ->execute([...$vals, $id]);
         flash('Proiect salvat.');
     } else {
-        db()->prepare('INSERT INTO ' . t('projects') . ' (slug, name, client, location, year, services, description, hero, hero_m, hero_video, hero_video_m, cover_v, cover_l, logo, blocks, meta_description, published, updated_at, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+        db()->prepare('INSERT INTO ' . t('projects') . ' (slug, name, client, location, year, services, description, hero, hero_m, hero_video, hero_video_m, category, cover_v, cover_l, logo, blocks, meta_description, published, updated_at, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
             ->execute([...$vals, next_sort('projects')]);
         $id = (int) db()->lastInsertId();
         flash('Proiect creat.');
@@ -96,6 +96,10 @@ admin_head($id ? $p['name'] : 'Proiect nou', 'work');
 <?= f_text('client', 'Client', (string) $p['client'], 'Exact cum vrea clientul să apară.') ?>
 <?= f_text('location', 'Locație', (string) $p['location'], 'Oraș, țară') ?>
 <?= f_text('year', 'An', (string) $p['year']) ?>
+<?php $usedCats = array_values(array_unique(array_filter(array_merge(['Hospitality', 'Brands'], db()->query('SELECT DISTINCT category FROM ' . t('projects'))->fetchAll(PDO::FETCH_COLUMN))))); ?>
+<label class="fld"><span class="lb">Categorie</span><input type="text" name="category" value="<?= e((string) ($p['category'] ?? '')) ?>" list="projCats" placeholder="Hospitality">
+  <datalist id="projCats"><?php foreach ($usedCats as $c): ?><option value="<?= e($c) ?>"><?php endforeach ?></datalist>
+  <span class="help">Ex. Hospitality sau Brands. Pe pagina Work apar filtre când există cel puțin două categorii. Gol = Hospitality.</span></label>
 <div class="fld"><span class="lb">Servicii</span><div style="display:flex;flex-wrap:wrap;gap:6px 16px">
 <?php foreach ($SERVICES as $s): ?><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" name="services[]" value="<?= e($s) ?>" <?= in_array($s, $services, true) ? 'checked' : '' ?>><?= e($s) ?></label><?php endforeach ?>
 </div><input type="text" name="services_other" value="<?= e($other) ?>" placeholder="Altele, separate prin virgulă"></div>
