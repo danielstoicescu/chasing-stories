@@ -83,7 +83,7 @@ table.list .thumb.logo{object-fit:contain;background:#fff;border:1px solid var(-
 .rep-row .rowhead b{font:500 .7rem var(--mono);letter-spacing:.12em;text-transform:uppercase}
 .rep-row .span2{grid-column:span 2}.rep-row .span4{grid-column:1/-1}
 .rep-add{display:flex;gap:6px;flex-wrap:wrap}
-[data-show]{display:none}
+[data-show]:not(.shown){display:none}
 /* picker */
 .picker{position:fixed;inset:0;background:rgba(15,21,20,.55);z-index:50;display:grid;place-items:center;padding:24px}
 .pk-box{background:#fff;width:min(1100px,100%);height:min(760px,calc(100vh - 48px));height:min(760px,calc(100dvh - 48px));min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr);overflow:hidden}

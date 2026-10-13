@@ -93,7 +93,7 @@
      Every input inside a row with data-f="key" becomes a property of that row's object. */
   function syncShow(row) {
     const t = $('[data-f="t"]', row); if (!t) return;
-    $$('[data-show]', row).forEach(el => { el.style.display = el.dataset.show.split(' ').includes(t.value) ? '' : 'none' });
+    $$('[data-show]', row).forEach(el => el.classList.toggle('shown', el.dataset.show.split(' ').includes(t.value)));
   }
   $$('.rep').forEach(rep => {
     const list = $('.rep-list', rep), tpl = $('template', rep);
