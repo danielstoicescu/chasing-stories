@@ -349,4 +349,29 @@ function upload_error_text(int $code): string
 function content_cache_clear(): void
 {
     @unlink(CS_ROOT . '/cache/site.json');
+    indexnow_ping();
+}
+
+/** Tells Bing and the other IndexNow engines that the site changed (at most once every 10 minutes, never blocks the panel). */
+function indexnow_ping(): void
+{
+    $keyFile = glob(CS_ROOT . '/[0-9a-f]*.txt')[0] ?? '';
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $stamp = CS_ROOT . '/cache/indexnow.last';
+    if ($keyFile === '' || $host === '' || str_contains($host, 'localhost') || (is_file($stamp) && time() - filemtime($stamp) < 600)) {
+        return;
+    }
+    @touch($stamp);
+    $key = basename($keyFile, '.txt');
+    $base = 'https://' . $host;
+    $urls = [$base . '/', $base . '/work', $base . '/photography', $base . '/film', $base . '/services', $base . '/about', $base . '/contact'];
+    try {
+        foreach (db()->query('SELECT slug FROM ' . t('projects') . ' WHERE published = 1') as $p) {
+            $urls[] = $base . '/work/' . rawurlencode($p['slug']);
+        }
+    } catch (Throwable $e) {
+    }
+    $body = json_encode(['host' => $host, 'key' => $key, 'keyLocation' => $base . '/' . $key . '.txt', 'urlList' => $urls], JSON_UNESCAPED_SLASHES);
+    $ctx = stream_context_create(['http' => ['method' => 'POST', 'header' => "Content-Type: application/json; charset=utf-8\r\n", 'content' => $body, 'timeout' => 3, 'ignore_errors' => true]]);
+    @file_get_contents('https://api.indexnow.org/indexnow', false, $ctx);
 }

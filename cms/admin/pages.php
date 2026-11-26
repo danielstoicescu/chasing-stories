@@ -12,9 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $pairs = ['redirects' => $red, 'seo.description' => trim((string) ($_POST['seo_description'] ?? '')),
         'seo.home_title_suffix' => trim((string) ($_POST['seo_suffix'] ?? ''))];
-    if (is_admin()) {
-        $pairs['seo.index'] = ($_POST['seo_index'] ?? '0') === '1' ? '1' : '0';
-    }
     setting_save($pairs);
     flash('Salvat.');
     redirect('pages.php');
@@ -29,9 +26,6 @@ admin_head('Pagini și SEO', 'pages');
 <?= card_open('Google și distribuire', 'Titlul și descrierea paginii principale, cum apar în Google și când site-ul e distribuit pe WhatsApp sau social.') ?>
 <?= f_text('seo_suffix', 'Titlul paginii principale (după nume)', setting('seo.home_title_suffix', 'Luxury Hospitality Photography & Film'), 'Rezultă: Chasing Stories | …', ['wide' => true]) ?>
 <?= f_area('seo_description', 'Descriere', setting('seo.description', 'Visual storytelling for luxury hospitality, travel and lifestyle brands. Photography, film and creative production, available worldwide.'), 'Max 155 de caractere.', 2) ?>
-<?php if (is_admin()): ?>
-<?= f_check('seo_index', 'Site-ul poate apărea în Google', setting('seo.index', '0') === '1', 'Lasă debifat cât timp site-ul e în test. Bifează la lansare.') ?>
-<?php endif ?>
 <?= cf('brand', 'Numele studioului', 'Apare în titluri și în emailuri.') ?>
 <?= card_close() ?>
 <?= card_open('Work, Photography, Film') ?>

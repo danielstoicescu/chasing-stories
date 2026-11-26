@@ -68,9 +68,13 @@ if ($seg) {
         $desc = $md !== '' ? $md : trim(implode(', ', $p['services']) . ' for ' . ($p['client'] ?: $p['name']) . ($p['location'] ? ' in ' . $p['location'] : '') . ($p['year'] ? ', ' . $p['year'] : '') . '.');
         $image = $p['coverL'] ?: $p['hero'];
     } elseif (count($seg) === 2 && $top === 'photography' && in_array($seg[1], $catIds, true)) {
-        $title = 'Photography | ' . $brand;
+        $cn = array_column($data['cats'], 1, 0)[$seg[1]] ?? 'Photography';
+        $title = $cn . ' Photography | ' . $brand;
+        $desc = $cn . ' photography for luxury hotels, resorts and brands by ' . $brand . '. Selected images from recent productions worldwide.';
     } elseif (count($seg) === 2 && $top === 'services' && in_array($seg[1], $svcIds, true)) {
-        $title = 'Services | ' . $brand;
+        $sv = array_column($data['services'], null, 'id')[$seg[1]];
+        $title = $sv['name'] . ' for Luxury Hospitality | ' . $brand;
+        $desc = trim((string) ($sv['short'] ?: $desc));
     } else {
         $status = 404;
         $title = 'Page not found | ' . $brand;
@@ -79,7 +83,7 @@ if ($seg) {
 http_response_code($status);
 
 [$assets, $dims, $avoid] = site_assets($data);
-$indexable = setting('seo.index', '0') === '1';
+$indexable = true;   // the site is live: always open to search engines
 $abs = site_base();
 $img = ref_url((string) $image);
 $head = '<title>' . e($title) . '</title>'
@@ -90,7 +94,33 @@ $head = '<title>' . e($title) . '</title>'
     . '<meta property="og:title" content="' . e($title) . '"><meta property="og:description" content="' . e($desc) . '">'
     . ($img ? '<meta property="og:image" content="' . e($abs . $img) . '"><meta name="twitter:card" content="summary_large_image">' : '')
     . '<link rel="icon" href="' . e(setting('seo.favicon', '/assets/favicon.svg')) . '">';
+$head .= '<meta property="og:url" content="' . e($abs . $path) . '"><meta property="og:locale" content="en_GB">'
+    . '<meta name="twitter:title" content="' . e($title) . '"><meta name="twitter:description" content="' . e($desc) . '">'
+    . '<link rel="sitemap" type="application/xml" href="/sitemap.xml">';
+$ld = fn(array $o) => '<script type="application/ld+json">' . json_encode($o, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . '</script>';
+if ($status === 200 && $seg) {
+    $crumbs = [['/', $brand]];
+    if (isset($pages[$seg[0]])) $crumbs[] = ['/' . $seg[0], $pages[$seg[0]]];
+    if (count($seg) === 2) $crumbs[] = [$path, preg_replace('/ \| .*$/', '', $title)];
+    $head .= $ld(['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => array_map(fn($c, $i) => ['@type' => 'ListItem', 'position' => $i + 1, 'name' => $c[1], 'item' => $abs . $c[0]], $crumbs, array_keys($crumbs))]);
+}
+if ($status === 200 && count($seg) === 2 && $seg[0] === 'work' && isset($bySlug[$seg[1]])) {
+    // a project is a piece of creative work by the studio, with its photographs and film
+    $p = $bySlug[$seg[1]];
+    $imgs = [];
+    foreach (array_merge([(string) ($p['hero'] ?: $p['coverL'])], ...array_map(fn($b) => array_filter((array) ($b['k'] ?? []), 'is_string'), $p['blocks'])) as $k) {
+        if (($u = ref_url($k)) && count($imgs) < 12) $imgs[] = $abs . $u;
+    }
+    $work = ['@context' => 'https://schema.org', '@type' => 'CreativeWork', 'name' => $p['name'], 'url' => $abs . $path, 'description' => $desc,
+        'creator' => ['@type' => 'Organization', 'name' => $brand, 'url' => $abs . '/'], 'image' => array_values(array_unique($imgs)),
+        'keywords' => implode(', ', array_merge($p['services'], array_filter([$p['client'], $p['location'], 'luxury hospitality'])))];
+    if ($p['year']) $work['dateCreated'] = (string) $p['year'];
+    if ($p['location']) $work['locationCreated'] = ['@type' => 'Place', 'name' => $p['location']];
+    if ($p['client']) $work['sourceOrganization'] = ['@type' => 'Organization', 'name' => $p['client']];
+    $head .= $ld($work);
+}
 if ($path === '/') {
+    $head .= $ld(['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => $brand, 'url' => $abs . '/']);
     // who the studio is, for Google's knowledge panel
     $K = $data['copy']['contact'] ?? [];
     $org = ['@context' => 'https://schema.org', '@type' => 'Organization', 'name' => $brand, 'url' => $abs . '/',
