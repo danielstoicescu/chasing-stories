@@ -6,6 +6,7 @@
  */
 require __DIR__ . '/includes/bootstrap.php';
 require __DIR__ . '/includes/content.php';
+require __DIR__ . '/includes/seo.php';
 
 if (!db_ready()) {
     http_response_code(503);
@@ -89,6 +90,16 @@ $head = '<title>' . e($title) . '</title>'
     . '<meta property="og:title" content="' . e($title) . '"><meta property="og:description" content="' . e($desc) . '">'
     . ($img ? '<meta property="og:image" content="' . e($abs . $img) . '"><meta name="twitter:card" content="summary_large_image">' : '')
     . '<link rel="icon" href="' . e(setting('seo.favicon', '/assets/favicon.svg')) . '">';
+if ($path === '/') {
+    // who the studio is, for Google's knowledge panel
+    $K = $data['copy']['contact'] ?? [];
+    $org = ['@context' => 'https://schema.org', '@type' => 'Organization', 'name' => $brand, 'url' => $abs . '/',
+        'description' => $desc, 'logo' => $abs . '/assets/favicon.svg',
+        'sameAs' => array_values(array_filter([$K['instagram'] ?? '', $K['linkedin'] ?? '']))];
+    if (!empty($K['email'])) $org['email'] = $K['email'];
+    if ($img) $org['image'] = $abs . $img;
+    $head .= '<script type="application/ld+json">' . json_encode($org, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . '</script>';
+}
 
 $flags = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP;
 $boot = 'window.SITE_DATA=' . json_encode($data, $flags) . ";\n"
@@ -101,4 +112,8 @@ header('Content-Type: text/html; charset=utf-8');
 if (!$indexable) {
     header('X-Robots-Tag: noindex, nofollow');
 }
-echo str_replace(['<!--HEAD-->', '/*BOOT*/'], [$head, $boot], $tpl);
+// readable page for crawlers and previews; the front end swaps in the designed page on start
+$ssr = $status === 200 ? seo_snapshot($seg, $data, $desc) : '';
+$head .= '<style>.ssr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}</style>'
+    . '<noscript><style>.ssr{position:static;width:auto;height:auto;clip-path:none;white-space:normal;max-width:900px;margin:120px auto;padding:0 16px}.ssr img{max-width:100%;height:auto}</style></noscript>';
+echo str_replace(['<!--HEAD-->', '/*BOOT*/', '<main id="app"></main>'], [$head, $boot, '<main id="app">' . $ssr . '</main>'], $tpl);

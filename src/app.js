@@ -203,7 +203,7 @@ function projCard(p,cls,land,withSvc,img){
   const imgs=[].concat(img||[]);imgs[0]=imgs[0]||(land?p.coverL:p.coverV);for(let j=imgs.length-1;j>0;j--)if(!imgs[j])imgs.splice(j,1);
   const loc=[p.location,p.year].filter(Boolean).join(' · ')||'Location to confirm';
   return `<a class="card ${land?'land ':''}${cls}" href="#work-${p.slug}">
-    ${frame(imgs[0],p.name,{ratio:land?'3/2':'4/5'}).replace(/<\/div>$/,imgs.length>1?imgs.slice(1).map(k=>`<img class="alt" src="${I(k)}" alt="" loading="lazy">`).join('')+`<span class="steps" aria-hidden="true">${imgs.map((_,j)=>`<i${j?'':' class="on"'}></i>`).join('')}</span></div>`:'</div>')}
+    ${frame(imgs[0],p.name,{ratio:land?'3/2':'4/5',v:imgs.length>1||videoURL(imgs[0])?'':(p.heroVideo||'')}).replace(/<\/div>$/,imgs.length>1?imgs.slice(1).map(k=>`<img class="alt" src="${I(k)}" alt="" loading="lazy">`).join('')+`<span class="steps" aria-hidden="true">${imgs.map((_,j)=>`<i${j?'':' class="on"'}></i>`).join('')}</span></div>`:'</div>')}
     <div class="row"><div><h3>${esc(p.name)}</h3><div class="meta">${esc(loc)}</div>${withSvc?`<div class="meta svc">${esc((p.services||[]).join(', '))}</div>`:''}</div><span class="arrow" aria-hidden="true">↗</span></div></a>`;
 }
 const intro=(lab,line)=>`<div class="intro"><div class="l">${label(esc(lab))}${line?`<p>${esc(line)}</p>`:''}</div></div>`;

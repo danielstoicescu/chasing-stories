@@ -12,7 +12,12 @@ RewriteEngine On
 RewriteCond %{HTTPS} off
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# one address for Google: chasingstories.org -> www.chasingstories.org
+RewriteCond %{HTTP_HOST} ^chasingstories\.org$ [NC]
+RewriteRule ^ https://www.chasingstories.org%{REQUEST_URI} [L,R=301]
+
 RewriteRule ^robots\.txt$ robots.php [L]
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
 
 # never serve internals
 RewriteRule ^(includes|cache)(/|$) - [F,L]
